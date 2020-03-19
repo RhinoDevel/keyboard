@@ -19,5 +19,6 @@ adptr$    = 15 ; term. width & lim. for scanning src. columns (2 unused bytes).
 
 sob$ = $0401 ; default start address of basic program / text area.
 chrout$ = $ffd2 ; write a character to the screen.
+chrin$ = $ffe4
 
 screen_ram$ = $8000 ; start of video ram.

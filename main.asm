@@ -38,7 +38,13 @@ dec_addr4 = 7;main MOD $a
          byte 0
 next     word 0
 
-main     clrscr
+main     sei
+         clrscr
+
+@test    jsr chrin$
+         beq @test
+         jsr chrout$
+         jmp @test
 
 @go      ldy #0 ; char row / line nr. (0 - 24).
          
