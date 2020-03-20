@@ -38,15 +38,28 @@
     </BuildEvents>
     <BuildList>
         <FileName>system.asm</FileName>
+        <FileName>keydecode.asm</FileName>
         <FileName>petscii.asm</FileName>
         <FileName>defines.asm</FileName>
         <FileName>main.asm</FileName>
         <FileName>draw.asm</FileName>
+        <FileName>but.asm</FileName>
     </BuildList>
     <DetermineBuildOrder>1</DetermineBuildOrder>
     <PaddingByte>0</PaddingByte>
     <AssyBinaryFileLocation />
     <SourceFiles>
+        <SourceFile>
+            <Name>but.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>True</FileOpen>
+        </SourceFile>
         <SourceFile>
             <Name>defines.asm</Name>
             <PrgName />
@@ -65,8 +78,19 @@
             <IncludeInBuild>True</IncludeInBuild>
             <Regions />
             <Breakpoints />
-            <Bookmarks>5,</Bookmarks>
+            <Bookmarks>3,</Bookmarks>
             <Topmost>False</Topmost>
+            <FileOpen>True</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>keydecode.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>True</Topmost>
             <FileOpen>True</FileOpen>
         </SourceFile>
         <SourceFile>
@@ -110,7 +134,7 @@
             <Regions />
             <Breakpoints />
             <Bookmarks />
-            <Topmost>True</Topmost>
+            <Topmost>False</Topmost>
             <FileOpen>True</FileOpen>
         </SourceFile>
     </SourceFiles>
