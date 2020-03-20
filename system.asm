@@ -22,3 +22,6 @@ chrout$ = $ffd2 ; write a character to the screen.
 chrin$ = $ffe4
 
 screen_ram$ = $8000 ; start of video ram.
+
+pia1porta$ = $e810
+pia1portb$ = $e812
