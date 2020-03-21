@@ -41,6 +41,8 @@ next     word 0
 main     sei
          clrscr
 
+         keydraw$
+
 @test    ldx #'q'
          jsr but_pre$
          beq @testoff
