@@ -8,6 +8,21 @@
 ; --- macros ---
 ; --------------
 
+; *** draw all keys at their designated positions on screen.
+; ***
+; *** input:
+; *** ------
+; *** (none)
+; ***
+; *** output:
+; *** -------
+; *** x = garbage.
+; *** a = garbage.
+; *** y = garbage.
+; ***
+; *** zero_word_buf$ =  garbage.
+; ***
+;
 defm keydraw$
          ldx #0
 @loop    lda keyposx$,x
