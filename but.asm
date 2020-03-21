@@ -7,8 +7,9 @@
 ; --- functions ---
 ; -----------------
 
+; *** check, if button is currently pressed.
 ; ***
-; *** you must disable interrupts before calling this function.
+; *** you may need to disable interrupts before calling this function.
 ; ***
 ; *** input:
 ; *** ------
@@ -16,7 +17,8 @@
 ; ***
 ; *** output:
 ; *** -------
-; *** a = 1, if pressed. 0, if not pressed.
+; *** a = 0, if pressed. not 0, if not pressed.
+; *** z-flag = 0, if pressed. 1, if not pressed.
 ; *** x = screen (not petscii) code of button to check (kept).
 ; ***
 ;
@@ -24,11 +26,6 @@
 but_pre$ lda key_row$,x ; set keyboard row to check (seems to be the way to do
          sta pia1porta$ ; this, just "overwrite" whole port a with row nr. 0-9).
 
-         lda pia1portb$ ; load row's data.
-         and key_neg$,x
-         beq pressed@
-         lda #0 ; is not pressed.
-         rts
-         
-pressed@ lda #1 ; is pressed.
+         lda pia1portb$ ; loads row's data.
+         and key_neg$,x ; checks, if button is pressed.
          rts

@@ -43,7 +43,7 @@ main     sei
 
 @test    ldx #'q'
          jsr but_pre$
-         beq @testoff ; this is ok (see function).
+         beq @testoff
          lda #'1'
          sta screen_ram$
          jmp @test
