@@ -41,9 +41,14 @@ next     word 0
 main     sei
          clrscr
 
-@test    jsr chrin$
-         beq @test
-         jsr chrout$
+@test    ldx #'q'
+         jsr but_pre$
+         beq @testoff ; this is ok (see function).
+         lda #'1'
+         sta screen_ram$
+         jmp @test
+@testoff lda #'0'
+         sta screen_ram$
          jmp @test
 
 @go      ldy #0 ; char row / line nr. (0 - 24).

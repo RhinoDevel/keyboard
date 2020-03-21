@@ -38,12 +38,12 @@
     </BuildEvents>
     <BuildList>
         <FileName>system.asm</FileName>
-        <FileName>keydecode.asm</FileName>
         <FileName>petscii.asm</FileName>
         <FileName>defines.asm</FileName>
         <FileName>main.asm</FileName>
         <FileName>draw.asm</FileName>
         <FileName>but.asm</FileName>
+        <FileName>key.asm</FileName>
     </BuildList>
     <DetermineBuildOrder>1</DetermineBuildOrder>
     <PaddingByte>0</PaddingByte>
@@ -83,14 +83,14 @@
             <FileOpen>True</FileOpen>
         </SourceFile>
         <SourceFile>
-            <Name>keydecode.asm</Name>
+            <Name>key.asm</Name>
             <PrgName />
             <FileType>2</FileType>
             <IncludeInBuild>True</IncludeInBuild>
             <Regions />
             <Breakpoints />
             <Bookmarks />
-            <Topmost>True</Topmost>
+            <Topmost>False</Topmost>
             <FileOpen>True</FileOpen>
         </SourceFile>
         <SourceFile>
