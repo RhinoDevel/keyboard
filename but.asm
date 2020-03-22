@@ -17,8 +17,8 @@
 ; ***
 ; *** output:
 ; *** -------
-; *** a = 0, if pressed. not 0, if not pressed.
-; *** z-flag = 0, if pressed. 1, if not pressed.
+; *** a = 0, if pressed(!). not 0, if not pressed.
+; *** z-flag = 0, if pressed(!). 1, if not pressed.
 ; *** x = screen (not petscii) code of button to check (kept).
 ; ***
 ;
