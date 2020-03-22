@@ -6,3 +6,4 @@
 ; ---------------
 
 zero_word_buf$ = adptr$
+pattern$ = tapbufin$

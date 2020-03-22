@@ -1,14 +1,14 @@
 
 ; marcel timm, rhinodevel, 2020mar18
 
-target TGT_PETBV4;TGT_PETBV2
+target TGT_PETBV2;TGT_PETBV4
 
 ; ---------------------------------------------------------
 ; --- system memory locations (basic v2 / rev.3 AND v4) ---
 ; ---------------------------------------------------------
 
 adptr$ = 15 ; term. width & lim. for scanning src. columns (2 unused bytes).
-;tapbufin$ = $bb ; tape buf. #1 & #2 indices to next char (2 bytes).
+tapbufin$ = $bb ; tape buf. #1 & #2 indices to next char (2 bytes).
 ;cursor_y$ = $c4 ; lsb of cursor screen line mapped memory location.
 ;cursor_x$ = $c6 ; cursor position into the screen line.
 

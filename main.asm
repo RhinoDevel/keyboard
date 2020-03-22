@@ -41,6 +41,12 @@ next     word 0
 main     sei
          clrscr
          keydraw$
+ 
+         lindraw$
+
+         lda #%10100101
+         sta pattern$
+         jsr patdraw$
 
 @go      ldx #0
 @loop    lda keyposx$,x
