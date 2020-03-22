@@ -1,9 +1,9 @@
 
-; marcel timm, rhinodevel, 2020mar18
+; marcel timm, rhinodevel, 2020mar18 
 
-; --------------
-; --- macros ---
-; --------------
+; -----------------
+; --- functions ---
+; -----------------
 
 ; *** input:
 ; *** ------
@@ -19,7 +19,7 @@
 ; *** zero_word_buf$ = screen mem. addr.
 ; ***
 ;
-defm get_mem_addr
+get_mem_addr
          ; init. to screen ram start addr.:
          ;
          lda #<screen_ram$
@@ -44,11 +44,7 @@ defm get_mem_addr
          ;
 @copy    sta zero_word_buf$
          stx zero_word_buf$ + 1
-         endm 
-
-; -----------------
-; --- functions ---
-; -----------------
+         rts
 
 ; ****************
 ; *** pos_draw ***
@@ -61,7 +57,7 @@ defm get_mem_addr
 ; *** y = char row / line nr. (0 - 24).
 ; ***
 pos_draw$ pha
-          get_mem_addr
+          jsr get_mem_addr
           pla
           sta (zero_word_buf$),y
           rts
