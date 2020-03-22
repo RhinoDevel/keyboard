@@ -45,12 +45,16 @@ main     sei
 
 @test    ldx #'q'
          jsr but_pre$
-         beq @testoff
-         lda #'1'
-         sta screen_ram$
+         bne @testoff
+         ldy keyposx$,x
+         sty zero_word_buf$
+         ldy keyposy$,x
+         jsr rev_on$
          jmp @test
-@testoff lda #'0'
-         sta screen_ram$
+@testoff ldy keyposx$,x
+         sty zero_word_buf$
+         ldy keyposy$,x
+         jsr rev_off$
          jmp @test
 
 @go      ldy #0 ; char row / line nr. (0 - 24).
