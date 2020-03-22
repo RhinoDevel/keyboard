@@ -16,10 +16,9 @@
 ; ***
 ; *** output:
 ; *** -------
-; *** x = garbage.
 ; *** a = garbage.
+; *** x = garbage.
 ; *** y = garbage.
-; ***
 ; *** zero_word_buf$ =  garbage.
 ; ***
 ;
