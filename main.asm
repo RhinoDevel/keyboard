@@ -40,56 +40,34 @@ next     word 0
 
 main     sei
          clrscr
-
          keydraw$
 
-@test    ldx #'q'
+@go      ldx #0
+@loop    lda keyposx$,x
+         cmp #$ff
+         beq @next
          jsr but_pre$
          bne @testoff
          ldy keyposx$,x
          sty zero_word_buf$
          ldy keyposy$,x
+         txa
+         pha
          jsr rev_on$
-         jmp @test
+         pla
+         tax
+         jmp @next
 @testoff ldy keyposx$,x
          sty zero_word_buf$
          ldy keyposy$,x
-         jsr rev_off$
-         jmp @test
-
-@go      ldy #0 ; char row / line nr. (0 - 24).
-         
-@loopy   ldx #0 ; char column / pos. in line (0 - 39 or 0 - 79).
-         
-@loopx   tya
-         pha
          txa
          pha
-
-         stx zero_word_buf$
-@scrmem  lda #$4d ; screen mem. code char.
-         jsr pos_draw$
-
+         jsr rev_off$
          pla
          tax
-         pla
-         tay
-
-         inx
-         cpx #line_len$
-         bne @loopx
-         
-         iny
-         cpy #25
-         bne @loopy
-
-         lda @scrmem + 1
-         cmp #$4d
-         bne @b
-         lda #$4e
-         jmp @c
-@b       lda #$4d
-@c       sta @scrmem + 1
+@next    inx
+         cpx #64 ; TODO: hard-coded (for screen codes 0 - 63)!
+         bne @loop
          jmp @go
 
 ;@halt    jmp @halt
