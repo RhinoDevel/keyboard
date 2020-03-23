@@ -52,18 +52,27 @@ next     word 0
 main     sei
    
          lda #$00
-         sta flags$       
+         sta flags$ 
+
+         sta timer2_low$    
+
+         ; enable free running mode:
+         ;
+         lda #16
+         sta via_acr$
 
          clrscr
          keydraw$
  
          patstaticdraw$
 
-         lda #%00001111
+         lda #22
          sta pattern$
+         sta via_shift$
          jsr patdraw$
 
 @go      ldx #0
+         stx cur_note$
 @loop    lda keyposx$,x
          cmp #$ff
          beq @next
@@ -104,6 +113,13 @@ main     sei
          inc pattern$
 @no_pat_l
 
+         ldy cur_note$
+         bne @no_note ; already found a note to play.
+         ldy keynote$,x
+         beq @no_note
+         sty cur_note$
+@no_note 
+     
          ldy keyposx$,x
          sty zero_word_buf$
          ldy keyposy$,x
@@ -138,8 +154,11 @@ main     sei
          tax
 @next    inx
          cpx #64 ; TODO: hard-coded (for screen codes 0 - 63)!
-         bne @loop
+         bne @to_loop
+         lda pattern$
+         sta via_shift$
+         lda cur_note$
+         sta timer2_low$
          jsr patdraw$
          jmp @go
-
-;@halt    jmp @halt
+@to_loop jmp @loop
