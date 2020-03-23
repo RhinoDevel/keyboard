@@ -14,7 +14,9 @@ column = 21
 ; --- macros ---
 ; --------------
 
-defm lindraw$
+defm patstaticdraw$
+         ; draw line under bit pattern:
+         ;
          ldx #8
 @loop    ldy #row + 1 ; char row / line nr. (0 - 24).
          pha
@@ -22,7 +24,7 @@ defm lindraw$
          pha
          txa ; char column / pos. in line offset.
          clc
-         adc #column ; add pattern start column to offset.
+         adc #column - 1; add pattern start column to offset.
          sta zero_word_buf$
          lda #$77
          jsr pos_draw$
@@ -31,6 +33,14 @@ defm lindraw$
          pla
          dex
          bne @loop
+
+         ; draw dollar sign (indicating hexadecimal number) below line:
+         ;
+         ldy #row + 2; char row / line nr. (0 - 24).
+         lda #column
+         sta zero_word_buf$
+         lda #'$'
+         jsr pos_draw$
          endm
 
 ; -----------------
@@ -48,7 +58,7 @@ patdraw$ ldx #8
          ldy #row ; char row / line nr. (0 - 24).
          txa ; char column / pos. in line offset.
          clc
-         adc #column ; add pattern start column to offset.
+         adc #column - 1; add pattern start column to offset.
          sta zero_word_buf$
          lda #%10100000 ; inverted space.
          jsr pos_draw$
@@ -64,7 +74,7 @@ patdraw$ ldx #8
          ldy #6 ; char row / line nr. (0 - 24).
          txa ; char column / pos. in line offset.
          clc
-         adc #21 ; add pattern start column to offset.
+         adc #column - 1 ; add pattern start column to offset.
          sta zero_word_buf$
          lda #%00100000 ; space.
          jsr pos_draw$
@@ -74,4 +84,13 @@ patdraw$ ldx #8
 
 @next    dex
          bne @loop
+
+         ; print as hexadecimal value:
+         ;
+         ldy #row + 2; char row / line nr. (0 - 24).
+         lda #column + 1
+         sta zero_word_buf$
+         lda pattern$
+         jsr printby$
+
          rts

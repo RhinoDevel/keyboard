@@ -42,7 +42,7 @@ main     sei
          clrscr
          keydraw$
  
-         lindraw$
+         patstaticdraw$
 
          lda #%10100101
          sta pattern$
