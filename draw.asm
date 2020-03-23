@@ -104,8 +104,40 @@ rev_off$ pha
 ; *** zero_word_buf$ = screen mem. addr.
 ; ***
 ;
-pos_draw$ pha
-          jsr get_mem_addr
-          pla
-          sta (zero_word_buf$),y ; (y is 0)
-          rts
+pos_draw$
+         pha
+         jsr get_mem_addr
+         pla
+         sta (zero_word_buf$),y ; (y is 0)
+         rts
+
+; ***
+;
+conv_hd  and #$0f ; ignore left 4 bits.
+         cmp #$0a
+         bcc @digit
+         sec ; more or equal $0a - a to f.
+         sbc #$0a
+         clc
+         adc #'a' 
+         rts
+@digit   ;clc ; less than $0a - 0 to 9
+         adc #'0'
+         rts
+
+; ******************************************************
+; *** print byte in accumulator as hexadecimal value ***
+; ******************************************************
+;
+printby$ pha
+         lsr a
+         lsr a
+         lsr a
+         lsr a
+         jsr conv_hd
+         jsr pos_draw$
+         pla
+         jsr conv_hd
+         inc zero_word_buf$     ; hard-coded, does not support line break
+         sta (zero_word_buf$),y ; (y is 0).
+         rts
