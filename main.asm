@@ -62,9 +62,18 @@ main     sei
          sta via_acr$
 
          clrscr
+
          keydraw$
  
          patstaticdraw$
+
+         ; draw dollar sign (indicating hexadecimal number) before cur. "note":
+         ;
+         ldy #3 ; hard-coded
+         lda #16 ; hard-coded
+         sta zero_word_buf$
+         lda #'$'
+         jsr pos_draw$
 
          lda #22
          sta pattern$
@@ -75,15 +84,16 @@ main     sei
          stx cur_note$
 @loop    lda keyposx$,x
          cmp #$ff
-         beq @next
-         jsr but_pre$
+         bne @notnext
+         jmp @next
+@notnext jsr but_pre$
          bne @testoff
 
          cpx #59 ; ';', hard-coded.
          bne @no_pat_h
          lda flags$
          and #flag_pre_pat_h
-         bne @no_pat_h
+         bne @no_note
          lda flags$
          ora #flag_pre_pat_h
          sta flags$
@@ -91,13 +101,14 @@ main     sei
          clc
          adc #$10
          sta pattern$
+         jmp @no_note
 @no_pat_h
 
          cpx #'?'
          bne @no_pat_l
          lda flags$
          and #flag_pre_pat_l
-         bne @no_pat_l
+         bne @no_note
          lda flags$
          ora #flag_pre_pat_l
          sta flags$
@@ -108,7 +119,7 @@ main     sei
          lda pattern$
          and #$f0
          sta pattern$
-         jmp @no_pat_l
+         jmp @no_note
 @pat_l_add
          inc pattern$
 @no_pat_l
@@ -160,5 +171,14 @@ main     sei
          lda cur_note$
          sta timer2_low$
          jsr patdraw$
+
+         ; print note's timer value as hexadecimal value:
+         ;
+         ldy #3 ; hard-coded
+         lda #17 ; hard-coded
+         sta zero_word_buf$
+         lda cur_note$ ; (zero, if none)
+         jsr printby$
+
          jmp @go
 @to_loop jmp @loop
