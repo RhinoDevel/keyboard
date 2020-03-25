@@ -124,6 +124,7 @@ main     sei
          jmp @no_note
 @pat_l_add
          inc pattern$
+         jmp @no_note
 @no_pat_l
 
          ldy cur_note$
