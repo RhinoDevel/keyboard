@@ -20,18 +20,7 @@ keystat$ byte 3 ; char row / line nr. (0 - 24).
          byte 2
          byte 13
          byte 93 ; |
-         byte ' '
-         byte 93 ; |
-         byte ' '
-         byte 93 ; |
-         byte ' '
-         byte 93 ; |
-         byte ' '
-         byte 93 ; |
-         byte ' '
-         byte 93 ; |
-         byte ' '
-         byte 93 ; |
+         byte ' ', 93, ' ', 93,' ', 93,' ', 93,' ', 93,' ', 93
           
          
 
