@@ -7,8 +7,8 @@
 
 ; *** input:
 ; *** ------
-; *** y = char row / line nr. (0 - 39 or 0 - 79).
-; *** zero_word_buf$ = char column / pos. in line (0 - 24).
+; *** y = char row / line nr. (0 - 24).
+; *** zero_word_buf$ = char column / pos. in line (0 - 39 or 0 - 79).
 ; ***
 ; *** output:
 ; *** -------
@@ -18,7 +18,7 @@
 ; *** zero_word_buf$ = screen mem. addr.
 ; ***
 ;
-get_mem_addr
+get_mem_addr$
          ; init. to screen ram start addr.:
          ;
          lda #<screen_ram$
@@ -59,7 +59,7 @@ get_mem_addr
 ; ***
 ;
 rev_on$  pha
-         jsr get_mem_addr
+         jsr get_mem_addr$
          lda (zero_word_buf$),y
          ora #%10000000 ; sets reverse bit of screen code.
          sta (zero_word_buf$),y
@@ -80,7 +80,7 @@ rev_on$  pha
 ; ***
 ;
 rev_off$ pha
-         jsr get_mem_addr
+         jsr get_mem_addr$
          lda (zero_word_buf$),y
          and #%01111111 ; disables reverse bit of screen code.
          sta (zero_word_buf$),y
@@ -106,7 +106,7 @@ rev_off$ pha
 ;
 pos_draw$
          pha
-         jsr get_mem_addr
+         jsr get_mem_addr$
          pla
          sta (zero_word_buf$),y ; (y is 0)
          rts

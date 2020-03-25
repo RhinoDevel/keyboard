@@ -63,6 +63,8 @@ main     sei
 
          clrscr
 
+         keydrawstat$
+
          keydraw$
  
          patstaticdraw$
