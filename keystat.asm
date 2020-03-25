@@ -5,7 +5,14 @@
 ; --- static keyboard layout (screen codes) ---
 ; ---------------------------------------------
 
-keystat$ byte 3 ; char row / line nr. (0 - 24).
+keystat$ byte 1
+         byte 1
+         byte 21
+         byte 'r', 'h', 'i', 'n', 'o', 'd', 'e', 'v', 'e', 'l'
+         byte 39 ; '
+         byte 's', ' ', 'k', 'e', 'y', 'b', 'o', 'a', 'r', 'd'
+         
+         byte 3 ; char row / line nr. (0 - 24).
          byte 2 ; char column / pos. in line (0 - 39 or 0 - 79).
          byte 13; char count.
          byte 85 ; rounded top-left edge.
@@ -22,6 +29,55 @@ keystat$ byte 3 ; char row / line nr. (0 - 24).
          byte 93 ; |
          byte ' ', 93, ' ', 93,' ', 93,' ', 93,' ', 93,' ', 93
           
-         
+         byte 5
+         byte 1
+         byte 17
+         byte 85
+         byte 113 ; 180 deg rotated T.
+         byte 114, 113, 114, 113, 114, 113, 114, 113, 114, 113, 114, 113, 114
+         byte 64, 73 
+
+         byte 6
+         byte 1
+         byte 17
+         byte 93, ' ', 93, ' ', 93, ' ', 93, ' ', 93, ' ', 93, ' ', 93, ' ', 93
+         byte ' ', 93 
+
+         byte 7
+         byte 1
+         byte 17
+         byte 74 ; rounded bottom-left edge.
+         byte 64, 113, 114, 113, 114, 113, 114, 113, 114, 113, 114, 113, 114
+         byte 113, 114
+         byte 75 ; rounded bottom-right edge.
+
+         byte 8
+         byte 4
+         byte 13
+         byte 93, ' ', 93, ' ', 93, ' ', 93, ' ', 93, ' ', 93, ' ', 93
+
+         byte 9
+         byte 3
+         byte 22
+         byte 85, 113, 114, 113, 114, 113, 114, 113, 114, 113, 114, 113, 114
+         byte 113, 114, 64, 73
+         byte 112 ; top-left edge.
+         byte 64, 114, 64
+         byte 110 ; top-right edge.
+
+         byte 10
+         byte 3
+         byte 22
+         byte 93, ' ', 93, ' ', 93, ' ', 93, ' ', 93, ' ', 93, ' ', 93, ' ', 93
+         byte ' ', 93, 93, ' ', 93, ' ', 93
+
+         byte 11
+         byte 3
+         byte 22
+         byte 74, 64, 113, 64, 113, 64, 113, 64, 113, 64, 113, 64, 113
+         byte 64, 113, 64, 75
+         byte 109 ; bottom-left edge.
+         byte 64, 113, 64
+         byte 125 ; bottom-right edge.
 
          byte $ff ; end marker.
