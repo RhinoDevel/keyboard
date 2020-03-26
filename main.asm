@@ -39,38 +39,7 @@ next     word 0
 
 main     sei
    
-         lda #$00
-         sta flags$ 
-
-         sta timer2_low$  
-
-         sta old_note$  
-
-         ; enable free running mode:
-         ;
-         lda #16
-         sta via_acr$
-
-         clrscr$
-
-         keydrawstat$
-
-         keydraw$
- 
-         patstaticdraw$
-
-         ; draw dollar sign (indicating hexadecimal number) before cur. "note":
-         ;
-         ldy #3 ; hard-coded
-         lda #16 ; hard-coded
-         sta zero_word_buf$
-         lda #'$'
-         jsr pos_draw$
-
-         lda #22
-         sta pattern$
-         sta via_shift$
-         jsr patdraw$
+         jsr init
 
 @go      ldx #0
          stx cur_note$
@@ -173,13 +142,66 @@ main     sei
          sta old_note$
          jsr patdraw$
 
-         ; print note's timer value as hexadecimal value:
-         ;
-         ldy #3 ; hard-coded
+         jsr drawnote
+
+         jmp @go
+@to_loop jmp @loop
+
+; ****************
+; *** drawnote ***
+; ****************
+;
+; print note's timer value as hexadecimal value.
+;
+; input:
+; ------
+; cur_note$
+;
+; output:
+; -------
+; a = garbage.
+; x = garbage.
+; y = garbage.
+; zero_word_buf$ = garbage.
+;
+drawnote ldy #3 ; hard-coded
          lda #17 ; hard-coded
          sta zero_word_buf$
          lda cur_note$ ; (zero, if none)
          jsr printby$
+         rts
 
-         jmp @go
-@to_loop jmp @loop
+; ************
+; *** init ***
+; ************
+;
+init     lda #0
+         sta flags$ ; disable all flags.
+         sta old_note$
+         sta cur_note$
+         lda #22
+         sta pattern$ 
+
+         lda #0
+         sta timer2_low$ ; disable sound by timer reset.
+         lda #16 ; enable free running mode.
+         sta via_acr$
+         lda pattern$
+         sta via_shift$
+
+         clrscr$
+         keydrawstat$
+         keydraw$
+         patstaticdraw$
+
+         ; draw dollar sign (indicating hexadecimal number) before cur. "note":
+         ;
+         ldy #3 ; hard-coded
+         lda #16 ; hard-coded
+         sta zero_word_buf$
+         lda #'$'
+         jsr pos_draw$
+
+         jsr patdraw$
+         jsr drawnote
+         rts
