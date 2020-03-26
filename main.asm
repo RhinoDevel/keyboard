@@ -54,7 +54,9 @@ main     sei
          lda #$00
          sta flags$ 
 
-         sta timer2_low$    
+         sta timer2_low$  
+
+         sta old_note$  
 
          ; enable free running mode:
          ;
@@ -128,8 +130,14 @@ main     sei
 @no_pat_l
 
          ldy cur_note$
-         bne @no_note ; already found a note to play.
-         ldy keynote$,x
+
+         beq @notechk ; cur_note$ is 0. no pressed note key found in loop, yet.
+         
+         cpy old_note$ ; another pressed note key was already found in loop.
+         bne @no_note  ; use currently found pressed note key, if already found
+                       ; other pressed key is the old_note$.
+
+@notechk ldy keynote$,x
          beq @no_note
          sty cur_note$
 @no_note 
@@ -169,10 +177,12 @@ main     sei
 @next    inx
          cpx #64 ; TODO: hard-coded (for screen codes 0 - 63)!
          bne @to_loop
+
          lda pattern$
          sta via_shift$
          lda cur_note$
          sta timer2_low$
+         sta old_note$
          jsr patdraw$
 
          ; print note's timer value as hexadecimal value:
