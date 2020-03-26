@@ -27,6 +27,11 @@ timer2_low$ = $e848 ; low byte of timer 2.
 via_shift$ = $e84a ; via's shift register.
 via_acr$ = $e84b ; via's auxiliary control register.
 
+via_pcr$ = $e84c ; via's peripheral control register.
+;
+; poke 59468, 12 for graphics mode.
+; poke 59468, 14 for lower-case mode.
+
 chrout$ = $ffd2 ; write a character to the screen.
 chrin$ = $ffe4 ; get one character.
 
