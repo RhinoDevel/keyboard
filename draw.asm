@@ -1,6 +1,24 @@
 
 ; marcel timm, rhinodevel, 2020mar18 
 
+; --------------
+; --- macros ---
+; --------------
+
+; *************************
+; *** clear the screen. ***
+; *************************
+; ***
+; *** output:
+; *** -------
+; *** a = garbage.
+; ***
+;
+defm clrscr$
+            lda #chr_clr$
+            jsr chrout$
+            endm
+
 ; -----------------
 ; --- functions ---
 ; -----------------
@@ -14,7 +32,7 @@
 ; *** -------
 ; *** a = low byte of screen mem. addr.
 ; *** x = high byte of screen mem. addr.
-; *** y = 0
+; *** y = 0.
 ; *** zero_word_buf$ = screen mem. addr.
 ; ***
 ;
