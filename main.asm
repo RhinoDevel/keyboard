@@ -175,16 +175,19 @@ drawnote ldy #3 ; hard-coded
 ; *** init ***
 ; ************
 ;
-init     lda #0
-         sta flags$ ; disable all flags.
+init     lda #12; hard-coded. enable graphics mode.
+         sta via_pcr$
+
+         lda #0
+         sta flags$ ; disables all flags.
          sta old_note$
          sta cur_note$
          lda #22
          sta pattern$ 
 
          lda #0
-         sta timer2_low$ ; disable sound by timer reset.
-         lda #16 ; enable free running mode.
+         sta timer2_low$ ; disables sound by timer reset.
+         lda #16 ; hard-coded. enable free running mode.
          sta via_acr$
          lda pattern$
          sta via_shift$
