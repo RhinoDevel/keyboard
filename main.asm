@@ -213,7 +213,13 @@ init     lda #12; hard-coded. enable graphics mode.
          sta via_shift$
 
          clrscr$
+
+         lda #<keystat$
+         sta zero_word_buf2$
+         lda #>keystat$
+         sta zero_word_buf2$ + 1
          keydrawstat$
+
          keydraw$
          patstaticdraw$
 

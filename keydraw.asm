@@ -40,36 +40,44 @@ defm keydraw$
 ; ***
 ;
 defm keydrawstat$ ; hard-coded
-         ldx #0 ; x stores index in keystat$ byte array.
-@line    ldy keystat$,x ; loads line nr.
-         inx
-         lda keystat$,x ; loads start position in line.
-         inx
+         ldy #0 ; y stores index in keystat$ byte array.
+@line    lda (zero_word_buf2$),y ; loads line nr.
+         tax
+         iny
+         lda (zero_word_buf2$),y ; loads start position in line.
+         iny
          sta zero_word_buf1$
-         txa ; saves array index.
+         tya ; saves array index.
          pha
+         txa
+         tay
          jsr get_mem_addr$ ; puts start address into zero_word_buf1$.
          pla ; restores array index.
+         tay
+         lda (zero_word_buf2$),y ; loads char count into x.
          tax
-         ldy keystat$,x ; loads char count into y.
-         inx
+         iny
 
-@next    tya ; saves char counter.
+@next    txa ; saves char counter.
+         pha
+         tya
          pha         
-         lda keystat$,x ; loads current screen code.
-         inx
+         lda (zero_word_buf2$),y ; loads current screen code.
          ldy #0
          sta (zero_word_buf1$),y ; write current char to screen.
-         inc zero_word_buf1$ ; increment screen address.
-         bne @y_resto
-         inc zero_word_buf1$ + 1
-@y_resto pla ; restore char counter.
+         pla
          tay
-         dey
+         iny ; (for current screen code load, above)
+         inc zero_word_buf1$ ; increment screen address.
+         bne @x_resto
+         inc zero_word_buf1$ + 1
+@x_resto pla ; restore char counter.
+         tax
+         dex
          bne @next
 
-         lda keystat$,x ; tries to load next line data.
-         ; (don't increment x)
+         lda (zero_word_buf2$),y ; tries to load next line data.
+         ; (don't increment y)
          cmp #$ff ; hard-coded
          bne @line ; fills next line.       
          endm
