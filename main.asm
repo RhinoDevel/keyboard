@@ -67,6 +67,11 @@ main     sei
          lda #0
          sta keybufnum$ ; (sometimes, the <left arrow> will still be printed..)
          clrscr$
+         lda #<goodbye$
+         sta zero_word_buf2$
+         lda #>goodbye$
+         sta zero_word_buf2$ + 1
+         jsr keydrawstat$
          cli
          rts
 
@@ -218,7 +223,7 @@ init     lda #12; hard-coded. enable graphics mode.
          sta zero_word_buf2$
          lda #>keystat$
          sta zero_word_buf2$ + 1
-         keydrawstat$
+         jsr keydrawstat$
 
          keydraw$
          patstaticdraw$

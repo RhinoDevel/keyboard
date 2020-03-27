@@ -37,9 +37,13 @@ defm keydraw$
          bne @loop
          endm 
 
+; -----------------
+; --- functions ---
+; -----------------
+
 ; ***
 ;
-defm keydrawstat$ ; hard-coded
+keydrawstat$ ; hard-coded
          ldy #0 ; y stores index in keystat$ byte array.
 @line    lda (zero_word_buf2$),y ; loads line nr.
          tax
@@ -80,4 +84,4 @@ defm keydrawstat$ ; hard-coded
          ; (don't increment y)
          cmp #$ff ; hard-coded
          bne @line ; fills next line.       
-         endm
+         rts
