@@ -2,7 +2,7 @@
 ; marcel timm, rhinodevel, 2020mar21
 
 ; - needs tables keyposx$ and keyposy$.
-; - calls pos_draw$() and uses zero_word_buf$.
+; - calls pos_draw$() and uses zero_word_buf1$.
 
 ; --------------
 ; --- macros ---
@@ -19,7 +19,7 @@
 ; *** a = garbage.
 ; *** x = garbage.
 ; *** y = garbage.
-; *** zero_word_buf$ =  garbage.
+; *** zero_word_buf1$ =  garbage.
 ; ***
 ;
 defm keydraw$
@@ -27,7 +27,7 @@ defm keydraw$
 @loop    lda keyposx$,x
          cmp #$ff
          beq @next
-         sta zero_word_buf$
+         sta zero_word_buf1$
          ldy keyposy$,x
          txa
          jsr pos_draw$
@@ -45,10 +45,10 @@ defm keydrawstat$ ; hard-coded
          inx
          lda keystat$,x ; loads start position in line.
          inx
-         sta zero_word_buf$
+         sta zero_word_buf1$
          txa ; saves array index.
          pha
-         jsr get_mem_addr$ ; puts start address into zero_word_buf$.
+         jsr get_mem_addr$ ; puts start address into zero_word_buf1$.
          pla ; restores array index.
          tax
          ldy keystat$,x ; loads char count into y.
@@ -59,10 +59,10 @@ defm keydrawstat$ ; hard-coded
          lda keystat$,x ; loads current screen code.
          inx
          ldy #0
-         sta (zero_word_buf$),y ; write current char to screen.
-         inc zero_word_buf$ ; increment screen address.
+         sta (zero_word_buf1$),y ; write current char to screen.
+         inc zero_word_buf1$ ; increment screen address.
          bne @y_resto
-         inc zero_word_buf$ + 1
+         inc zero_word_buf1$ + 1
 @y_resto pla ; restore char counter.
          tay
          dey

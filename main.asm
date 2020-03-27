@@ -120,7 +120,7 @@ main     sei
 @no_note 
      
          ldy keyposx$,x
-         sty zero_word_buf$
+         sty zero_word_buf1$
          ldy keyposy$,x
          txa
          pha
@@ -144,7 +144,7 @@ main     sei
 @no_pat_l_2
 
          ldy keyposx$,x
-         sty zero_word_buf$
+         sty zero_word_buf1$
          ldy keyposy$,x
          txa
          pha
@@ -182,11 +182,11 @@ main     sei
 ; a = garbage.
 ; x = garbage.
 ; y = garbage.
-; zero_word_buf$ = garbage.
+; zero_word_buf1$ = garbage.
 ;
 drawnote ldy #3 ; hard-coded
          lda #17 ; hard-coded
-         sta zero_word_buf$
+         sta zero_word_buf1$
          lda cur_note$ ; (zero, if none)
          jsr printby$
          rts
@@ -221,7 +221,7 @@ init     lda #12; hard-coded. enable graphics mode.
          ;
          ldy #3 ; hard-coded
          lda #16 ; hard-coded
-         sta zero_word_buf$
+         sta zero_word_buf1$
          lda #'$'
          jsr pos_draw$
 

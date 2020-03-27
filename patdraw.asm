@@ -25,7 +25,7 @@ defm patstaticdraw$
          txa ; char column / pos. in line offset.
          clc
          adc #column - 1; add pattern start column to offset.
-         sta zero_word_buf$
+         sta zero_word_buf1$
          lda #$77
          jsr pos_draw$
          pla
@@ -38,7 +38,7 @@ defm patstaticdraw$
          ;
          ldy #row + 2; char row / line nr. (0 - 24).
          lda #column
-         sta zero_word_buf$
+         sta zero_word_buf1$
          lda #'$'
          jsr pos_draw$
          endm
@@ -59,7 +59,7 @@ patdraw$ ldx #8
          txa ; char column / pos. in line offset.
          clc
          adc #column - 1; add pattern start column to offset.
-         sta zero_word_buf$
+         sta zero_word_buf1$
          lda #%10100000 ; inverted space.
          jsr pos_draw$
          pla
@@ -75,7 +75,7 @@ patdraw$ ldx #8
          txa ; char column / pos. in line offset.
          clc
          adc #column - 1 ; add pattern start column to offset.
-         sta zero_word_buf$
+         sta zero_word_buf1$
          lda #%00100000 ; space.
          jsr pos_draw$
          pla
@@ -89,7 +89,7 @@ patdraw$ ldx #8
          ;
          ldy #row + 2; char row / line nr. (0 - 24).
          lda #column + 1
-         sta zero_word_buf$
+         sta zero_word_buf1$
          lda pattern$
          jsr printby$
 
