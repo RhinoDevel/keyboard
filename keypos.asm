@@ -39,7 +39,7 @@ keyposx$ byte $ff ; @
          byte $ff ; \
          byte $ff ; ]
          byte $ff ; <up arrow>
-         byte $ff ; <left arrow>
+         byte $1f ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
          byte $03 ; <quotation mark>
@@ -111,7 +111,7 @@ keyposy$ byte $ff ; @
          byte $ff ; \
          byte $ff ; ]
          byte $ff ; <up arrow>
-         byte $ff ; <left arrow>
+         byte $01 ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
          byte $04 ; <quotation mark>

@@ -40,7 +40,7 @@ key_row$ byte $ff ; @
          byte $ff ; \
          byte $ff ; ]
          byte $ff ; <up arrow>
-         byte $ff ; <left arrow>
+         byte $00 ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
          byte $01 ; <quotation mark>
@@ -113,7 +113,7 @@ key_neg$ byte $ff ; @
          byte $ff ; \
          byte $ff ; ]
          byte $ff ; <up arrow>
-         byte $ff ; <left arrow>
+         byte $20 ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
          byte $01 ; <quotation mark>

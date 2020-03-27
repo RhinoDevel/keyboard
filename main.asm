@@ -50,7 +50,17 @@ main     sei
 @notnext jsr but_pre$
          bne @testoff
 
-         cpx #59 ; ';', hard-coded.
+         ; does the user want to exit?
+         ;
+         cpx #31 ; <left arrow>
+         bne @no_exit
+         lda #0
+         sta keybufnum$ ; (sometimes, the <left arrow> will still be printed..)
+         clrscr$
+         cli
+         rts
+
+@no_exit cpx #59 ; ';', hard-coded.
          bne @no_pat_h
          lda flags$
          and #flag_pre_pat_h
