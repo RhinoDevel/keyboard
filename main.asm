@@ -17,13 +17,9 @@ flag_pre_pat_h_neg = %11111110 ; complement of flag_pre_pat_h.
 flag_pre_pat_l =     %00000010
 flag_pre_pat_l_neg = %11111101 ; complement of flag_pre_pat_l.
 
-; -----------------
-; --- functions ---
-; -----------------
-
-; ************
-; *** main ***
-; ************
+; ----------------------
+; --- basic "loader" ---
+; ----------------------
 
 * = sob$
 
@@ -42,6 +38,14 @@ flag_pre_pat_l_neg = %11111101 ; complement of flag_pre_pat_l.
          byte ",", " ", "2", "0", "2", "0" 
          byte 0
 next     word 0
+
+; -----------------
+; --- functions ---
+; -----------------
+
+; ************
+; *** main ***
+; ************
 
 main     sei
    
