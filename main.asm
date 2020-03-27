@@ -7,8 +7,8 @@
 
 dec_addr1 = 1;main/1000
 dec_addr2 = 0;(main/100) MOD $a
-dec_addr3 = 3;(main/10) MOD $a
-dec_addr4 = 7;main MOD $a
+dec_addr3 = 6;(main/10) MOD $a
+dec_addr4 = 0;main MOD $a
 
 ; to be used with flags$ variable:
 ;
@@ -34,6 +34,12 @@ flag_pre_pat_l_neg = %11111101 ; complement of flag_pre_pat_l.
          byte chr_0$ + dec_addr2
          byte chr_0$ + dec_addr3
          byte chr_0$ + dec_addr4
+         byte ":"
+         byte $8f; rem token
+         byte " "
+         byte "(", "c", ")", " "
+         byte "r", "h" ,"i", "n", "o", "d", "e", "v", "e", "l"
+         byte ",", " ", "2", "0", "2", "0" 
          byte 0
 next     word 0
 
