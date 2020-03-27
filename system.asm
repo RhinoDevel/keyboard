@@ -8,6 +8,7 @@ target TGT_PETBV2;TGT_PETBV4
 ; ---------------------------------------------------------
 
 adptr$ = 15 ; term. width & lim. for scanning src. columns (2 unused bytes).
+keybufnum$ = $9e ; current number of characters in keyboard buffer.
 utility$ = $a2 ; not used / utility (1 unused byte).
 tapeutil$ = $ba ; tape utility (1 byte).
 tapbufin$ = $bb ; tape buf. #1 & #2 indices to next char (2 bytes).
