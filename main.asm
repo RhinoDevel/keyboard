@@ -33,9 +33,9 @@ flag_pre_pat_l_neg = %11111101 ; complement of flag_pre_pat_l.
          byte ":"
          byte $8f; rem token
          byte " "
-         byte "(", "c", ")", " "
+         byte "(", "c", ")", " ", "2", "0", "2", "0"
+         byte ",", " "
          byte "r", "h" ,"i", "n", "o", "d", "e", "v", "e", "l"
-         byte ",", " ", "2", "0", "2", "0" 
          byte 0
 next     word 0
 
@@ -64,16 +64,7 @@ main     sei
          ;
          cpx #31 ; <left arrow>
          bne @no_exit
-         lda #0
-         sta keybufnum$ ; (sometimes, the <left arrow> will still be printed..)
-         clrscr$
-         lda #<goodbye$
-         sta zero_word_buf2$
-         lda #>goodbye$
-         sta zero_word_buf2$ + 1
-         jsr keydrawstat$
-         cli
-         rts
+         jmp @exit
 
 @no_exit cpx #59 ; ';', hard-coded.
          bne @no_pat_h
@@ -171,6 +162,19 @@ main     sei
 
          jmp @go
 @to_loop jmp @loop
+
+         ; exit application (show "goodbye"):
+         ;
+@exit    lda #0
+         sta keybufnum$ ; (sometimes, the <left arrow> will still be printed..)
+         clrscr$
+         lda #<goodbye$
+         sta zero_word_buf2$
+         lda #>goodbye$
+         sta zero_word_buf2$ + 1
+         jsr keydrawstat$
+         cli
+         rts
 
 ; ****************
 ; *** drawnote ***
