@@ -15,7 +15,11 @@ goodbye$ byte 5, 3, 34
          text '**********************************'
 
          byte 9, 2, 36
-         text '--- contact: marc@rhinodevel.com ---'
+         text '--- contact: '
+         byte 'm', 'a', 'r', 'c', '@'
+         byte 'r', 'h', 'i', 'n', 'o', 'd', 'e', 'v', 'e', 'l', '.'
+         byte 'c', 'o', 'm'
+         text ' ---'
 
          byte 11, 2, 36
          text '--- website: www.rhinodevel.com  ---'
