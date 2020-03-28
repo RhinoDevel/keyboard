@@ -72,7 +72,9 @@ keydrawstat$ ; hard-coded
          pla
          tay
          iny ; (for current screen code load, above)
-         inc zero_word_buf1$ ; increment screen address.
+         bne @incscr
+         inc zero_word_buf2$ + 1
+@incscr  inc zero_word_buf1$ ; increment screen address.
          bne @x_resto
          inc zero_word_buf1$ + 1
 @x_resto pla ; restore char counter.
