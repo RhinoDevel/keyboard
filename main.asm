@@ -53,7 +53,18 @@ main     sei
 
 @go      ldx #0
          stx cur_note$
-@loop    lda keyposx$,x
+@loop   
+ 
+         ; delay:
+         ;
+;         lda #$ff
+;         sta timer1_low$
+;         lda #$07
+;         sta timer1_high$ ; clears interrupt flag and starts timer.
+;@timeout bit via_ifr$ ; did timer one time out?
+;         bvc @timeout
+
+         lda keyposx$,x
          cmp #$ff
          bne @notnext
          jmp @next
@@ -208,16 +219,22 @@ init     lda #12; hard-coded. enable graphics mode.
          sta via_pcr$
 
          lda #0
+
          sta flags$ ; disables all flags.
+
          sta old_note$
          sta cur_note$
+
          lda #22
          sta pattern$ 
 
          lda #0
+
          sta timer2_low$ ; disables sound by timer reset.
+
          lda #16 ; hard-coded. enable free running mode.
          sta via_acr$
+
          lda pattern$
          sta via_shift$
 
