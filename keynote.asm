@@ -17,7 +17,7 @@ keynote$ byte $00 ; @
          byte $00 ; f
          byte 176 ; g
          byte 157 ; h
-         byte  61; i
+         byte  61 ; i
          byte 139 ; j
          byte $00 ; k
          byte $00 ; l
