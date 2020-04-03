@@ -17,7 +17,6 @@ tapbufin$ = $bb ; tape buf. #1 & #2 indices to next char (2 bytes).
 ;cursor_y$ = $c4 ; lsb of cursor screen line mapped memory location.
 ;cursor_x$ = $c6 ; cursor position into the screen line.
 
-
 sob$ = $0401 ; default start address of basic program / text area.
 
 screen_ram$ = $8000 ; start of video ram.
@@ -61,4 +60,4 @@ ifdef TGT_PETBV4 ; assuming 80 columns!!
 
 line_len$ = 80 ; count of characters per line.
 
-endif ;TGT_PETBV2
+endif ;TGT_PETBV4
