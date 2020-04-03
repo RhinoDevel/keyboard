@@ -113,9 +113,10 @@ main     sei
          ldy cur_note$
          beq @notechk ; cur_note$ is 0. no pressed note key found in loop, yet.
          
-         cpy old_note$ ; another pressed note key was already found in loop.
-         bne @draw_on  ; use currently found pressed note key, if already found
-                       ; other pressed key is the old_note$.
+         ; another pressed note key was already found in loop.
+
+         cpy old_note$ ; use currently found pressed note key, if already found
+         bne @draw_on  ; other pressed key is the currently playing note.
 
 @notechk ldy keynote$,x ; (0 = supported button has no associated note)
          beq @draw_on
@@ -165,13 +166,16 @@ main     sei
 
          lda pattern$ ; update shift pattern (for timbre and sometimes octave).
          sta via_shift$
-         lda cur_note$ ; update note to play (pattern may change octave, too).
-         sta timer2_low$
-         sta old_note$ ; remember this note as playing.
-
          jsr patdraw$ ; draw shift pattern.
+
+         lda cur_note$ ; update note to play (pattern may change octave, too).
+         cmp old_note$
+         beq @to_infloop ; don't update register and redraw note, if no need.
+         sta timer2_low$ ; update register
+         sta old_note$ ; remember this note as playing.
          jsr drawnote ; draw currently playing note.
 
+@to_infloop
          jmp @infloop ; restart key processing loop.
 
          ; exit application (show "goodbye"):
