@@ -51,38 +51,34 @@ main     sei
    
          jsr init
 
-@go      ldx #0
+@infloop ; infinite loop.
+
+         ldx #0 ; reset current note to none. 
          stx cur_note$
-@loop   
- 
-         ; delay:
-         ;
-;         lda #$ff
-;         sta timer1_low$
-;         lda #$07
-;         sta timer1_high$ ; clears interrupt flag and starts timer.
-;@timeout bit via_ifr$ ; did timer one time out?
-;         bvc @timeout
 
-         lda keyposx$,x
+@keyloop ; loop through all buttons.
+
+         lda keyposx$,x ; skip (currently) unsupported/unused buttons.
          cmp #$ff
-         bne @notnext
+         bne @supported
          jmp @next
-@notnext jsr but_pre$
-         bne @testoff
+@supported
 
-         ; does the user want to exit?
-         ;
-         cpx #31 ; <left arrow>
+         jsr but_pre$ ; check, if supported button is pressed or not.
+         bne @testoff ; branch to code for not-pressed supported button.
+
+         ; supported button is pressed.
+
+         cpx #31 ; <left arrow> ; does the user want to exit?
          bne @no_exit
          jmp @exit
 @no_exit
 
-         cpx #59 ; ';', hard-coded.
+         cpx #59 ; ';' ; increase-pattern-high-nibble key pressed?
          bne @no_pat_h ; skips, if increase-pattern-high-nibble key not pressed.
          lda flags$
          and #flag_pre_pat_h
-         bne @no_note ; skips, if press already is processed (skip others, too).
+         bne @draw_on ; skips, if press already is processed (skip others, too).
          lda flags$
          ora #flag_pre_pat_h
          sta flags$ ; remember current key press to be already processed.
@@ -90,14 +86,14 @@ main     sei
          clc
          adc #$10
          sta pattern$
-         jmp @no_note
+         jmp @draw_on
 @no_pat_h
 
-         cpx #'?'
+         cpx #'?' ; increase-pattern-low-nibble key pressed?
          bne @no_pat_l
          lda flags$
          and #flag_pre_pat_l
-         bne @no_note
+         bne @draw_on
          lda flags$
          ora #flag_pre_pat_l
          sta flags$
@@ -108,26 +104,24 @@ main     sei
          lda pattern$
          and #$f0
          sta pattern$
-         jmp @no_note
+         jmp @draw_on
 @pat_l_add
          inc pattern$
-         jmp @no_note
+         jmp @draw_on
 @no_pat_l
 
          ldy cur_note$
-
          beq @notechk ; cur_note$ is 0. no pressed note key found in loop, yet.
          
          cpy old_note$ ; another pressed note key was already found in loop.
-         bne @no_note  ; use currently found pressed note key, if already found
+         bne @draw_on  ; use currently found pressed note key, if already found
                        ; other pressed key is the old_note$.
 
-@notechk ldy keynote$,x
-         beq @no_note
+@notechk ldy keynote$,x ; (0 = supported button has no associated note)
+         beq @draw_on
          sty cur_note$
-@no_note 
-     
-         ldy keyposx$,x
+
+@draw_on ldy keyposx$,x ; draw key as pressed and go on.
          sty zero_word_buf1$
          ldy keyposy$,x
          txa
@@ -136,22 +130,24 @@ main     sei
          pla
          tax
          jmp @next
-@testoff 
-         cpx #59 ; ';', hard-coded.
+
+@testoff ; supported button is not pressed.
+ 
+         cpx #59 ; ';' ; increase-pattern-high-nibble key?
          bne @no_pat_h_2
-         lda flags$
+         lda flags$ ; disable is-pressed flag.
          and #flag_pre_pat_h_neg
          sta flags$
 @no_pat_h_2 
 
-         cpx #'?'
+         cpx #'?' ; increase-pattern-low-nibble key?
          bne @no_pat_l_2
          lda flags$
          and #flag_pre_pat_l_neg
          sta flags$
 @no_pat_l_2
 
-         ldy keyposx$,x
+         ldy keyposx$,x ; draw key as not pressed and go on
          sty zero_word_buf1$
          ldy keyposy$,x
          txa
@@ -159,21 +155,24 @@ main     sei
          jsr rev_off$
          pla
          tax
+
 @next    inx
          cpx #64 ; TODO: hard-coded (for screen codes 0 - 63)!
-         bne @to_loop
+         beq @keyloopdone ; no more keys to check.
+         jmp @keyloop ; still more keys to check.
 
-         lda pattern$
+@keyloopdone ; all keys got processed in loop.
+
+         lda pattern$ ; update shift pattern (for timbre and sometimes octave).
          sta via_shift$
-         lda cur_note$
+         lda cur_note$ ; update note to play (pattern may change octave, too).
          sta timer2_low$
-         sta old_note$
-         jsr patdraw$
+         sta old_note$ ; remember this note as playing.
 
-         jsr drawnote
+         jsr patdraw$ ; draw shift pattern.
+         jsr drawnote ; draw currently playing note.
 
-         jmp @go
-@to_loop jmp @loop
+         jmp @infloop ; restart key processing loop.
 
          ; exit application (show "goodbye"):
          ;
@@ -261,3 +260,12 @@ init     lda #12; hard-coded. enable graphics mode.
          jsr patdraw$
          jsr drawnote
          rts
+
+         ; delay:
+         ;
+;         lda #$ff
+;         sta timer1_low$
+;         lda #$07
+;         sta timer1_high$ ; clears interrupt flag and starts timer.
+;@timeout bit via_ifr$ ; did timer one time out?
+;         bvc @timeout
