@@ -164,16 +164,23 @@ main     sei
 
 @keyloopdone ; all keys got processed in loop.
 
-         lda pattern$ ; update shift pattern (for timbre and sometimes octave).
+         lda flags$ ; upd. shift pattern on change (for timbre & maybe octave).
+         and #flag_pre_pat_h
+         bne @upd_pat
+         lda flags$
+         and #flag_pre_pat_l
+         beq @upd_note_chk
+@upd_pat lda pattern$
          sta via_shift$
-         jsr patdraw$ ; draw shift pattern.
+         jsr patdraw$ ; draws shift pattern.
 
-         lda cur_note$ ; update note to play (pattern may change octave, too).
+@upd_note_chk ; update note to play, if changed (pattern may alter octave, too).
+         lda cur_note$
          cmp old_note$
          beq @to_infloop ; don't update register and redraw note, if no need.
          sta timer2_low$ ; update register
          sta old_note$ ; remember this note as playing.
-         jsr drawnote ; draw currently playing note.
+         jsr drawnote ; draws currently playing note.
 
 @to_infloop
          jmp @infloop ; restart key processing loop.
