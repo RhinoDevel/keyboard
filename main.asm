@@ -76,16 +76,17 @@ main     sei
          cpx #31 ; <left arrow>
          bne @no_exit
          jmp @exit
+@no_exit
 
-@no_exit cpx #59 ; ';', hard-coded.
-         bne @no_pat_h
+         cpx #59 ; ';', hard-coded.
+         bne @no_pat_h ; skips, if increase-pattern-high-nibble key not pressed.
          lda flags$
          and #flag_pre_pat_h
-         bne @no_note
+         bne @no_note ; skips, if press already is processed (skip others, too).
          lda flags$
          ora #flag_pre_pat_h
-         sta flags$
-         lda pattern$
+         sta flags$ ; remember current key press to be already processed.
+         lda pattern$ ; increase high nibble of pattern.
          clc
          adc #$10
          sta pattern$
