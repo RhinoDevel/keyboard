@@ -172,6 +172,7 @@ main     sei
          lda flags$ ; disable is-pressed flag.
          and #flag_pre_pat_h_neg
          sta flags$
+         jmp @drawnotpre
 @no_pat_h_2 
 
          cpx #'?' ; increase-pattern-low-nibble key?
@@ -179,6 +180,7 @@ main     sei
          lda flags$
          and #flag_pre_pat_l_neg
          sta flags$
+         jmp @drawnotpre
 @no_pat_l_2
 
          cpx '+' ; record key?
@@ -186,6 +188,7 @@ main     sei
          lda flags$ ; disable is-pressed flag.
          and #flag_pre_rec_neg
          sta flags$
+         jmp @drawnotpre
 @no_rec_2
 
          cpx '-' ; stop key?
@@ -193,9 +196,11 @@ main     sei
          lda flags$ ; disable is-pressed flag.
          and #flag_pre_stop_neg
          sta flags$
+         ;jmp @drawnotpre
 @no_stop_2
 
-         ldy keyposx$,x ; draw key as not pressed and go on
+@drawnotpre ; draw key as not pressed and go on
+         ldy keyposx$,x
          sty zero_word_buf1$
          ldy keyposy$,x
          txa
