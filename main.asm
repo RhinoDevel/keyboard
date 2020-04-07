@@ -12,18 +12,17 @@ dec_addr4 = 0;main MOD $a
 
 ; to be used with flags$ variable:
 ;
-flag_pre_pat_h =     %00000001
-flag_pre_pat_h_neg = %11111110 ; complement of flag_pre_pat_h.
-flag_pre_pat_l =     %00000010
-flag_pre_pat_l_neg = %11111101 ; complement of flag_pre_pat_l.
+flag_pre_pat_h = 1
+flag_pre_pat_h_neg = 255 - flag_pre_pat_h
+flag_pre_pat_l = 2
+flag_pre_pat_l_neg = 255 - flag_pre_pat_l
+flag_pre_rec = 4
+flag_pre_rec_neg = 255 - flag_pre_rec
+flag_pre_stop = 8
+flag_pre_stop_neg  = 255 - flag_pre_stop
 ;
-flag_upd_pat      = %00100000
-flag_upd_pat_neg  = %11011111 ; complement of flag_upd_pat.
-;
-flag_pre_rec       = %00001000
-flag_pre_rec_neg   = %11110111 ; complement of flag_pre_rec. 
-flag_pre_stop      = %00010000
-flag_pre_stop_neg  = %11101111 ; complement of flag_pre_stop.
+flag_upd_pat = 16
+flag_upd_pat_neg  = 255 - flag_upd_pat
 
 ; ----------------------
 ; --- basic "loader" ---
