@@ -19,10 +19,10 @@ flag_pre_pat_l_neg = 255 - flag_pre_pat_l
 flag_pre_rec = 4
 flag_pre_rec_neg = 255 - flag_pre_rec
 flag_pre_stop = 8
-flag_pre_stop_neg  = 255 - flag_pre_stop
+flag_pre_stop_neg = 255 - flag_pre_stop
 ;
 flag_upd_pat = 16
-flag_upd_pat_neg  = 255 - flag_upd_pat
+flag_upd_pat_neg = 255 - flag_upd_pat
 
 ; ----------------------
 ; --- basic "loader" ---
