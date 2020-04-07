@@ -16,6 +16,9 @@ flag_pre_pat_h =     %00000001
 flag_pre_pat_h_neg = %11111110 ; complement of flag_pre_pat_h.
 flag_pre_pat_l =     %00000010
 flag_pre_pat_l_neg = %11111101 ; complement of flag_pre_pat_l.
+;
+flag_upd_pat      = %00100000
+flag_upd_pat_neg  = %11011111 ; complement of flag_upd_pat.
 
 ; ----------------------
 ; --- basic "loader" ---
@@ -65,11 +68,12 @@ main     sei
 @supported
 
          jsr but_pre$ ; check, if supported button is pressed or not.
-         bne @testoff ; branch to code for not-pressed supported button.
+         beq @teston
+         jmp @testoff ; jump to code for not-pressed supported button.
 
          ; supported button is pressed.
 
-         cpx #31 ; <left arrow> ; does the user want to exit?
+@teston  cpx #31 ; <left arrow> ; does the user want to exit?
          bne @no_exit
          jmp @exit
 @no_exit
@@ -78,10 +82,11 @@ main     sei
          bne @no_pat_h ; skips, if increase-pattern-high-nibble key not pressed.
          lda flags$
          and #flag_pre_pat_h
-         bne @draw_on ; skips, if press already is processed (skip others, too).
+         bne @draw_on ; skips, if press already is processed.
          lda flags$
          ora #flag_pre_pat_h
-         sta flags$ ; remember current key press to be already processed.
+         ora #flag_upd_pat
+         sta flags$ ; rem. cur. key press to be alr. processed and request upd.
          lda pattern$ ; increase high nibble of pattern.
          clc
          adc #$10
@@ -96,6 +101,7 @@ main     sei
          bne @draw_on
          lda flags$
          ora #flag_pre_pat_l
+         ora #flag_upd_pat
          sta flags$
          lda pattern$
          and #$0f
@@ -165,12 +171,12 @@ main     sei
 @keyloopdone ; all keys got processed in loop.
 
          lda flags$ ; upd. shift pattern on change (for timbre & maybe octave).
-         and #flag_pre_pat_h
-         bne @upd_pat
-         lda flags$
-         and #flag_pre_pat_l
+         and #flag_upd_pat
          beq @upd_note_chk
-@upd_pat lda pattern$
+         lda flags$
+         and #flag_upd_pat_neg
+         sta flags$
+         lda pattern$
          sta via_shift$
          jsr patdraw$ ; draws shift pattern.
 
@@ -275,7 +281,7 @@ init     lda #12; hard-coded. enable graphics mode.
          ; delay:
          ;
 ;         lda #$ff
-;         sta timer1_low$
+;         sta timer1_low$ ; (reading would also clear interrupt flag)
 ;         lda #$07
 ;         sta timer1_high$ ; clears interrupt flag and starts timer.
 ;@timeout bit via_ifr$ ; did timer one time out?
