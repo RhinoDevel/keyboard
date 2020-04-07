@@ -66,15 +66,15 @@ main     sei
          cmp #$ff
          bne @supported
          jmp @next
-@supported
+@supported ; the button to check is supported.
 
          jsr but_pre$ ; check, if supported button is pressed or not pressed.
-         beq @teston
-         jmp @testoff ; jump to code for not-pressed supported button.
+         beq @sup_but_is_pressed
+         jmp @sup_but_is_not_pressed
 
-         ; supported button is pressed.
+@sup_but_is_pressed ; supported button is pressed.
 
-@teston  cpx #31 ; <left arrow> ; does the user want to exit?
+         cpx #31 ; <left arrow> ; does the user want to exit?
          bne @no_exit
          jmp @exit
 @no_exit
@@ -143,14 +143,14 @@ main     sei
          ; pressed key must be a note key:
 
          ldy cur_note$
-         beq @notechk ; cur_note$ is 0. no pressed note key found in loop, yet.
+         beq @set_cur ; cur_note$ is 0. no pressed note key found in loop, yet.
          
          ; another pressed note key was already found in loop.
 
          cpy old_note$ ; use currently found pressed note key, if already found
          bne @draw_on  ; other pressed key is the currently playing note.
 
-@notechk ldy keynote$,x ; (must never be 0, here)
+@set_cur ldy keynote$,x ; (must never be 0, here)
          sty cur_note$
 
 @draw_on ldy keyposx$,x ; draw key as pressed and go on.
@@ -163,7 +163,7 @@ main     sei
          tax
          jmp @next
 
-@testoff ; supported button is not pressed.
+@sup_but_is_not_pressed ; supported button is not pressed.
  
          cpx #59 ; ';' ; increase-pattern-high-nibble key?
          bne @no_pat_h_2
