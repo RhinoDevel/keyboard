@@ -19,6 +19,11 @@ flag_pre_pat_l_neg = %11111101 ; complement of flag_pre_pat_l.
 ;
 flag_upd_pat      = %00100000
 flag_upd_pat_neg  = %11011111 ; complement of flag_upd_pat.
+;
+flag_pre_rec       = %00001000
+flag_pre_rec_neg   = %11110111 ; complement of flag_pre_rec. 
+flag_pre_stop      = %00010000
+flag_pre_stop_neg  = %11101111 ; complement of flag_pre_stop.
 
 ; ----------------------
 ; --- basic "loader" ---
@@ -116,6 +121,29 @@ main     sei
          jmp @draw_on
 @no_pat_l
 
+         cpx #'+' ; record button pressed?
+         bne @no_rec
+         lda flags$
+         and #flag_pre_rec
+         bne @draw_on ; skips, if press already is processed.
+         lda flags$
+         ora #flag_pre_rec
+         sta flags$ ; remember current key press to be already processed.
+         ; (nothing to do, here)
+         jmp @draw_on
+@no_rec
+         cpx #'-' ; stop button pressed?
+         bne @no_stop
+         lda flags$
+         and #flag_pre_stop
+         bne @draw_on ; skips, if press already is processed.
+         lda flags$
+         ora #flag_pre_stop
+         sta flags$ ; remember current key press to be already processed.
+         ; (nothing to do, here)
+         jmp @draw_on
+@no_stop
+
          ldy cur_note$
          beq @notechk ; cur_note$ is 0. no pressed note key found in loop, yet.
          
@@ -153,6 +181,20 @@ main     sei
          and #flag_pre_pat_l_neg
          sta flags$
 @no_pat_l_2
+
+         cpx '+' ; record key?
+         bne @no_rec_2
+         lda flags$ ; disable is-pressed flag.
+         and #flag_pre_rec_neg
+         sta flags$
+@no_rec_2
+
+         cpx '-' ; stop key?
+         bne @no_stop_2
+         lda flags$ ; disable is-pressed flag.
+         and #flag_pre_stop_neg
+         sta flags$
+@no_stop_2
 
          ldy keyposx$,x ; draw key as not pressed and go on
          sty zero_word_buf1$
