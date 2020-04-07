@@ -68,7 +68,7 @@ main     sei
          jmp @next
 @supported
 
-         jsr but_pre$ ; check, if supported button is pressed or not.
+         jsr but_pre$ ; check, if supported button is pressed or not pressed.
          beq @teston
          jmp @testoff ; jump to code for not-pressed supported button.
 
@@ -140,6 +140,8 @@ main     sei
          jmp @draw_on
 @no_stop
 
+         ; pressed key must be a note key:
+
          ldy cur_note$
          beq @notechk ; cur_note$ is 0. no pressed note key found in loop, yet.
          
@@ -148,8 +150,7 @@ main     sei
          cpy old_note$ ; use currently found pressed note key, if already found
          bne @draw_on  ; other pressed key is the currently playing note.
 
-@notechk ldy keynote$,x ; (0 = supported button has no associated note)
-         beq @draw_on
+@notechk ldy keynote$,x ; (must never be 0, here)
          sty cur_note$
 
 @draw_on ldy keyposx$,x ; draw key as pressed and go on.
