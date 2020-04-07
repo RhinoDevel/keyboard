@@ -17,6 +17,11 @@ keystat$ byte 1
          byte 6
          byte '=', ' ', 'e', 'x', 'i', 't'
 
+         byte 3
+         byte 33
+         byte 6
+         text '= rec.'
+
          byte 3 ; char row / line nr. (0 - 24).
          byte 2 ; char column / pos. in line (0 - 39 or 0 - 79).
          byte 13; char count.
