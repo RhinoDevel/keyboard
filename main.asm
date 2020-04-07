@@ -39,10 +39,7 @@ flag_upd_pat_neg  = 255 - flag_upd_pat
          byte chr_0$ + dec_addr4
          byte ":"
          byte $8f; rem token
-         byte " "
-         byte "(", "c", ")", " ", "2", "0", "2", "0"
-         byte ",", " "
-         byte "r", "h" ,"i", "n", "o", "d", "e", "v", "e", "l"
+         text " (c) 2020, rhinodevel"
          byte 0
 next     word 0
 
