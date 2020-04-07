@@ -18,11 +18,15 @@ flag_pre_pat_l = 2
 flag_pre_pat_l_neg = 255 - flag_pre_pat_l
 flag_pre_rec = 4
 flag_pre_rec_neg = 255 - flag_pre_rec
-flag_pre_stop = 8
-flag_pre_stop_neg = 255 - flag_pre_stop
 ;
-flag_upd_pat = 16
+flag_upd_pat = 8
 flag_upd_pat_neg = 255 - flag_upd_pat
+;
+flag_upd_rec = 16
+flag_upd_rec_neg = 255 - flag_upd_rec
+;
+flag_mode_rec = 32
+flag_mode_rec_neg = 255 - flag_mode_rec
 
 ; ----------------------
 ; --- basic "loader" ---
@@ -124,21 +128,11 @@ main     sei
          bne @draw_on ; skips, if press already is processed.
          lda flags$
          ora #flag_pre_rec
-         sta flags$ ; remember current key press to be already processed.
+         ora #flag_upd_rec
+         sta flags$
          ; (nothing to do, here)
          jmp @draw_on
 @no_rec
-         cpx #'-' ; stop button pressed?
-         bne @no_stop
-         lda flags$
-         and #flag_pre_stop
-         bne @draw_on ; skips, if press already is processed.
-         lda flags$
-         ora #flag_pre_stop
-         sta flags$ ; remember current key press to be already processed.
-         ; (nothing to do, here)
-         jmp @draw_on
-@no_stop
 
          ; pressed key must be a note key:
 
@@ -181,21 +175,13 @@ main     sei
          jmp @drawnotpre
 @no_pat_l_2
 
-         cpx '+' ; record key?
+         cpx #'+' ; record key?
          bne @no_rec_2
          lda flags$ ; disable is-pressed flag.
          and #flag_pre_rec_neg
          sta flags$
          jmp @drawnotpre
 @no_rec_2
-
-         cpx '-' ; stop key?
-         bne @no_stop_2
-         lda flags$ ; disable is-pressed flag.
-         and #flag_pre_stop_neg
-         sta flags$
-         ;jmp @drawnotpre
-@no_stop_2
 
 @drawnotpre ; draw key as not pressed and go on
          ldy keyposx$,x
@@ -216,24 +202,48 @@ main     sei
 
          lda flags$ ; upd. shift pattern on change (for timbre & maybe octave).
          and #flag_upd_pat
-         beq @upd_note_chk
+         beq @no_upd_pat
          lda flags$
          and #flag_upd_pat_neg
          sta flags$
          lda pattern$
          sta via_shift$
          jsr patdraw$ ; draws shift pattern.
+@no_upd_pat
 
-@upd_note_chk ; update note to play, if changed (pattern may alter octave, too).
+         ; update note to play, if changed (pattern may alter octave, too):
+         ;
          lda cur_note$
          cmp old_note$
-         beq @to_infloop ; don't update register and redraw note, if no need.
+         beq @no_upd_note ; don't update register and redraw note, if no need.
          sta timer2_low$ ; update register
          sta old_note$ ; remember this note as playing.
          jsr drawnote ; draws currently playing note.
+@no_upd_note
+         
+         ; update record mode (etc.), if necessary:
+         ;
+         lda flags$
+         and #flag_upd_rec
+         beq @no_upd_rec
+         lda flags$
+         and #flag_upd_rec_neg
+         sta flags$
+         and #flag_mode_rec
+         beq @rec_enable
+         lda flags$ ; disable recording mode.
+         and #flag_mode_rec_neg
+         sta flags$
+         ; TODO: add functionality!
+         jmp @no_upd_rec ; (misleading label name, here..)
+@rec_enable ; enable recording mode:
+         lda flags$
+         ora #flag_mode_rec
+         sta flags$
+         ; TODO: add functionality!
+@no_upd_rec
 
-@to_infloop
-         jmp @infloop ; restart key processing loop.
+         jmp @infloop ; restart infinite key processing loop.
 
          ; exit application (show "goodbye"):
          ;
