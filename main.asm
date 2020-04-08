@@ -61,8 +61,8 @@ main     sei
 
 @infloop ; infinite loop.
 
-         ldx #0 ; reset current note to none. 
-         stx cur_note$
+         ldx #0 ; reset found note to none. 
+         stx found_note$
 
 @keyloop ; loop through all buttons.
 
@@ -134,18 +134,19 @@ main     sei
          jmp @draw_on
 @no_rec
 
-         ; pressed key must be a note key:
+         ; pressed key must be a note key at this point.
 
-         ldy cur_note$
-         beq @set_cur ; cur_note$ is 0. no pressed note key found in loop, yet.
+         ldy found_note$
+         beq @set_found ; branch, if no other pressed note key found, yet.
          
          ; another pressed note key was already found in loop.
 
-         cpy old_note$ ; use currently found pressed note key, if already found
-         bne @draw_on  ; other pressed key is the currently playing note.
+         cpy playing_note$ ; use currently found pressed note key, if already
+         bne @draw_on      ; found other pressed key is the playing note.
 
-@set_cur ldy keynote$,x ; (must never be 0, here)
-         sty cur_note$
+@set_found
+         ldy keynote$,x ; (must never be 0, here)
+         sty found_note$
 
 @draw_on ldy keyposx$,x ; draw key as pressed and go on.
          sty zero_word_buf1$
@@ -213,11 +214,11 @@ main     sei
 
          ; update note to play, if changed (pattern may alter octave, too):
          ;
-         lda cur_note$
-         cmp old_note$
+         lda found_note$
+         cmp playing_note$
          beq @no_upd_note ; don't update register and redraw note, if no need.
-         sta timer2_low$ ; update register
-         sta old_note$ ; remember this note as playing.
+         sta timer2_low$ ; update register.
+         sta playing_note$ ; remember this note as playing.
          jsr drawnote ; draws currently playing note.
 @no_upd_note
          
@@ -266,7 +267,7 @@ main     sei
 ;
 ; input:
 ; ------
-; cur_note$
+; playing_note$
 ;
 ; output:
 ; -------
@@ -278,7 +279,7 @@ main     sei
 drawnote ldy #3 ; hard-coded
          lda #17 ; hard-coded
          sta zero_word_buf1$
-         lda cur_note$ ; (zero, if none)
+         lda playing_note$ ; (zero, if none)
          jsr printby$
          rts
 
@@ -293,8 +294,8 @@ init     lda #12; hard-coded. enable graphics mode.
 
          sta flags$ ; disables all flags.
 
-         sta old_note$
-         sta cur_note$
+         sta playing_note$
+         sta found_note$
 
          lda #22
          sta pattern$ 
