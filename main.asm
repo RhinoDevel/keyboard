@@ -249,6 +249,7 @@ main     sei
          ; exit application (show "goodbye"):
          ;
 @exit    lda #0
+         sta timer2_low$ ; disables sound by timer reset.
          sta keybufnum$ ; (sometimes, the <left arrow> will still be printed..)
          clrscr$
          lda #<goodbye$
