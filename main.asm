@@ -145,8 +145,11 @@ main     sei
          bne @draw_on      ; found other pressed key is the playing note.
 
 @set_found
-         ldy keynote$,x ; (must never be 0, here)
-         sty found_note$
+         ldy keynote$,x ; gets note's index in array (must never be $ff, here).
+         txa ; saves x.
+         ldx notes$,y ; gets note's timer 2 low byte value.
+         stx found_note$
+         tax ; restores x.
 
 @draw_on ldy keyposx$,x ; draw key as pressed and go on.
          sty zero_word_buf1$
