@@ -156,6 +156,6 @@ printby$ pha
          jsr pos_draw$
          pla
          jsr conv_hd
-         inc zero_word_buf1$     ; hard-coded, does not support line break
+         inc zero_word_buf1$     ; hard-coded, does not support line break.
          sta (zero_word_buf1$),y ; (y is 0).
          rts
