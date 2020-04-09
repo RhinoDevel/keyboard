@@ -61,7 +61,7 @@ main     sei
 
 @infloop ; infinite loop.
 
-         ldx #0 ; reset found note to none. 
+         ldx #$ff ; reset found note to none. 
          stx found_note$
 
 @keyloop ; loop through all buttons.
@@ -137,6 +137,7 @@ main     sei
          ; pressed key must be a note key at this point.
 
          ldy found_note$
+         cpy #$ff
          beq @set_found ; branch, if no other pressed note key found, yet.
          
          ; another pressed note key was already found in loop.
@@ -146,10 +147,7 @@ main     sei
 
 @set_found
          ldy keynote$,x ; gets note's index in array (must never be $ff, here).
-         txa ; saves x.
-         ldx notes$,y ; gets note's timer 2 low byte value.
-         stx found_note$
-         tax ; restores x.
+         sty found_note$
 
 @draw_on ldy keyposx$,x ; draw key as pressed and go on.
          sty zero_word_buf1$
@@ -217,12 +215,17 @@ main     sei
 
          ; update note to play, if changed (pattern may alter octave, too):
          ;
-         lda found_note$
-         cmp playing_note$
+         ldy found_note$
+         cpy playing_note$
          beq @no_upd_note ; don't update register and redraw note, if no need.
-         sta timer2_low$ ; update register.
-         sta playing_note$ ; remember this note as playing.
-         jsr drawnote ; draws currently playing note.
+         sty playing_note$ ; remembers this note as playing (the index).
+         lda #0 ; (for no note to play)
+         cpy #$ff
+         beq @do_upd_note ; skip loading, because index $ff does not work..
+         lda notes$,y ; loads notes' timer 2 low byte value.
+@do_upd_note
+         sta timer2_low$ ; updates register.
+         jsr drawnotea ; draws currently playing note.
 @no_upd_note
          
          ; update record mode (etc.), if necessary:
@@ -263,15 +266,15 @@ main     sei
          cli
          rts
 
-; ****************
-; *** drawnote ***
-; ****************
+; *****************
+; *** drawnotea ***
+; *****************
 ;
-; print note's timer value as hexadecimal value.
+; print note (value must be in register a) as hexadecimal value.
 ;
 ; input:
 ; ------
-; playing_note$
+; a
 ;
 ; output:
 ; -------
@@ -280,10 +283,10 @@ main     sei
 ; y = garbage.
 ; zero_word_buf1$ = garbage.
 ;
-drawnote ldy #3 ; hard-coded
-         lda #17 ; hard-coded
-         sta zero_word_buf1$
-         lda playing_note$ ; (zero, if none)
+drawnotea
+         ldy #17 ; hard-coded
+         sty zero_word_buf1$
+         ldy #3 ; hard-coded         
          jsr printby$
          rts
 
@@ -298,6 +301,7 @@ init     lda #12; hard-coded. enable graphics mode.
 
          sta flags$ ; disables all flags.
 
+         lda #$ff
          sta playing_note$
          sta found_note$
 
@@ -334,7 +338,8 @@ init     lda #12; hard-coded. enable graphics mode.
          jsr pos_draw$
 
          jsr patdraw$
-         jsr drawnote
+         lda #0
+         jsr drawnotea
          rts
 
          ; delay:
