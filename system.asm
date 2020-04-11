@@ -8,8 +8,14 @@ target TGT_PETBV2;TGT_PETBV4
 ; ---------------------------------------------------------
 
 adptr$ = 15 ; term. width & lim. for scanning src. columns (2 unused bytes).
+;fp_acc3$ = $54 ; "floating-point accumulator" nr. 3 (6 bytes).
+;fp_acc1$ = $5e ; floating-point accumulator nr. 1 (6 bytes).
+;fp_acc2$ = $66 ; floating-point accumulator nr. 2 (6 bytes).
 keybufnum$ = $9e ; current number of characters in keyboard buffer.
 utility$ = $a2 ; not used / utility (1 unused byte).
+;tapflag$ = $ab ; end of tape input flag / flag for tape write (1 byte).
+;tappari$ = $b1 ; tape character parity (1 byte).
+;receive$ = $b2 ; byte received flag (1 byte).
 io_util$ = $b3 ; i/o utility / temporary save, e.g. by dos wedge (1 byte).
 tapbufch$ = $b4 ; tape buffer character / mlm.
 tapeutil$ = $ba ; tape utility (1 byte).
