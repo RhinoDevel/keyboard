@@ -10,6 +10,8 @@ dec_addr2 = 0;(main/100) MOD $a
 dec_addr3 = 6;(main/10) MOD $a
 dec_addr4 = 0;main MOD $a
 
+def_pattern = #$0f ; default pattern (for timbre and sometimes octave).
+
 ; to be used with flags$ variable:
 ;
 flag_pre_pat_h = 1
@@ -294,7 +296,7 @@ drawnotea
 ; *** init ***
 ; ************
 ;
-init     lda #12; hard-coded. enable graphics mode.
+init     lda #12; hard-coded. enable graphics mode (character set to use).
          sta via_pcr$
 
          lda #0
@@ -305,7 +307,7 @@ init     lda #12; hard-coded. enable graphics mode.
          sta playing_note$
          sta found_note$
 
-         lda #22
+         lda #def_pattern
          sta pattern$ 
 
          lda #0
