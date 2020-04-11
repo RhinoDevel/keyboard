@@ -217,16 +217,7 @@ main     sei
 @no_upd_pat
 
          ; update note to play, if necessary (pattern may alter octave, too):
-         ;
-;         ldy found_note$
-;         cpy playing_note$
-;         beq @no_upd_note ; don't update register and redraw note, if no need.
-;         sty playing_note$ ; remembers this note as playing (the index).
-;         lda #0 ; (for no note to play)
-;         cpy #$ff
-;         beq @do_upd_note ; skip loading, because index $ff does not work..
-;         lda notes$,y ; loads notes' timer 2 low byte value.
-         ;
+         
          ldy playing_note$
          cpy #$ff
          bne @a_note_is_playing
@@ -242,6 +233,7 @@ main     sei
          ldy found_note2$
          cpy #$ff
          bne @did_find_two_notes
+         sty last_note$
          ldy found_note1$ ; just the one note found.
          cpy playing_note$
          beq @no_upd_note ; the note is already playing (nothing to do).
@@ -263,11 +255,15 @@ main     sei
          sty found_note2$  ; if found_note2$ will not be used from here on.
 
 @other_and_playing_found
-         ldy found_note1$ ; just use this for toggling between both notes.
+         ;ldy found_note1$ ; just use this for toggling between both notes.
          ;
-         ; TODO: implement mode 
+         ldy found_note1$
+         cpy last_note$
+         beq @no_upd_note
 
 @do_upd_note
+         lda playing_note$
+         sta last_note$
          sty playing_note$
          lda #0
          cpy #$ff
@@ -354,6 +350,7 @@ init     ; *** initialize internal variables ***
          sta playing_note$
          sta found_note1$
          sta found_note2$
+         sta last_note$
 
          lda #def_pattern
          sta pattern$ 
