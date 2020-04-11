@@ -63,8 +63,9 @@ main     sei
 
 @infloop ; infinite loop.
 
-         ldx #$ff ; reset found note to none. 
-         stx found_note$
+         ldx #$ff ; reset found notes to none. 
+         stx found_note1$
+         stx found_note2$
 
 @keyloop ; loop through all buttons.
 
@@ -138,18 +139,18 @@ main     sei
 
          ; pressed key must be a note key at this point.
 
-         ldy found_note$
+         ldy found_note1$
          cpy #$ff
-         beq @set_found ; branch, if no other pressed note key found, yet.
-         
-         ; another pressed note key was already found in loop.
-
-         cpy playing_note$ ; use currently found pressed note key, if already
-         bne @draw_on      ; found other pressed key is the playing note.
-
-@set_found
+         bne @found_note1_already_set
          ldy keynote$,x ; gets note's index in array (must never be $ff, here).
-         sty found_note$
+         sty found_note1$
+         jmp @draw_on
+@found_note1_already_set
+         ldy found_note2$
+         cpy #$ff
+         bne @draw_on
+         ldy keynote$,x ; gets note's index in array (must never be $ff, here).
+         sty found_note2$
 
 @draw_on ldy keyposx$,x ; draw key as pressed and go on.
          sty zero_word_buf1$
@@ -215,17 +216,64 @@ main     sei
          jsr patdraw$ ; draws shift pattern.
 @no_upd_pat
 
-         ; update note to play, if changed (pattern may alter octave, too):
+         ; update note to play, if necessary (pattern may alter octave, too):
          ;
-         ldy found_note$
-         cpy playing_note$
-         beq @no_upd_note ; don't update register and redraw note, if no need.
-         sty playing_note$ ; remembers this note as playing (the index).
-         lda #0 ; (for no note to play)
+;         ldy found_note$
+;         cpy playing_note$
+;         beq @no_upd_note ; don't update register and redraw note, if no need.
+;         sty playing_note$ ; remembers this note as playing (the index).
+;         lda #0 ; (for no note to play)
+;         cpy #$ff
+;         beq @do_upd_note ; skip loading, because index $ff does not work..
+;         lda notes$,y ; loads notes' timer 2 low byte value.
+         ;
+         ldy playing_note$
          cpy #$ff
-         beq @do_upd_note ; skip loading, because index $ff does not work..
-         lda notes$,y ; loads notes' timer 2 low byte value.
+         bne @a_note_is_playing
+         ldy found_note1$
+
+@a_note_is_playing
+         ldy found_note1$
+         cpy #$ff
+         beq @do_upd_note ; no note (key) found. disable currently playing note.
+         
+         ; one note (key) was found.
+         
+         ldy found_note2$
+         cpy #$ff
+         bne @did_find_two_notes
+         ldy found_note1$ ; just the one note found.
+         cpy playing_note$
+         beq @no_upd_note ; the note is already playing (nothing to do).
+         jmp @do_upd_note ; it is not the same as the note playing. update!
+@did_find_two_notes
+         cpy playing_note$ ; (expects found_note2 to be in y register).
+         beq @other_and_playing_found
+         ldy found_note1$
+         cpy playing_note$
+         bne @do_upd_note ; two note (keys) found, where both are not the
+                          ; playing note. this will always use found_note1$.
+
+         ; playing note (key) and other note (key) found (in this order).
+
+         ldy found_note2$ ; reorder.
+         sty found_note1$
+
+         ldy playing_note$ ; this is not necessary,
+         sty found_note2$  ; if found_note2$ will not be used from here on.
+
+@other_and_playing_found
+         ldy found_note1$ ; just use this for toggling between both notes.
+         ;
+         ; TODO: implement mode 
+
 @do_upd_note
+         sty playing_note$
+         lda #0
+         cpy #$ff
+         beq @set_timer2_low
+         lda notes$,y ; loads notes' timer 2 low byte value.
+@set_timer2_low         
          sta timer2_low$ ; updates register.
          jsr drawnotea ; draws currently playing note.
 @no_upd_note
@@ -304,7 +352,8 @@ init     ; *** initialize internal variables ***
 
          lda #$ff
          sta playing_note$
-         sta found_note$
+         sta found_note1$
+         sta found_note2$
 
          lda #def_pattern
          sta pattern$ 
