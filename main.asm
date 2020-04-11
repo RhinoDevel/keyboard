@@ -296,8 +296,7 @@ drawnotea
 ; *** init ***
 ; ************
 ;
-init     lda #12; hard-coded. enable graphics mode (character set to use).
-         sta via_pcr$
+init     ; *** initialize internal variables ***
 
          lda #0
 
@@ -310,8 +309,9 @@ init     lda #12; hard-coded. enable graphics mode (character set to use).
          lda #def_pattern
          sta pattern$ 
 
-         lda #0
+         ; *** setup system registers ***
 
+         lda #0
          sta timer2_low$ ; disables sound by timer reset.
 
          lda #16 ; hard-coded. enable free running mode.
@@ -319,6 +319,11 @@ init     lda #12; hard-coded. enable graphics mode (character set to use).
 
          lda pattern$
          sta via_shift$
+
+         lda #12; hard-coded. enable graphics mode (character set to use).
+         sta via_pcr$
+
+         ; *** draw initial screen ***
 
          clrscr$
 
@@ -342,6 +347,7 @@ init     lda #12; hard-coded. enable graphics mode (character set to use).
          jsr patdraw$
          lda #0
          jsr drawnotea
+
          rts
 
          ; delay:
