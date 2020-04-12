@@ -10,12 +10,12 @@ dec_addr2 = 0;(main/100) MOD $a
 dec_addr3 = 6;(main/10) MOD $a
 dec_addr4 = 0;main MOD $a
 
-def_pattern = #$0f ; default pattern (for timbre and sometimes octave).
+def_pat_index = 6 ; default pattern index (for timbre and sometimes octave).
 
 ; to be used with flags$ variable:
 ;
-flag_pre_pat_h = 1
-flag_pre_pat_h_neg = 255 - flag_pre_pat_h
+flag_pre_pat_n = 1
+flag_pre_pat_n_neg = 255 - flag_pre_pat_n
 flag_pre_pat_l = 2
 flag_pre_pat_l_neg = 255 - flag_pre_pat_l
 flag_pre_rec = 4
@@ -86,23 +86,29 @@ main     sei
          jmp @exit
 @no_exit
 
-         cpx #59 ; ';' ; increase-pattern-high-nibble key pressed?
-         bne @no_pat_h ; skips, if increase-pattern-high-nibble key not pressed.
+         cpx #59 ; ';' ; next-pattern key pressed?
+         bne @no_pat_n ; skips, if next-pattern key not pressed.
          lda flags$
-         and #flag_pre_pat_h
+         and #flag_pre_pat_n
          bne @draw_on ; skips, if press already is processed.
          lda flags$
-         ora #flag_pre_pat_h
+         ora #flag_pre_pat_n
          ora #flag_upd_pat
          sta flags$ ; rem. cur. key press to be alr. processed and request upd.
-         lda pattern$ ; increase high nibble of pattern.
-         clc
-         adc #$10
+         inc pat_index$
+         lda #pattern_count$
+         cmp pat_index$
+         bne @set_pattern
+         lda #0
+         sta pat_index$
+@set_pattern ; (also used from for other pattern key handling..)
+         ldy pat_index$
+         lda patterns$,y
          sta pattern$
          jmp @draw_on
-@no_pat_h
+@no_pat_n
 
-         cpx #'?' ; increase-pattern-low-nibble key pressed?
+         cpx #'?' ; last-pattern key pressed?
          bne @no_pat_l
          lda flags$
          and #flag_pre_pat_l
@@ -111,17 +117,13 @@ main     sei
          ora #flag_pre_pat_l
          ora #flag_upd_pat
          sta flags$
-         lda pattern$
-         and #$0f
-         cmp #$0f
-         bne @pat_l_add
-         lda pattern$
-         and #$f0
-         sta pattern$
-         jmp @draw_on
-@pat_l_add
-         inc pattern$
-         jmp @draw_on
+         dec pat_index$
+         lda #$ff
+         cmp pat_index$
+         bne @set_pattern
+         lda #pattern_count$ - 1
+         sta pat_index$
+         bne @set_pattern ; (always branches)
 @no_pat_l
 
          cpx #'+' ; record button pressed?
@@ -164,15 +166,15 @@ main     sei
 
 @sup_but_is_not_pressed ; supported button is not pressed.
  
-         cpx #59 ; ';' ; increase-pattern-high-nibble key?
-         bne @no_pat_h_2
+         cpx #59 ; ';' ; next-pattern key?
+         bne @no_pat_n_2
          lda flags$ ; disable is-pressed flag.
-         and #flag_pre_pat_h_neg
+         and #flag_pre_pat_n_neg
          sta flags$
          jmp @drawnotpre
-@no_pat_h_2 
+@no_pat_n_2 
 
-         cpx #'?' ; increase-pattern-low-nibble key?
+         cpx #'?' ; last-pattern key?
          bne @no_pat_l_2
          lda flags$
          and #flag_pre_pat_l_neg
@@ -352,8 +354,10 @@ init     ; *** initialize internal variables ***
          sta found_note2$
          sta last_note$
 
-         lda #def_pattern
-         sta pattern$ 
+         ldy #def_pat_index
+         sty pat_index$
+         lda patterns$,y
+         sta pattern$
 
          ; *** setup system registers ***
 

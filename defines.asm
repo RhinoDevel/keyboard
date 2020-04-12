@@ -7,6 +7,7 @@
 
 zero_word_buf1$ = adptr$
 zero_word_buf2$ = tapbufin$
+pat_index$ = tappari$
 pattern$ = io_util$
 flags$ = tapbufch$
 playing_note$ = tapeutil$
