@@ -10,7 +10,7 @@ dec_addr2 = 0;(main/100) MOD $a
 dec_addr3 = 6;(main/10) MOD $a
 dec_addr4 = 0;main MOD $a
 
-def_pat_index = 6 ; default pattern index (for timbre and sometimes octave).
+def_pat_index = 0 ; default pattern index (for timbre and sometimes octave).
 
 ; to be used with flags$ variable:
 ;
