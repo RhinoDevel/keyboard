@@ -30,6 +30,8 @@ flag_upd_rec_neg = 255 - flag_upd_rec
 flag_mode_rec = 32
 flag_mode_rec_neg = 255 - flag_mode_rec
 
+rec_freq = 50000 ; microseconds (not really the frequency, but the reciprocal..)
+
 ; ----------------------
 ; --- basic "loader" ---
 ; ----------------------
@@ -101,7 +103,7 @@ main     sei
          bne @set_pattern
          lda #0
          sta pat_index$
-@set_pattern ; (also used from for other pattern key handling..)
+@set_pattern ; (also used by other pattern key handling..)
          ldy pat_index$
          lda patterns$,y
          sta pattern$
@@ -408,3 +410,33 @@ init     ; *** initialize internal variables ***
 ;         sta timer1_high$ ; clears interrupt flag and starts timer.
 ;@timeout bit via_ifr$ ; did timer one time out?
 ;         bvc @timeout
+
+         ; stores changes of tune:
+         
+tune_len word 8 ; count of changes (not bytes).
+
+tune     byte 0 ; playing note's index (or 255 for a pause / no note playing).
+         byte 10 ; length of note in multiples of rec_freq.
+                 ;
+                 ; max. value: rec_freq * 255 = 12.75 seconds.
+         
+         byte 2
+         byte 10
+
+         byte 4
+         byte 10
+
+         byte 5
+         byte 10
+
+         byte 7
+         byte 10
+
+         byte 9
+         byte 10
+
+         byte 11
+         byte 10
+
+         byte 12
+         byte 10
