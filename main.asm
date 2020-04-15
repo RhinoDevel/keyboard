@@ -20,14 +20,19 @@ flag_pre_pat_l = 2
 flag_pre_pat_l_neg = 255 - flag_pre_pat_l
 flag_pre_rec = 4
 flag_pre_rec_neg = 255 - flag_pre_rec
+flag_pre_play = 8
+flag_pre_play_neg = 255 - flag_pre_play
 ;
-flag_upd_pat = 8
+flag_upd_pat = 16
 flag_upd_pat_neg = 255 - flag_upd_pat
 ;
-flag_upd_rec = 16
+flag_upd_rec = 32
 flag_upd_rec_neg = 255 - flag_upd_rec
 ;
-flag_mode_rec = 32
+flag_upd_play = 64
+flag_upd_play_net = 255 - flag_upd_play
+;
+flag_mode_rec = 128
 flag_mode_rec_neg = 255 - flag_mode_rec
 
 rec_freq = 50000 ; microseconds (not really the frequency, but the reciprocal..)
@@ -92,7 +97,7 @@ main     sei
          bne @no_pat_n ; skips, if next-pattern key not pressed.
          lda flags$
          and #flag_pre_pat_n
-         bne @draw_on ; skips, if press already is processed.
+         bne @jmp_draw_on ; skips, if press already is processed.
          lda flags$
          ora #flag_pre_pat_n
          ora #flag_upd_pat
@@ -107,6 +112,7 @@ main     sei
          ldy pat_index$
          lda patterns$,y
          sta pattern$
+@jmp_draw_on
          jmp @draw_on
 @no_pat_n
 
@@ -140,6 +146,19 @@ main     sei
          ; (nothing to do, here)
          jmp @draw_on
 @no_rec
+
+         cpx #'=' ; play button pressed?
+         bne @no_play
+         lda flags$
+         and #flag_pre_play
+         bne @draw_on ; skips, if press already is processed.
+         lda flags$
+         ora #flag_pre_play
+         ora #flag_upd_play
+         sta flags$
+         ; (nothing to do, here)
+         jmp @draw_on
+@no_play
 
          ; pressed key must be a note key at this point.
 
@@ -191,6 +210,14 @@ main     sei
          sta flags$
          jmp @drawnotpre
 @no_rec_2
+
+         cpx #'=' ; play key?
+         bne @no_play_2
+         lda flags$ ; disable is-pressed flag.
+         and #flag_pre_play_neg
+         sta flags$
+         jmp @drawnotpre
+@no_play_2
 
 @drawnotpre ; draw key as not pressed and go on
          ldy keyposx$,x
@@ -299,6 +326,8 @@ main     sei
          sta flags$
          ; TODO: add functionality!
 @no_upd_rec
+         ;
+         ; TODO: add play button handling!
 
          jmp @infloop ; restart infinite key processing loop.
 

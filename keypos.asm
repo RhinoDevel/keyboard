@@ -69,7 +69,7 @@ keyposx$ byte $ff ; @
          byte $ff ; :
          byte $15 ; ;
          byte $ff ; <
-         byte $ff ; =
+         byte $1f ; =
          byte $ff ; >
          byte $17 ; ?
 
@@ -141,6 +141,6 @@ keyposy$ byte $ff ; @
          byte $ff ; :
          byte $0a ; ;
          byte $ff ; <
-         byte $ff ; =
+         byte $05 ; =
          byte $ff ; >
          byte $0a ; ?

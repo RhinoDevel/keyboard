@@ -70,7 +70,7 @@ key_row$ byte $ff ; @
          byte $ff ; :
          byte $06 ; ;
          byte $ff ; <
-         byte $ff ; =
+         byte $09 ; =
          byte $ff ; >
          byte $07 ; ?
 
@@ -143,6 +143,6 @@ key_neg$ byte $ff ; @
          byte $ff ; :
          byte $10 ; ;
          byte $ff ; <
-         byte $ff ; =
+         byte $80 ; =
          byte $ff ; >
          byte $10 ; ?
