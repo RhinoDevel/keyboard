@@ -416,7 +416,7 @@ init     ; *** initialize internal variables ***
 tune_len word 8 ; count of changes (not bytes).
 
 tune     byte 0 ; playing note's index (or 255 for a pause / no note playing).
-         byte 10 ; length of note in multiples of rec_freq.
+         byte 10 ; length of note (or pause) in multiples of rec_freq.
                  ;
                  ; max. value: rec_freq * 255 = 12.75 seconds.
          
@@ -439,4 +439,4 @@ tune     byte 0 ; playing note's index (or 255 for a pause / no note playing).
          byte 10
 
          byte 12
-         byte 10
+         byte 20
