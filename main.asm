@@ -30,10 +30,14 @@ flag_upd_rec = 32
 flag_upd_rec_neg = 255 - flag_upd_rec
 ;
 flag_upd_play = 64
-flag_upd_play_net = 255 - flag_upd_play
+flag_upd_play_neg = 255 - flag_upd_play
+
+; to be used with variable named mode:
 ;
-flag_mode_rec = 128
-flag_mode_rec_neg = 255 - flag_mode_rec
+mode_rec = 1
+mode_rec_neg = 255 - mode_rec
+mode_play = 2
+mode_play_neg = 255 - mode_play
 
 rec_freq = 50000 ; microseconds (not really the frequency, but the reciprocal..)
 
@@ -305,29 +309,70 @@ main     sei
          jsr drawnotea ; draws currently playing note.
 @no_upd_note
          
-         ; update record mode (etc.), if necessary:
+         ; change/update mode, if necessary:
          ;
+         lda flags$
+         and #flag_upd_play
+         beq @mode_chk_rec ; no update because of play button necessary.
+         ;
+         ; update because of play button:
+         ;
+         lda flags$
+         and #flag_upd_play_neg ; play button is handled.
+         and #flag_upd_rec_neg ; record but. is handled (play button overrules).
+         sta flags$
+         ;
+         lda mode
+         beq @play_enable ; switch from normal to play mode.
+         and #mode_play
+         beq @mode_no_upd ; must be in record mode, do nothing.
+         ;
+         ; disable play mode:
+         ;
+         lda mode
+         and #mode_play_neg
+         jmp @mode_upd
+         ;
+         ; enable play mode (must be in normal mode):
+         ;
+@play_enable
+         lda mode
+         ora #mode_play
+         jmp @mode_upd
+         ;
+         ; check, if record mode is enabled (play update must not be necessary):
+         ;
+@mode_chk_rec
          lda flags$
          and #flag_upd_rec
-         beq @no_upd_rec
-         lda flags$
-         and #flag_upd_rec_neg
-         sta flags$
-         and #flag_mode_rec
-         beq @rec_enable
-         lda flags$ ; disable recording mode.
-         and #flag_mode_rec_neg
-         sta flags$
-         ; TODO: add functionality!
-         jmp @no_upd_rec ; (misleading label name, here..)
-@rec_enable ; enable recording mode:
-         lda flags$
-         ora #flag_mode_rec
-         sta flags$
-         ; TODO: add functionality!
-@no_upd_rec
+         beq @mode_no_upd ; no update because of record button necessary.
          ;
-         ; TODO: add play button handling!
+         ; update because of record button:
+         ;
+         lda flags$
+         and #flag_upd_rec_neg ; record button is handled.
+         sta flags$
+         ;
+         lda mode
+         beq @rec_enable ; switch from normal to record mode.
+         and #mode_rec
+         beq @mode_no_upd ; must be in play mode, do nothing.
+         ;
+         ; disable record mode:
+         ;
+         lda mode
+         and #mode_rec_neg
+         jmp @mode_upd
+         ;
+         ; enable play mode (must be in normal mode):
+         ;
+@rec_enable
+         lda mode
+         ora #mode_rec
+@mode_upd
+         sta mode
+         jsr drawmodea
+@mode_no_upd
 
          jmp @infloop ; restart infinite key processing loop.
 
@@ -343,6 +388,30 @@ main     sei
          sta zero_word_buf2$ + 1
          jsr keydrawstat$
          cli
+         rts
+
+; *****************
+; *** drawmodea ***
+; *****************
+;
+; print mode (value must be in register a) as hexadecimal value.
+;
+; input:
+; ------
+; a
+;
+; output:
+; -------
+; a = garbage.
+; x = garbage.
+; y = garbage.
+; zero_word_buf1$ = garbage.
+;
+drawmodea
+         ldy #21 ; hard-coded
+         sty zero_word_buf1$
+         ldy #3 ; hard-coded         
+         jsr printby$
          rts
 
 ; *****************
@@ -378,6 +447,8 @@ init     ; *** initialize internal variables ***
          lda #0
 
          sta flags$ ; disables all flags.
+
+         sta mode ; set to normal mode.
 
          lda #$ff
          sta playing_note$
@@ -429,6 +500,9 @@ init     ; *** initialize internal variables ***
          lda #0
          jsr drawnotea
 
+         lda mode
+         jsr drawmodea
+
          rts
 
          ; delay:
@@ -439,6 +513,8 @@ init     ; *** initialize internal variables ***
 ;         sta timer1_high$ ; clears interrupt flag and starts timer.
 ;@timeout bit via_ifr$ ; did timer one time out?
 ;         bvc @timeout
+
+mode     byte 0 ; 0 = normal, 1 = record, 2 = play.
 
          ; stores changes of tune:
          
