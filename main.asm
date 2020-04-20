@@ -313,10 +313,15 @@ main     sei
          lda mode$
          beq @no_mode_stuff ; normal mode, do nothing.
          cmp #mode_rec
-         beq @no_mode_stuff ; record mode, CURRENTLY NOT SUPPORTED!
+         bne @play_stuff ; play mode.
+         ;
+         ; record mode:
+         ;
+         jmp @no_mode_stuff ; TODO: implement!
          ;
          ; play mode:
          ;
+@play_stuff
          lda playing_note$
          sta found_note1$
          lda #$ff
