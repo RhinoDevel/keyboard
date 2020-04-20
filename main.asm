@@ -34,10 +34,9 @@ flag_upd_play_neg = 255 - flag_upd_play
 
 ; to be used with variable named mode:
 ;
+mode_normal = 0
 mode_rec = 1
-mode_rec_neg = 255 - mode_rec
 mode_play = 2
-mode_play_neg = 255 - mode_play
 
 rec_freq = 50000 ; microseconds (not really the frequency, but the reciprocal..)
 
@@ -240,6 +239,137 @@ main     sei
 
 @keyloopdone ; all keys got processed in loop.
 
+         ; change/update mode, if necessary:
+         ;
+         lda flags$
+         and #flag_upd_play
+         beq @mode_chk_rec ; no update because of play button necessary.
+         ;
+         ; update because of play button:
+         ;
+         lda flags$
+         and #flag_upd_play_neg ; play button is handled.
+         and #flag_upd_rec_neg ; record but. is handled (play button overrules).
+         sta flags$
+         ;
+         lda mode$
+         beq @play_enable ; switch from normal to play mode (normal mode = 0).
+         cmp #mode_rec
+         beq @mode_no_upd ; must be in record mode, do nothing.
+         ;
+         ; disable play mode:
+         ;
+         bne @normal_enable ; (always branches, as play mode value is not 0)
+         ;
+         ; enable play mode (must be in normal mode):
+         ;
+@play_enable
+         lda #<tune$
+         sta tune_ptr$
+         lda #>tune$
+         sta tune_ptr$ + 1
+         lda #1
+         sta tune_countdown$
+         lda #<rec_freq
+         sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
+         lda #>rec_freq
+         sta timer1_high$ ; clears interrupt flag and starts timer.
+         lda #mode_play
+         bne @mode_upd ; (always branches, because play mode value is not zero)
+         ;
+         ; check, if record mode is enabled (play update must not be necessary):
+         ;
+@mode_chk_rec
+         lda flags$
+         and #flag_upd_rec
+         beq @mode_no_upd ; no update because of record button necessary.
+         ;
+         ; update because of record button:
+         ;
+         lda flags$
+         and #flag_upd_rec_neg ; record button is handled.
+         sta flags$
+         ;
+         lda mode$
+         beq @rec_enable ; switch from normal to record mode (normal = 0).
+         cmp #mode_play
+         beq @mode_no_upd ; must be in play mode, do nothing.
+         ;
+         ; disable record mode (also play mode, if branched from above):
+         ;
+@normal_enable
+         lda #mode_normal ; (always branches, because normal mode value is zero)
+         beq @mode_upd
+         ;
+         ; enable record mode (must be in normal mode):
+         ;
+@rec_enable
+         lda #mode_rec
+@mode_upd
+         sta mode$
+         jsr drawmodea
+@mode_no_upd
+
+         lda mode$
+         beq @no_mode_stuff ; normal mode, do nothing.
+         cmp #mode_rec
+         beq @no_mode_stuff ; record mode, CURRENTLY NOT SUPPORTED!
+         ;
+         ; play mode:
+         ;
+         lda playing_note$
+         sta found_note1$
+         lda #$ff
+         sta found_note2$
+         ;
+         bit via_ifr$ ; did timer one time out?
+         bvc @no_mode_stuff ; no, it did not time out.
+         ;
+         dec tune_countdown$
+         bne @play_timer_restart
+         ;
+         ; next note of tune (if there is one), please:
+         ;
+         ldy #0
+         lda (tune_ptr$),y
+         bne @play_next_note
+         ;
+         ; reached end of tune.
+         ;
+         lda #mode_normal
+         sta mode$
+         jsr drawmodea
+         jmp @no_mode_stuff
+         ;
+         ; play next note:
+         ;
+@play_next_note
+         sta tune_countdown$
+         ;
+         inc tune_ptr$
+         bne @play_tune_ptr_inc_done1
+         inc tune_ptr$ + 1
+@play_tune_ptr_inc_done1
+         ;
+         ldy #0
+         lda (tune_ptr$),y
+         sta found_note1$
+         ;
+         inc tune_ptr$
+         bne @play_tune_ptr_inc_done2
+         inc tune_ptr$ + 1
+@play_tune_ptr_inc_done2
+         ;
+         ; restart timer:
+         ;
+@play_timer_restart
+         lda #<rec_freq
+         sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
+         lda #>rec_freq
+         sta timer1_high$ ; clears interrupt flag and starts timer.
+@no_mode_stuff
+
+@upd_pat_chk
          lda flags$ ; upd. shift pattern on change (for timbre & maybe octave).
          and #flag_upd_pat
          beq @no_upd_pat
@@ -309,71 +439,6 @@ main     sei
          jsr drawnotea ; draws currently playing note.
 @no_upd_note
          
-         ; change/update mode, if necessary:
-         ;
-         lda flags$
-         and #flag_upd_play
-         beq @mode_chk_rec ; no update because of play button necessary.
-         ;
-         ; update because of play button:
-         ;
-         lda flags$
-         and #flag_upd_play_neg ; play button is handled.
-         and #flag_upd_rec_neg ; record but. is handled (play button overrules).
-         sta flags$
-         ;
-         lda mode
-         beq @play_enable ; switch from normal to play mode.
-         and #mode_play
-         beq @mode_no_upd ; must be in record mode, do nothing.
-         ;
-         ; disable play mode:
-         ;
-         lda mode
-         and #mode_play_neg
-         jmp @mode_upd
-         ;
-         ; enable play mode (must be in normal mode):
-         ;
-@play_enable
-         lda mode
-         ora #mode_play
-         jmp @mode_upd
-         ;
-         ; check, if record mode is enabled (play update must not be necessary):
-         ;
-@mode_chk_rec
-         lda flags$
-         and #flag_upd_rec
-         beq @mode_no_upd ; no update because of record button necessary.
-         ;
-         ; update because of record button:
-         ;
-         lda flags$
-         and #flag_upd_rec_neg ; record button is handled.
-         sta flags$
-         ;
-         lda mode
-         beq @rec_enable ; switch from normal to record mode.
-         and #mode_rec
-         beq @mode_no_upd ; must be in play mode, do nothing.
-         ;
-         ; disable record mode:
-         ;
-         lda mode
-         and #mode_rec_neg
-         jmp @mode_upd
-         ;
-         ; enable play mode (must be in normal mode):
-         ;
-@rec_enable
-         lda mode
-         ora #mode_rec
-@mode_upd
-         sta mode
-         jsr drawmodea
-@mode_no_upd
-
          jmp @infloop ; restart infinite key processing loop.
 
          ; exit application (show "goodbye"):
@@ -448,7 +513,7 @@ init     ; *** initialize internal variables ***
 
          sta flags$ ; disables all flags.
 
-         sta mode ; set to normal mode.
+         sta mode$ ; set to normal mode (equals 0).
 
          lda #$ff
          sta playing_note$
@@ -500,7 +565,7 @@ init     ; *** initialize internal variables ***
          lda #0
          jsr drawnotea
 
-         lda mode
+         lda mode$
          jsr drawmodea
 
          rts
@@ -513,35 +578,3 @@ init     ; *** initialize internal variables ***
 ;         sta timer1_high$ ; clears interrupt flag and starts timer.
 ;@timeout bit via_ifr$ ; did timer one time out?
 ;         bvc @timeout
-
-mode     byte 0 ; 0 = normal, 1 = record, 2 = play.
-
-         ; stores changes of tune:
-         
-tune_len word 8 ; count of changes (not bytes).
-
-tune     byte 0 ; playing note's index (or 255 for a pause / no note playing).
-         byte 10 ; length of note (or pause) in multiples of rec_freq.
-                 ;
-                 ; max. value: rec_freq * 255 = 12.75 seconds.
-         
-         byte 2
-         byte 10
-
-         byte 4
-         byte 10
-
-         byte 5
-         byte 10
-
-         byte 7
-         byte 10
-
-         byte 9
-         byte 10
-
-         byte 11
-         byte 10
-
-         byte 12
-         byte 20

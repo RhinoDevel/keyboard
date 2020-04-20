@@ -8,7 +8,7 @@ target TGT_PETBV2;TGT_PETBV4
 ; ---------------------------------------------------------
 
 adptr$ = 15 ; term. width & lim. for scanning src. columns (2 unused bytes).
-;fp_acc3$ = $54 ; "floating-point accumulator" nr. 3 (6 bytes).
+fp_acc3$ = $54 ; "floating-point accumulator" nr. 3 (6 bytes).
 ;fp_acc1$ = $5e ; floating-point accumulator nr. 1 (6 bytes).
 ;fp_acc2$ = $66 ; floating-point accumulator nr. 2 (6 bytes).
 keybufnum$ = $9e ; current number of characters in keyboard buffer.
@@ -30,8 +30,8 @@ screen_ram$ = $8000 ; start of video ram.
 pia1porta$ = $e810
 pia1portb$ = $e812
 
-;timer1_low$ = $e844
-;timer1_high$ = $e845
+timer1_low$ = $e844
+timer1_high$ = $e845
 
 timer2_low$ = $e848 ; low byte of timer 2.
 
@@ -43,7 +43,7 @@ via_pcr$ = $e84c ; via's peripheral control register.
 ; poke 59468, 12 for graphics mode.
 ; poke 59468, 14 for lower-case mode.
 
-;via_ifr$ = $e84d ; via's interrupt flag register.
+via_ifr$ = $e84d ; via's interrupt flag register.
 
 chrout$ = $ffd2 ; write a character to the screen.
 chrin$ = $ffe4 ; get one character.
