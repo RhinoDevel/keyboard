@@ -16,5 +16,5 @@ found_note1$ = utility$
 found_note2$ = receive$
 
 mode$ = fp_acc3$ ; 0 = normal, 1 = record, 2 = play.
-tune_ptr$ =  $54 + 1; TODO: fp_acc3$ + 1
-tune_countdown$ =  $54 + 3; TODO: fp_acc3$ + 3
+tune_ptr$ =  fp_acc3_1$
+tune_countdown$ =  fp_acc3_3$
