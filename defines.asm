@@ -18,3 +18,4 @@ found_note2$ = receive$
 mode$ = fp_acc3$ ; 0 = normal, 1 = record, 2 = play.
 tune_ptr$ =  fp_acc3_1$
 tune_countdown$ =  fp_acc3_3$
+tune_note$ = fp_acc3_4$

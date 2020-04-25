@@ -39,6 +39,9 @@ mode_rec = 1
 mode_play = 2
 
 rec_freq = 50000 ; microseconds (not really the frequency, but the reciprocal..)
+rec_is_waiting = $ee ; value indicates rec. mode waiting for first note.
+
+note_none = $ff ; represents a pause "note" / no note.
 
 ; ----------------------
 ; --- basic "loader" ---
@@ -73,7 +76,7 @@ main     sei
 
 @infloop ; infinite loop.
 
-         ldx #$ff ; reset found notes to none. 
+         ldx #note_none ; reset found notes to none. 
          stx found_note1$
          stx found_note2$
 
@@ -166,16 +169,16 @@ main     sei
          ; pressed key must be a note key at this point.
 
          ldy found_note1$
-         cpy #$ff
+         cpy #note_none
          bne @found_note1_already_set
-         ldy keynote$,x ; gets note's index in array (must never be $ff, here).
+         ldy keynote$,x ; gets note's index in array (never #note_none, here).
          sty found_note1$
          jmp @draw_on
 @found_note1_already_set
          ldy found_note2$
-         cpy #$ff
+         cpy #note_none
          bne @draw_on
-         ldy keynote$,x ; gets note's index in array (must never be $ff, here).
+         ldy keynote$,x ; gets note's index in array (never #note_none, here).
          sty found_note2$
 
 @draw_on ldy keyposx$,x ; draw key as pressed and go on.
@@ -295,40 +298,42 @@ main     sei
          cmp #mode_play
          beq @mode_no_upd ; must be in play mode, do nothing.
          ;
-         ; disable record mode (also play mode, if branched from above):
+         ; disable record mode:
+         ;
+         ldy #0
+         lda #0 ; end of tune marker.
+         sta (tune_ptr$),y
          ;
 @normal_enable
-         lda #mode_normal ; (always branches, because normal mode value is zero)
-         beq @mode_upd
+         lda #mode_normal
+         beq @mode_upd ; (always branches, because normal mode value is zero)
          ;
          ; enable record mode (must be in normal mode):
          ;
 @rec_enable
+         lda #rec_is_waiting ; indicates waiting for first note to be played by
+         sta tune_note$      ; user to start recording via timer.
          lda #mode_rec
 @mode_upd
          sta mode$
          jsr drawmodea
 @mode_no_upd
 
+         ; do play mode stuff (before playing note), if play mode is active:
+         ;
          lda mode$
-         beq @no_mode_stuff ; normal mode, do nothing.
-         cmp #mode_rec
-         bne @play_stuff ; play mode.
-         ;
-         ; record mode:
-         ;
-         jmp @no_mode_stuff ; TODO: implement!
+         cmp #mode_play
+         bne @play_mode_stuff_end
          ;
          ; play mode:
          ;
-@play_stuff
          lda playing_note$
          sta found_note1$
-         lda #$ff
+         lda #note_none
          sta found_note2$
          ;
          bit via_ifr$ ; did timer one time out?
-         bvc @no_mode_stuff ; no, it did not time out.
+         bvc @play_mode_stuff_end ; no, it did not time out.
          ;
          dec tune_countdown$
          bne @play_timer_restart
@@ -344,7 +349,7 @@ main     sei
          lda #mode_normal
          sta mode$
          jsr drawmodea
-         jmp @no_mode_stuff
+         jmp @play_mode_stuff_end
          ;
          ; play next note:
          ;
@@ -372,7 +377,7 @@ main     sei
          sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
          lda #>rec_freq
          sta timer1_high$ ; clears interrupt flag and starts timer.
-@no_mode_stuff
+@play_mode_stuff_end
 
 @upd_pat_chk
          lda flags$ ; upd. shift pattern on change (for timbre & maybe octave).
@@ -389,19 +394,19 @@ main     sei
          ; update note to play, if necessary (pattern may alter octave, too):
          
          ldy playing_note$
-         cpy #$ff
+         cpy #note_none
          bne @a_note_is_playing
          ldy found_note1$
 
 @a_note_is_playing
          ldy found_note1$
-         cpy #$ff
+         cpy #note_none
          beq @do_upd_note ; no note (key) found. disable currently playing note.
          
          ; one note (key) was found.
          
          ldy found_note2$
-         cpy #$ff
+         cpy #note_none
          bne @did_find_two_notes
          sty last_note$
          ldy found_note1$ ; just the one note found.
@@ -436,7 +441,7 @@ main     sei
          sta last_note$
          sty playing_note$
          lda #0
-         cpy #$ff
+         cpy #note_none
          beq @set_timer2_low
          lda notes$,y ; loads notes' timer 2 low byte value.
 @set_timer2_low         
@@ -444,6 +449,81 @@ main     sei
          jsr drawnotea ; draws currently playing note.
 @no_upd_note
          
+; * TODO: implement handling of reached recording byte limit!
+;
+         ; do record mode stuff (after playing note), if record mode is active:
+         ;
+         lda mode$
+         cmp #mode_rec
+         bne @rec_mode_stuff_end
+         ;
+         ; record mode:
+         ;
+         lda tune_note$
+         cmp #rec_is_waiting
+         beq @rec_is_waiting_for_first_note
+         ;
+         ; record is already running:
+         ;
+         bit via_ifr$ ; did timer one time out?
+         bvc @rec_mode_stuff_end ; no, it did not time out.
+         ;
+         ; timer ran out, take a measure:
+         ;
+         lda tune_note$
+         cmp playing_note$
+         bne @rec_note_changed ; the last memorized note is no longer playing.
+         ;
+         ; the last memorized note is still playing:
+         ;
+         inc tune_countdown$
+         ;
+         ; * TODO: implement handling of reached limit $ff!
+         ;
+         jmp @rec_restart_timer
+         ;
+@rec_note_changed
+         lda tune_countdown$
+         beq @rec_next_note ; last note did play shorter than one measure unit.
+         ;
+         ; last note played for at least one measure unit, save it:
+         ;
+         ldy #0
+         sta (tune_ptr$),y
+         inc tune_ptr$
+         bne @rec_save_note
+         inc tune_ptr$ + 1
+@rec_save_note
+         lda tune_note$
+         sta (tune_ptr$),y
+         inc tune_ptr$
+         bne @rec_next_note
+         inc tune_ptr$ + 1
+         jmp @rec_next_note
+         ;
+@rec_is_waiting_for_first_note
+         lda playing_note$
+         cmp #note_none
+         beq @rec_mode_stuff_end ; still waiting for first note to play..
+         ;
+         ; the first note now is playing, start recording:
+         ;
+         lda #<tune$
+         sta tune_ptr$
+         lda #>tune$
+         sta tune_ptr$ + 1
+@rec_next_note
+         lda #0
+         sta tune_countdown$
+         lda playing_note$
+         sta tune_note$
+@rec_restart_timer
+         lda #<rec_freq
+         sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
+         lda #>rec_freq
+         sta timer1_high$ ; clears interrupt flag and starts timer.
+@rec_mode_stuff_end
+
          jmp @infloop ; restart infinite key processing loop.
 
          ; exit application (show "goodbye"):
@@ -520,7 +600,7 @@ init     ; *** initialize internal variables ***
 
          sta mode$ ; set to normal mode (equals 0).
 
-         lda #$ff
+         lda #note_none
          sta playing_note$
          sta found_note1$
          sta found_note2$
