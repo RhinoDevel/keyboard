@@ -38,7 +38,7 @@ mode_normal = 0
 mode_rec = 1
 mode_play = 2
 
-rec_freq = 50000 ; microseconds (not really the frequency, but the reciprocal..)
+rec_freq = 5000 ; microseconds (not really the frequency, but the reciprocal..)
 rec_is_waiting = $ee ; value indicates rec. mode waiting for first note.
 
 note_none = $ff ; represents a pause "note" / no note.
@@ -289,6 +289,8 @@ main     sei
          sta tune_ptr$ + 1
          lda #1
          sta tune_countdown$
+         lda #0
+         sta tune_countdown$ + 1
          lda #<rec_freq
          sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
          lda #>rec_freq
@@ -318,6 +320,8 @@ main     sei
          ;
          ldy #0
          lda #0 ; end of tune marker.
+         sta (tune_ptr$),y
+         iny
          sta (tune_ptr$),y
          ;
 @normal_enable
@@ -350,13 +354,32 @@ main     sei
          bit via_ifr$ ; did timer one time out?
          bvc @play_mode_stuff_end ; no, it did not time out.
          ;
-         dec tune_countdown$
+         lda tune_countdown$
+         bne @countdown_dec_lsb ; skip dec. msb, because lsb is not zero.
+         dec tune_countdown$ + 1 ; dec. msb, because lsb will underflow.
+@countdown_dec_lsb
+         dec tune_countdown$ ; dec. lsb.
+         ;
+         lda tune_countdown$
+         bne @play_timer_restart
+         lda tune_countdown$ + 1
          bne @play_timer_restart
          ;
          ; next note of tune (if there is one), please:
          ;
          ldy #0
          lda (tune_ptr$),y
+         sta tune_countdown$
+         ;
+         inc tune_ptr$
+         bne @play_tune_ptr_inc_done1
+         inc tune_ptr$ + 1
+@play_tune_ptr_inc_done1
+         ;
+         lda (tune_ptr$),y
+         sta tune_countdown$ + 1
+         bne @play_next_note
+         lda tune_countdown$
          bne @play_next_note
          ;
          ; reached end of tune.
@@ -368,21 +391,19 @@ main     sei
          ; play next note:
          ;
 @play_next_note
-         sta tune_countdown$
-         ;
          inc tune_ptr$
-         bne @play_tune_ptr_inc_done1
+         bne @play_tune_ptr_inc_done2
          inc tune_ptr$ + 1
-@play_tune_ptr_inc_done1
+@play_tune_ptr_inc_done2
          ;
          ldy #0
          lda (tune_ptr$),y
          sta found_note1$
          ;
          inc tune_ptr$
-         bne @play_tune_ptr_inc_done2
+         bne @play_tune_ptr_inc_done3
          inc tune_ptr$ + 1
-@play_tune_ptr_inc_done2
+@play_tune_ptr_inc_done3
          ;
          ; restart timer:
          ;
@@ -491,18 +512,31 @@ main     sei
          ; the last memorized note is still playing:
          ;
          inc tune_countdown$
+         bne @inc_countdown_done
+         inc tune_countdown$ + 1
+@inc_countdown_done
          ;
-         ; * TODO: implement handling of reached limit $ff!
+         ; * TODO: implement handling of reached limit $ffff!
          ;
          jmp @rec_restart_timer
          ;
 @rec_note_changed
          lda tune_countdown$
+         bne @rec_save_countdown
+         lda tune_countdown$ + 1
          beq @rec_next_note ; last note did play shorter than one measure unit.
          ;
          ; last note played for at least one measure unit, save it:
          ;
+@rec_save_countdown
+         lda tune_countdown$
          ldy #0
+         sta (tune_ptr$),y
+         inc tune_ptr$
+         bne @rec_save_countdown_msb
+         inc tune_ptr$ + 1
+@rec_save_countdown_msb
+         lda tune_countdown$ + 1
          sta (tune_ptr$),y
          inc tune_ptr$
          bne @rec_save_note
@@ -529,6 +563,7 @@ main     sei
 @rec_next_note
          lda #0
          sta tune_countdown$
+         sta tune_countdown$ + 1
          lda playing_note$
          sta tune_note$
 @rec_restart_timer
