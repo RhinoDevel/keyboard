@@ -214,6 +214,10 @@ main     sei
          lda flags$ ; disable is-pressed flag.
          and #flag_pre_rec_neg
          sta flags$
+         ;
+         lda mode$ ; keep reversed on screen, if record mode is already enabled.
+         cmp #mode_rec
+         beq @next
          jmp @drawnotpre
 @no_rec_2
 
@@ -222,7 +226,10 @@ main     sei
          lda flags$ ; disable is-pressed flag.
          and #flag_pre_play_neg
          sta flags$
-         jmp @drawnotpre
+         ;
+         lda mode$ ; keep reversed on screen, if play mode is already enabled.
+         cmp #mode_play
+         beq @next
 @no_play_2
 
 @drawnotpre ; draw key as not pressed and go on
@@ -267,6 +274,15 @@ main     sei
          ; enable play mode (must be in normal mode):
          ;
 @play_enable
+         ; keep reverse on:
+         ;
+         ldy #'=' ; play key (hard-coded).
+         lda keyposx$,y
+         sta zero_word_buf1$
+         lda keyposy$,y
+         tay
+         jsr rev_on$
+
          lda #<tune$
          sta tune_ptr$
          lda #>tune$
@@ -316,7 +332,6 @@ main     sei
          lda #mode_rec
 @mode_upd
          sta mode$
-         jsr drawmodea
 @mode_no_upd
 
          ; do play mode stuff (before playing note), if play mode is active:
@@ -348,7 +363,6 @@ main     sei
          ;
          lda #mode_normal
          sta mode$
-         jsr drawmodea
          jmp @play_mode_stuff_end
          ;
          ; play next note:
@@ -541,30 +555,6 @@ main     sei
          rts
 
 ; *****************
-; *** drawmodea ***
-; *****************
-;
-; print mode (value must be in register a) as hexadecimal value.
-;
-; input:
-; ------
-; a
-;
-; output:
-; -------
-; a = garbage.
-; x = garbage.
-; y = garbage.
-; zero_word_buf1$ = garbage.
-;
-drawmodea
-         ldy #21 ; hard-coded
-         sty zero_word_buf1$
-         ldy #3 ; hard-coded         
-         jsr printby$
-         rts
-
-; *****************
 ; *** drawnotea ***
 ; *****************
 ;
@@ -649,9 +639,6 @@ init     ; *** initialize internal variables ***
          jsr patdraw$
          lda #0
          jsr drawnotea
-
-         lda mode$
-         jsr drawmodea
 
          rts
 
