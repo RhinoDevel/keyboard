@@ -274,15 +274,6 @@ main     sei
          ; enable play mode (must be in normal mode):
          ;
 @play_enable
-         ; keep reverse on:
-         ;
-         ldy #'=' ; play key (hard-coded).
-         lda keyposx$,y
-         sta zero_word_buf1$
-         lda keyposy$,y
-         tay
-         jsr rev_on$
-
          lda #<tune$
          sta tune_ptr$
          lda #>tune$
