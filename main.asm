@@ -627,6 +627,24 @@ init     ; *** initialize internal variables ***
          lda patterns$,y
          sta pattern$
 
+         ; calc. and store max. count of bytes for notes/pauses storable in ram:
+         ;
+         sec
+         lda tom$
+         sbc #<tune$
+         sta max_note_bytes$
+         lda tom$ + 1
+         sbc #>tune$
+         sta max_note_bytes$ + 1
+         ;
+         sec
+         lda max_note_bytes$
+         sbc #2 ; hard-coded. byte count of end of tune marker.
+         sta max_note_bytes$
+         lda max_note_bytes$ + 1
+         sbc #0
+         sta max_note_bytes$ + 1
+
          ; *** setup system registers ***
 
          lda #0
@@ -665,6 +683,19 @@ init     ; *** initialize internal variables ***
          jsr patdraw$
          lda #0
          jsr drawnotea
+
+         ; draw count of note/pause bytes that can be stored in ram via rec.:
+         ;
+         ldy #4 ; hard-coded
+         lda #25 ; hard-coded
+         sta zero_word_buf1$
+         lda max_note_bytes$ + 1
+         jsr printby$
+         ldy #4 ; hard-coded
+         lda #27 ; hard-coded
+         sta zero_word_buf1$
+         lda max_note_bytes$
+         jsr printby$
 
          rts
 

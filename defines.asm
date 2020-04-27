@@ -19,3 +19,5 @@ mode$ = fp_acc3$ ; 1 byte. 0 = normal, 1 = record, 2 = play.
 tune_ptr$ =  fp_acc3_1$ ; 2 bytes. initially set to tune$.
 tune_countdown$ =  fp_acc3_3$ ; 2 bytes.
 tune_note$ = fp_acc3_5$ ; 1 byte. it's the note's index in notes$ array.
+
+max_note_bytes$ = fp_acc1$ ; 2 bytes. max. count of note bytes storable in ram.

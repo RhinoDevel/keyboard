@@ -17,6 +17,21 @@ keystat$ byte 1
          byte 6
          byte '=', ' ', 'e', 'x', 'i', 't'
 
+         ;byte 2
+;         byte 24
+;         byte 1
+;         byte '$'
+;         ;
+;         byte 3
+;         byte 26
+;         byte 1
+;         byte '/'
+;         ;
+         byte 4
+         byte 24
+         byte 1
+         byte '$'
+
          byte 3
          byte 33
          byte 6
