@@ -676,6 +676,41 @@ init     ; *** initialize internal variables ***
 @divskip dex
          bne @divloop
 
+         ; calc. current count of notes/pauses:
+         ;
+         ldy #0
+         sty note_count$
+         sty note_count$ + 1
+         lda #<tune$
+         sta tune_ptr$
+         lda #>tune$
+         sta tune_ptr$ + 1
+         ;
+@note_count_loop
+         lda (tune_ptr$),y
+         bne @note_count_not_eot
+         iny
+         lda (tune_ptr$),y
+         beq @note_count_end
+         ldy #0
+@note_count_not_eot
+         ;
+         ldx #3
+@note_count_inc_loop
+         inc tune_ptr$
+         bne @note_count_ptr_inc_done
+         inc tune_ptr$ + 1
+@note_count_ptr_inc_done
+         dex
+         bne @note_count_inc_loop
+         ;
+         inc note_count$
+         bne @note_count_cnt_inc_done
+         inc note_count$ + 1
+@note_count_cnt_inc_done
+         jmp @note_count_loop
+@note_count_end
+
          ; *** setup system registers ***
 
          lda #0
@@ -714,6 +749,19 @@ init     ; *** initialize internal variables ***
          jsr patdraw$
          lda #0
          jsr drawnotea
+
+         ; draw count of notes/pauses currently stored in ram:
+         ;
+         ldy #2 ; hard-coded
+         lda #25 ; hard-coded
+         sta zero_word_buf1$
+         lda note_count$ + 1
+         jsr printby$
+         ldy #2 ; hard-coded
+         lda #27 ; hard-coded
+         sta zero_word_buf1$
+         lda note_count$
+         jsr printby$
 
          ; draw count of notes/pauses that can be stored in ram via rec.:
          ;
