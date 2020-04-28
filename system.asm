@@ -14,7 +14,6 @@ fp_acc3_1$ = $54 + 1 ; inside of "floating-point accumulator" nr. 3.
 fp_acc3_3$ = $54 + 3 ; inside of "floating-point accumulator" nr. 3.
 fp_acc3_5$ = $54 + 5 ; inside of "floating-point accumulator" nr. 3.
 fp_acc1$ = $5e ; floating-point accumulator nr. 1 (6 bytes).
-;fp_acc1_2$ = $5e + 2 ; inside of "floating-point accumulator" nr. 1.
 ;fp_acc2$ = $66 ; floating-point accumulator nr. 2 (6 bytes).
 keybufnum$ = $9e ; current number of characters in keyboard buffer.
 utility$ = $a2 ; not used / utility (1 unused byte).
