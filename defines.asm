@@ -20,7 +20,7 @@ tune_ptr$ =  fp_acc3_1$ ; 2 bytes. initially set to tune$.
 tune_countdown$ =  fp_acc3_3$ ; 2 bytes.
 tune_note$ = fp_acc3_5$ ; 1 byte. it's the note's index in notes$ array.
 
-max_note_bytes$ = fp_acc1$ ; 2 bytes. max. count of note bytes storable in ram.
+max_notes$ = fp_acc1$ ; 2 bytes. max. count of notes storable in ram.
 
 ; TODO: some of these store data that can be stored outside of zero-page without
 ;       any performance decrease!

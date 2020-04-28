@@ -627,23 +627,54 @@ init     ; *** initialize internal variables ***
          lda patterns$,y
          sta pattern$
 
-         ; calc. and store max. count of bytes for notes/pauses storable in ram:
+         ; calc. max. count of bytes for notes/pauses storable in ram:
          ;
          sec
          lda tom$
          sbc #<tune$
-         sta max_note_bytes$
+         sta max_notes$
          lda tom$ + 1
          sbc #>tune$
-         sta max_note_bytes$ + 1
+         sta max_notes$ + 1
          ;
          sec
-         lda max_note_bytes$
+         lda max_notes$
          sbc #2 ; hard-coded. byte count of end of tune marker.
-         sta max_note_bytes$
-         lda max_note_bytes$ + 1
+         sta max_notes$
+         lda max_notes$ + 1
          sbc #0
-         sta max_note_bytes$ + 1
+         sta max_notes$ + 1
+
+         ; calc. max. count of notes/pauses storable in ram:
+         ;
+         ; * original division source code was found at: 
+         ; 
+         ;   www.codebase64.org/doku.php?id=base:16bit_division_16-bit_result
+         ;
+         lda #0 ; set remainder to zero.
+         sta zero_word_buf1$
+         sta zero_word_buf1$ + 1
+         ;
+         ldx #16 ; for each bit:
+         ;
+@divloop asl max_notes$
+         rol max_notes$ + 1
+         rol zero_word_buf1$
+         rol zero_word_buf1$ + 1
+         lda zero_word_buf1$
+         sec
+         sbc #3 ; hard-coded: count of bytes for one note/pause in memory.
+         tay
+         lda zero_word_buf1$ + 1
+         sbc #0
+         bcc @divskip
+         ;
+         sta zero_word_buf1$ + 1
+         sty zero_word_buf1$
+         inc max_notes$
+         ;
+@divskip dex
+         bne @divloop
 
          ; *** setup system registers ***
 
@@ -684,17 +715,17 @@ init     ; *** initialize internal variables ***
          lda #0
          jsr drawnotea
 
-         ; draw count of note/pause bytes that can be stored in ram via rec.:
+         ; draw count of notes/pauses that can be stored in ram via rec.:
          ;
          ldy #4 ; hard-coded
          lda #25 ; hard-coded
          sta zero_word_buf1$
-         lda max_note_bytes$ + 1
+         lda max_notes$ + 1
          jsr printby$
          ldy #4 ; hard-coded
          lda #27 ; hard-coded
          sta zero_word_buf1$
-         lda max_note_bytes$
+         lda max_notes$
          jsr printby$
 
          rts
