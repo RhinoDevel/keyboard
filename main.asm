@@ -282,6 +282,8 @@ main     sei
          sta tune_countdown$
          lda #0
          sta tune_countdown$ + 1
+         sta note_nr$
+         sta note_nr$ + 1
          lda #<rec_freq
          sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
          lda #>rec_freq
@@ -316,6 +318,7 @@ main     sei
          sta (tune_ptr$),y
          ;
 @normal_enable
+         jsr drawnotecount
          lda #mode_normal
          beq @mode_upd ; (always branches, because normal mode value is zero)
          ;
@@ -395,6 +398,13 @@ main     sei
          bne @play_tune_ptr_inc_done3
          inc tune_ptr$ + 1
 @play_tune_ptr_inc_done3
+         ;
+         inc note_nr$
+         bne @play_note_nr_inc_done
+         inc note_nr$ + 1
+@play_note_nr_inc_done
+         ;
+         jsr drawnotenr
          ;
          ; restart timer:
          ;
@@ -580,6 +590,38 @@ main     sei
          cli
          rts
 
+; *********************
+; *** drawnotecount ***
+; *********************
+;
+drawnotecount
+         ldy #2 ; hard-coded
+         lda #25 ; hard-coded
+         sta zero_word_buf1$
+         lda note_count$ + 1
+         jsr printby$
+         ldy #2 ; hard-coded
+         lda #27 ; hard-coded
+         sta zero_word_buf1$
+         lda note_count$
+         jmp printby$
+;
+; ******************
+; *** drawnotenr ***
+; ******************
+;
+drawnotenr
+         ldy #2 ; hard-coded
+         lda #25 ; hard-coded
+         sta zero_word_buf1$
+         lda note_nr$ + 1
+         jsr printby$
+         ldy #2 ; hard-coded
+         lda #27 ; hard-coded
+         sta zero_word_buf1$
+         lda note_nr$
+         jmp printby$
+
 ; *****************
 ; *** drawnotea ***
 ; *****************
@@ -601,8 +643,7 @@ drawnotea
          ldy #17 ; hard-coded
          sty zero_word_buf1$
          ldy #3 ; hard-coded         
-         jsr printby$
-         rts
+         jmp printby$
 
 ; ************
 ; *** init ***
@@ -752,16 +793,7 @@ init     ; *** initialize internal variables ***
 
          ; draw count of notes/pauses currently stored in ram:
          ;
-         ldy #2 ; hard-coded
-         lda #25 ; hard-coded
-         sta zero_word_buf1$
-         lda note_count$ + 1
-         jsr printby$
-         ldy #2 ; hard-coded
-         lda #27 ; hard-coded
-         sta zero_word_buf1$
-         lda note_count$
-         jsr printby$
+         jsr drawnotecount         
 
          ; draw count of notes/pauses that can be stored in ram via rec.:
          ;
