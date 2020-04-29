@@ -311,12 +311,20 @@ main     sei
          ;
          ; disable record mode:
          ;
+         lda note_nr$
+         bne @store_eot_and_count
+         lda note_nr$ + 1
+         beq @normal_enable
+@store_eot_and_count
          ldy #0
          lda #0 ; end of tune marker.
          sta (tune_ptr$),y
          iny
          sta (tune_ptr$),y
-         ;
+         lda note_nr$
+         sta note_count$
+         lda note_nr$ + 1
+         sta note_count$ + 1
 @normal_enable
          jsr drawnotecount
          lda #mode_normal
@@ -325,6 +333,11 @@ main     sei
          ; enable record mode (must be in normal mode):
          ;
 @rec_enable
+         lda #0
+         sta note_nr$
+         sta note_nr$ + 1
+         ; (don't show 0 as note nr., keep showing current note/pause count)
+         ;
          lda #rec_is_waiting ; indicates waiting for first note to be played by
          sta tune_note$      ; user to start recording via timer.
          lda #mode_rec
@@ -545,6 +558,11 @@ main     sei
 @rec_save_note
          lda tune_note$
          sta (tune_ptr$),y
+         inc note_nr$
+         bne @rec_note_nr_inc_done
+         inc note_nr$ + 1
+@rec_note_nr_inc_done
+         jsr drawnotenr
          inc tune_ptr$
          bne @rec_next_note
          inc tune_ptr$ + 1
