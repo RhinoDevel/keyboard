@@ -22,17 +22,22 @@ flag_pre_rec = 4
 flag_pre_rec_neg = 255 - flag_pre_rec
 flag_pre_play = 8
 flag_pre_play_neg = 255 - flag_pre_play
+flag_pre_speed = 16
+flag_pre_speed_neg = 255 - flag_pre_speed
 
 ; to be used with flag_upd$ variable:
 ;
 flag_upd_pat = 1
 flag_upd_pat_neg = 255 - flag_upd_pat
 ;
-flag_upd_rec = 2
+flag_upd_rec = 4
 flag_upd_rec_neg = 255 - flag_upd_rec
 ;
-flag_upd_play = 4
+flag_upd_play = 8
 flag_upd_play_neg = 255 - flag_upd_play
+;
+flag_upd_speed = 16
+flag_upd_speed_neg = 255 - flag_upd_speed
 
 ; to be used with variable named mode$:
 ;
@@ -176,6 +181,21 @@ no_rec
          jmp draw_on
 no_play
 
+         cpx #'*' ; speed button pressed?
+         bne no_speed
+         lda flag_pre$
+         and #flag_pre_speed
+         bne draw_on ; skips, if press already is processed.
+         lda flag_pre$
+         ora #flag_pre_speed
+         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         lda flag_upd$
+         ora #flag_upd_speed
+         sta flag_upd$ ; request update.
+         ; (nothing to do, here)
+         jmp draw_on
+no_speed
+
          ; pressed key must be a note key at this point.
 
          ldy found_note1$
@@ -240,7 +260,16 @@ no_rec_2
          lda mode$ ; keep reversed on screen, if play mode is already enabled.
          cmp #mode_play
          beq next_key
+         jmp drawnotpre
 no_play_2
+
+         cpx #'*' ; speed key?
+         bne no_speed_2
+         lda flag_pre$ ; disable is-pressed flag.
+         and #flag_pre_speed_neg
+         sta flag_pre$
+         ;jmp drawnotpre
+no_speed_2 
 
 drawnotpre ; draw key as not pressed and go on
          ldy keyposx$,x
@@ -354,6 +383,29 @@ rec_enable
 mode_upd
          sta mode$
 mode_no_upd
+
+         ; change speed, if necessary:
+         ;
+         lda flag_upd$
+         and #flag_upd_speed
+         beq speed_no_upd ; no update because of speed button necessary.
+         ;
+         ; update because of speed button:
+         ;
+         lda flag_upd$
+         and #flag_upd_speed_neg ; speed button is handled.
+         sta flag_upd$
+         ;
+         inc speed + 1
+         lda #5 ; hard-coded speed maximum is this minus 1.
+         cmp speed + 1
+         bne speed_draw
+speed_to_one
+         lda #1
+         sta speed + 1
+speed_draw
+         jsr drawspeed
+speed_no_upd
 
          ; do play mode stuff (before playing note), if play mode is active:
          ;
