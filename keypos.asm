@@ -50,7 +50,7 @@ keyposx$ byte $ff ; @
          byte $0b ; '
          byte $ff ; (
          byte $ff ; )
-         byte $ff ; *
+         byte $1f ; *
          byte $1f ; +
          byte $12 ; ,
          byte $ff ; -
@@ -122,7 +122,7 @@ keyposy$ byte $ff ; @
          byte $04 ; '
          byte $ff ; (
          byte $ff ; )
-         byte $ff ; *
+         byte $07 ; *
          byte $03 ; +
          byte $0a ; ,
          byte $ff ; -

@@ -42,6 +42,16 @@ keystat$ byte 1
          byte 6
          text '= play'
 
+         byte 7
+         byte 33
+         byte 1
+         byte '='
+         ;
+         byte 7
+         byte 36
+         byte 1
+         byte 'x'
+
          byte 3 ; char row / line nr. (0 - 24).
          byte 2 ; char column / pos. in line (0 - 39 or 0 - 79).
          byte 13; char count.

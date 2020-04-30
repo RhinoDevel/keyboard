@@ -361,6 +361,7 @@ mode_no_upd
          bit via_ifr$ ; did timer one time out?
          bvc play_mode_stuff_end ; no, it did not time out.
          ;
+speed
          ldy #1;#3 ; TODO: increase this value to increase playback speed.
 countdown_dec
          lda tune_countdown$
@@ -605,7 +606,7 @@ rec_mode_stuff_end
 
          ; exit application (show "goodbye"):
          ;
-exit    lda #0
+exit     lda #0
          sta timer2_low$ ; disables sound by timer reset.
          sta keybufnum$ ; (sometimes, the <left arrow> will still be printed..)
          clrscr$
@@ -616,6 +617,19 @@ exit    lda #0
          jsr keydrawstat$
          cli
          rts
+
+; *****************
+; *** drawspeed ***
+; *****************
+;
+drawspeed
+         ldy #7 ; hard-coded
+         lda #35 ; hard-coded
+         sta zero_word_buf1$
+         lda speed + 1
+         clc
+         adc #'0'
+         jmp pos_draw$
 
 ; *********************
 ; *** drawnotecount ***
@@ -835,6 +849,8 @@ note_count_end
          lda max_notes$
          jsr printby$
 
+         jsr drawspeed ; draw playback speed.
+      
          rts
 
          ; delay:
