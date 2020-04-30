@@ -9,7 +9,7 @@ zero_word_buf1$ = adptr$
 zero_word_buf2$ = tapbufin$
 pat_index$ = tappari$
 pattern$ = io_util$
-flags$ = tapbufch$
+flag_pre$ = tapbufch$
 playing_note$ = tapeutil$
 last_note$ = tapflag$
 found_note1$ = utility$
@@ -23,6 +23,8 @@ tune_note$ = fp_acc3_5$ ; 1 byte. it's the note's index in notes$ array.
 max_notes$ = fp_acc1$ ; 2 bytes. max. count of notes/pauses storable in ram.
 note_count$ = fp_acc1_2$ ; 2 bytes. current count of notes/pauses stored in ram.
 note_nr$ = fp_acc1_4$ ; 2 bytes. current note's number (not index).
+
+flag_upd$ = fp_acc2$ ; 1 byte.
 
 ; TODO: some of these store data that can be stored outside of zero-page without
 ;       any performance decrease!

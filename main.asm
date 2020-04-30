@@ -12,7 +12,7 @@ dec_addr4 = 0;main MOD $a
 
 def_pat_index = 0 ; default pattern index (for timbre and sometimes octave).
 
-; to be used with flags$ variable:
+; to be used with flag_pre$ variable:
 ;
 flag_pre_pat_n = 1
 flag_pre_pat_n_neg = 255 - flag_pre_pat_n
@@ -22,17 +22,19 @@ flag_pre_rec = 4
 flag_pre_rec_neg = 255 - flag_pre_rec
 flag_pre_play = 8
 flag_pre_play_neg = 255 - flag_pre_play
+
+; to be used with flag_upd$ variable:
 ;
-flag_upd_pat = 16
+flag_upd_pat = 1
 flag_upd_pat_neg = 255 - flag_upd_pat
 ;
-flag_upd_rec = 32
+flag_upd_rec = 2
 flag_upd_rec_neg = 255 - flag_upd_rec
 ;
-flag_upd_play = 64
+flag_upd_play = 4
 flag_upd_play_neg = 255 - flag_upd_play
 
-; to be used with variable named mode:
+; to be used with variable named mode$:
 ;
 mode_normal = 0
 mode_rec = 1
@@ -101,13 +103,15 @@ no_exit
 
          cpx #59 ; ';' ; next-pattern key pressed?
          bne no_pat_n ; skips, if next-pattern key not pressed.
-         lda flags$
+         lda flag_pre$
          and #flag_pre_pat_n
          bne jmp_draw_on ; skips, if press already is processed.
-         lda flags$
+         lda flag_pre$
          ora #flag_pre_pat_n
+         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         lda flag_upd$
          ora #flag_upd_pat
-         sta flags$ ; rem. cur. key press to be alr. processed and request upd.
+         sta flag_upd$ ; request update.
          inc pat_index$
          lda #pattern_count$
          cmp pat_index$
@@ -124,13 +128,15 @@ no_pat_n
 
          cpx #'?' ; last-pattern key pressed?
          bne no_pat_l
-         lda flags$
+         lda flag_pre$
          and #flag_pre_pat_l
          bne draw_on
-         lda flags$
+         lda flag_pre$
          ora #flag_pre_pat_l
+         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         lda flag_upd$
          ora #flag_upd_pat
-         sta flags$
+         sta flag_upd$ ; request update.
          dec pat_index$
          lda #$ff
          cmp pat_index$
@@ -142,26 +148,30 @@ no_pat_l
 
          cpx #'+' ; record button pressed?
          bne no_rec
-         lda flags$
+         lda flag_pre$
          and #flag_pre_rec
          bne draw_on ; skips, if press already is processed.
-         lda flags$
+         lda flag_pre$
          ora #flag_pre_rec
+         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         lda flag_upd$
          ora #flag_upd_rec
-         sta flags$
+         sta flag_upd$ ; request update.
          ; (nothing to do, here)
          jmp draw_on
 no_rec
 
          cpx #'=' ; play button pressed?
          bne no_play
-         lda flags$
+         lda flag_pre$
          and #flag_pre_play
          bne draw_on ; skips, if press already is processed.
-         lda flags$
+         lda flag_pre$
          ora #flag_pre_play
+         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         lda flag_upd$
          ora #flag_upd_play
-         sta flags$
+         sta flag_upd$ ; request update.
          ; (nothing to do, here)
          jmp draw_on
 no_play
@@ -195,25 +205,25 @@ sup_but_is_not_pressed ; supported button is not pressed.
  
          cpx #59 ; ';' ; next-pattern key?
          bne no_pat_n_2
-         lda flags$ ; disable is-pressed flag.
+         lda flag_pre$ ; disable is-pressed flag.
          and #flag_pre_pat_n_neg
-         sta flags$
+         sta flag_pre$
          jmp drawnotpre
 no_pat_n_2 
 
          cpx #'?' ; last-pattern key?
          bne no_pat_l_2
-         lda flags$
+         lda flag_pre$
          and #flag_pre_pat_l_neg
-         sta flags$
+         sta flag_pre$
          jmp drawnotpre
 no_pat_l_2
 
          cpx #'+' ; record key?
          bne no_rec_2
-         lda flags$ ; disable is-pressed flag.
+         lda flag_pre$ ; disable is-pressed flag.
          and #flag_pre_rec_neg
-         sta flags$
+         sta flag_pre$
          ;
          lda mode$ ; keep reversed on screen, if record mode is already enabled.
          cmp #mode_rec
@@ -223,9 +233,9 @@ no_rec_2
 
          cpx #'=' ; play key?
          bne no_play_2
-         lda flags$ ; disable is-pressed flag.
+         lda flag_pre$ ; disable is-pressed flag.
          and #flag_pre_play_neg
-         sta flags$
+         sta flag_pre$
          ;
          lda mode$ ; keep reversed on screen, if play mode is already enabled.
          cmp #mode_play
@@ -251,16 +261,16 @@ keyloopdone ; all keys got processed in loop.
 
          ; change/update mode, if necessary:
          ;
-         lda flags$
+         lda flag_upd$
          and #flag_upd_play
          beq mode_chk_rec ; no update because of play button necessary.
          ;
          ; update because of play button:
          ;
-         lda flags$
+         lda flag_upd$
          and #flag_upd_play_neg ; play button is handled.
          and #flag_upd_rec_neg ; record but. is handled (play button overrules).
-         sta flags$
+         sta flag_upd$
          ;
          lda mode$
          beq play_enable ; switch from normal to play mode (normal mode = 0).
@@ -294,15 +304,15 @@ play_enable
          ; check, if record mode is enabled (play update must not be necessary):
          ;
 mode_chk_rec
-         lda flags$
+         lda flag_upd$
          and #flag_upd_rec
          beq mode_no_upd ; no update because of record button necessary.
          ;
          ; update because of record button:
          ;
-         lda flags$
+         lda flag_upd$
          and #flag_upd_rec_neg ; record button is handled.
-         sta flags$
+         sta flag_upd$
          ;
          lda mode$
          beq rec_enable ; switch from normal to record mode (normal = 0).
@@ -439,12 +449,12 @@ play_timer_restart
 play_mode_stuff_end
 
 upd_pat_chk
-         lda flags$ ; upd. shift pattern on change (for timbre & maybe octave).
+         lda flag_upd$ ; upd. shift pattern on change (for timbre & maybe octave).
          and #flag_upd_pat
          beq no_upd_pat
-         lda flags$
+         lda flag_upd$
          and #flag_upd_pat_neg
-         sta flags$
+         sta flag_upd$
          lda pattern$
          sta via_shift$
          jsr patdraw$ ; draws shift pattern.
@@ -694,7 +704,8 @@ init     ; *** initialize internal variables ***
 
          lda #0
 
-         sta flags$ ; disables all flags.
+         sta flag_pre$ ; disables all flags.
+         sta flag_upd$ ;
 
          sta mode$ ; set to normal mode (equals 0).
 
