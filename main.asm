@@ -767,7 +767,7 @@ init     ; *** initialize internal variables ***
          sta found_note2$
          sta last_note$
 
-         ldy #def_pat_index
+         ldy #def_pat_index ; TODO: keep pattern on exit / re-entry!
          sty pat_index$
          lda patterns$,y
          sta pattern$
