@@ -361,11 +361,19 @@ main     sei
          bit via_ifr$ ; did timer one time out?
          bvc @play_mode_stuff_end ; no, it did not time out.
          ;
+         ldy #1;#3 ; TODO: increase this value to increase playback speed.
+@countdown_dec
          lda tune_countdown$
          bne @countdown_dec_lsb ; skip dec. msb, because lsb is not zero.
          dec tune_countdown$ + 1 ; dec. msb, because lsb will underflow.
 @countdown_dec_lsb
          dec tune_countdown$ ; dec. lsb.
+         bne @countdown_y_dec
+         lda tune_countdown$ + 1
+         beq @countdown_next_note ; countdown already at zero, stop dec.
+@countdown_y_dec
+         dey
+         bne @countdown_dec
          ;
          lda tune_countdown$
          bne @play_timer_restart
@@ -374,6 +382,7 @@ main     sei
          ;
          ; next note of tune (if there is one), please:
          ;
+@countdown_next_note
          ldy #0
          lda (tune_ptr$),y
          sta tune_countdown$
