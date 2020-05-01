@@ -871,7 +871,7 @@ init     ; *** initialize internal variables ***
          ;
          ldx #16 ; for each bit:
          ;
-divloop asl max_notes$
+divloop  asl max_notes$
          rol max_notes$ + 1
          rol zero_word_buf1$
          rol zero_word_buf1$ + 1
@@ -887,7 +887,7 @@ divloop asl max_notes$
          sty zero_word_buf1$
          inc max_notes$
          ;
-divskip dex
+divskip  dex
          bne divloop
 
          ; calc. current count of notes/pauses:
