@@ -462,9 +462,22 @@ play_tune_ptr_inc_done1
          ; reached end of tune
          ; (high and low byte are zero, which is the end of tune marker).
          ;
+
          lda #mode_normal
          sta mode$
          jmp play_mode_stuff_end
+         ;
+         ; TODO: use this for infinite loop playback, instead:
+         ;
+;         lda #<tune$
+;         sta tune_ptr$
+;         lda #>tune$
+;         sta tune_ptr$ + 1
+;         ;ldy #0
+;         sty note_nr$
+;         sty note_nr$ + 1
+;         jmp countdown_next_note ; ok, there is alw. at least one note stored.
+
          ;
          ; play next note:
          ;
