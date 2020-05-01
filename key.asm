@@ -56,7 +56,7 @@ key_row$ byte $ff ; @
          byte $07 ; ,
          byte $ff ; -
          byte $ff ; .
-         byte $ff ; /
+         byte $03 ; /
          byte $ff ; 0
          byte $ff ; 1
          byte $ff ; 2
@@ -129,7 +129,7 @@ key_neg$ byte $ff ; @
          byte $08 ; ,
          byte $ff ; -
          byte $ff ; .
-         byte $ff ; /
+         byte $80 ; /
          byte $ff ; 0
          byte $ff ; 1
          byte $ff ; 2

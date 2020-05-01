@@ -24,6 +24,8 @@ flag_pre_play = 8
 flag_pre_play_neg = 255 - flag_pre_play
 flag_pre_speed = 16
 flag_pre_speed_neg = 255 - flag_pre_speed
+flag_pre_loop = 32
+flag_pre_loop_neg = 255 - flag_pre_loop
 
 ; to be used with flag_upd$ variable:
 ;
@@ -38,6 +40,9 @@ flag_upd_play_neg = 255 - flag_upd_play
 ;
 flag_upd_speed = 16
 flag_upd_speed_neg = 255 - flag_upd_speed
+;
+flag_upd_loop = 32
+flag_upd_loop_neg = 255 - flag_upd_loop
 
 ; to be used with variable named mode$:
 ;
@@ -135,7 +140,9 @@ no_pat_n
          bne no_pat_l
          lda flag_pre$
          and #flag_pre_pat_l
-         bne draw_on
+         beq pat_l_helper
+         jmp draw_on
+pat_l_helper
          lda flag_pre$
          ora #flag_pre_pat_l
          sta flag_pre$ ; rem. cur. key press to be alr. processed.
@@ -195,6 +202,21 @@ no_play
          ; (nothing to do, here)
          jmp draw_on
 no_speed
+
+         cpx #'/' ; loop button pressed?
+         bne no_loop
+         lda flag_pre$
+         and #flag_pre_loop
+         bne draw_on ; skips, if press already is processed.
+         lda flag_pre$
+         ora #flag_pre_loop
+         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         lda flag_upd$
+         ora #flag_upd_loop
+         sta flag_upd$ ; request update.
+         ; (nothing to do, here)
+         jmp draw_on
+no_loop
 
          ; pressed key must be a note key at this point.
 
@@ -268,8 +290,20 @@ no_play_2
          lda flag_pre$ ; disable is-pressed flag.
          and #flag_pre_speed_neg
          sta flag_pre$
+         jmp drawnotpre
+no_speed_2
+
+         cpx #'/' ; loop key?
+         bne no_loop_2
+         lda flag_pre$ ; disable is-pressed flag.
+         and #flag_pre_loop_neg
+         sta flag_pre$
+         ;
+         lda loop + 1 ; keep reversed on screen, if loop playback is alr. enabled.
+         bne next_key ; 0 = loop is disabled, 1 = loop is enabled.
          ;jmp drawnotpre
-no_speed_2 
+no_loop_2 
+
 
 drawnotpre ; draw key as not pressed and go on
          ldy keyposx$,x
@@ -407,6 +441,23 @@ speed_draw
          jsr drawspeed
 speed_no_upd
 
+         ; enable/disable loop playback, if necessary:
+         ;
+         lda flag_upd$
+         and #flag_upd_loop
+         beq loop_no_upd ; no update because of loop button necessary.
+         ;
+         ; update because of loop button:
+         ;
+         lda flag_upd$
+         and #flag_upd_loop_neg ; loop button is handled.
+         sta flag_upd$
+         ;
+         lda loop + 1
+         eor #1 ; toggles loop enabled/disabled.
+         sta loop + 1
+loop_no_upd
+
          ; do play mode stuff (before playing note), if play mode is active:
          ;
          lda mode$
@@ -463,21 +514,26 @@ play_tune_ptr_inc_done1
          ; (high and low byte are zero, which is the end of tune marker).
          ;
 
+loop     lda #0 ; 0 = don't loop, 1 = loop.
+         bne play_loop
+         ; 
+         ; stop playback and enter normal mode:
+         ;
          lda #mode_normal
          sta mode$
          jmp play_mode_stuff_end
          ;
-         ; TODO: use this for infinite loop playback, instead:
+         ; infinite loop playback:
          ;
-;         lda #<tune$
-;         sta tune_ptr$
-;         lda #>tune$
-;         sta tune_ptr$ + 1
-;         ;ldy #0
-;         sty note_nr$
-;         sty note_nr$ + 1
-;         jmp countdown_next_note ; ok, there is alw. at least one note stored.
-
+play_loop
+         lda #<tune$
+         sta tune_ptr$
+         lda #>tune$
+         sta tune_ptr$ + 1
+         ;ldy #0 ; (already set to 0, above)
+         sty note_nr$
+         sty note_nr$ + 1
+         jmp countdown_next_note ; ok, there is alw. at least one note stored.
          ;
          ; play next note:
          ;
@@ -681,6 +737,7 @@ rec_mode_stuff_end
          ; exit application (show "goodbye"):
          ;
 exit     lda #0
+         sta loop + 1 ; TODO: implementing keeping loop enabled, if wanted!
          sta timer2_low$ ; disables sound by timer reset.
          sta keybufnum$ ; (sometimes, the <left arrow> will still be printed..)
          clrscr$
