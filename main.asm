@@ -447,21 +447,20 @@ countdown_y_dec
          ;
 countdown_next_note
          ldy #0
-         lda (tune_ptr$),y
+         lda (tune_ptr$),y ; load next note's length's low byte.
          sta tune_countdown$
-         ;
-         inc tune_ptr$
+         inc tune_ptr$ ; incr. tune pointer to next note's length's high byte.
          bne play_tune_ptr_inc_done1
          inc tune_ptr$ + 1
 play_tune_ptr_inc_done1
-         ;
-         lda (tune_ptr$),y
+         lda (tune_ptr$),y ; load next note's length's high byte.
          sta tune_countdown$ + 1
-         bne play_next_note
+         bne play_next_note ; it really is a note's length, if high byte not 0.
          lda tune_countdown$
-         bne play_next_note
+         bne play_next_note ; it really is a note's length, if low byte not 0.
          ;
-         ; reached end of tune.
+         ; reached end of tune
+         ; (high and low byte are zero, which is the end of tune marker).
          ;
          lda #mode_normal
          sta mode$
