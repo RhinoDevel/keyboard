@@ -985,6 +985,49 @@ note_count_end
       
          rts
 
+         ; does not seem to work with vice (uses c64 format??):
+         ;
+;savetune lda #<tune$
+;         sta $fb ; TODO: hard-coded!
+;         lda #>tune$
+;         sta $fc
+;
+;         lda tune_ptr$ ; TODO: does work after playing whole tune, only!
+;         sta $c9 ; TODO: hard-coded!
+;         lda tune_ptr$ + 1 ; TODO: does work after playing whole tune, only!
+;         sta $ca
+;
+;         ldy #0
+;         lda #"t"
+;         sta $033a,y ; TODO: hard-coded!
+;         iny
+;         lda #"u"
+;         sta $033a,y ; TODO: hard-coded!
+;         iny
+;         lda #"n"
+;         sta $033a,y ; TODO: hard-coded!
+;         iny
+;         lda #"e"
+;         sta $033a,y ; TODO: hard-coded!
+;         iny 
+;
+;         lda #1
+;         sta $d4 ; TODO: hard-coded!
+;
+;         sty $d1 ; TODO: hard-coded! could use 0 for no filename.
+;
+;         lda #<$033a
+;         sta $da ; TODO: hard-coded!
+;         lda #>$033a
+;         sta $db ; TODO: hard-coded!
+;
+;         ldx #1
+;         dex
+;         jmp $f703 ; TODO: hard-coded!
+;
+;         ; TODO: error check?
+;         rts
+
          ; delay:
          ;
 ;         lda #$ff
