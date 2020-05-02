@@ -9,7 +9,7 @@ target TGT_PETBV2;TGT_PETBV4
 
 adptr$ = 15 ; term. width & lim. for scanning src. columns (2 unused bytes).
 tom$ = $34 ; pointer to top of memory / limit of basic.
-fp_acc3$ = $54 ; "floating-point accumulator" nr. 3 (6 bytes).
+;fp_acc3$ = $54 ; "floating-point accumulator" nr. 3 (6 bytes).
 fp_acc3_1$ = $54 + 1 ; inside of "floating-point accumulator" nr. 3.
 fp_acc3_3$ = $54 + 3 ; inside of "floating-point accumulator" nr. 3.
 fp_acc3_5$ = $54 + 5 ; inside of "floating-point accumulator" nr. 3.

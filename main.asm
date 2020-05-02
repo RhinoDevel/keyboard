@@ -44,7 +44,7 @@ flag_upd_speed_neg = 255 - flag_upd_speed
 flag_upd_loop = 32
 flag_upd_loop_neg = 255 - flag_upd_loop
 
-; to be used with variable named mode$:
+; to be used with variable named mode:
 ;
 mode_normal = 0
 mode_rec = 1
@@ -268,7 +268,7 @@ no_pat_l_2
          and #flag_pre_rec_neg
          sta flag_pre
          ;
-         lda mode$ ; keep reversed on screen, if record mode is already enabled.
+         lda mode ; keep reversed on screen, if record mode is already enabled.
          cmp #mode_rec
          beq next_key
          jmp drawnotpre
@@ -280,7 +280,7 @@ no_rec_2
          and #flag_pre_play_neg
          sta flag_pre
          ;
-         lda mode$ ; keep reversed on screen, if play mode is already enabled.
+         lda mode ; keep reversed on screen, if play mode is already enabled.
          cmp #mode_play
          beq next_key
          jmp drawnotpre
@@ -336,7 +336,7 @@ keyloopdone ; all keys got processed in loop.
          and #flag_upd_rec_neg ; record but. is handled (play button overrules).
          sta flag_upd
          ;
-         lda mode$
+         lda mode
          beq play_enable ; switch from normal to play mode (normal mode = 0).
          cmp #mode_rec
          beq mode_no_upd ; must be in record mode, do nothing.
@@ -378,7 +378,7 @@ mode_chk_rec
          and #flag_upd_rec_neg ; record button is handled.
          sta flag_upd
          ;
-         lda mode$
+         lda mode
          beq rec_enable ; switch from normal to record mode (normal = 0).
          cmp #mode_play
          beq mode_no_upd ; must be in play mode, do nothing.
@@ -416,7 +416,7 @@ rec_enable
          sta tune_note$      ; user to start recording via timer.
          lda #mode_rec
 mode_upd
-         sta mode$
+         sta mode
 mode_no_upd
 
          ; change speed, if necessary:
@@ -461,7 +461,7 @@ loop_no_upd
 
          ; do play mode stuff (before playing note), if play mode is active:
          ;
-         lda mode$
+         lda mode
          cmp #mode_play
          bne play_mode_stuff_end
          ;
@@ -521,7 +521,7 @@ loop     lda #0 ; 0 = don't loop, 1 = loop.
          ; stop playback and enter normal mode:
          ;
          lda #mode_normal
-         sta mode$
+         sta mode
          jmp play_mode_stuff_end
          ;
          ; infinite loop playback:
@@ -643,7 +643,7 @@ no_upd_note
 ;
          ; do record mode stuff (after playing note), if record mode is active:
          ;
-         lda mode$
+         lda mode
          cmp #mode_rec
          bne rec_mode_stuff_end
          ;
@@ -829,7 +829,7 @@ init     ; *** initialize internal variables ***
          sta flag_pre ; disables all flags.
          sta flag_upd ;
 
-         sta mode$ ; set to normal mode (equals 0).
+         sta mode ; set to normal mode (equals 0).
 
          lda #note_none
          sta playing_note$
@@ -1035,6 +1035,8 @@ note_count_end
 
 flag_pre byte 0 ; 1 byte.
 flag_upd byte 0 ; 1 byte.
+
+mode     byte 0 ; 1 byte. 0 = normal, 1 = record, 2 = play.
 
          ; delay:
          ;
