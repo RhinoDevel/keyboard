@@ -9,7 +9,6 @@ zero_word_buf1$ = adptr$
 zero_word_buf2$ = tapbufin$
 pat_index$ = tappari$
 pattern$ = io_util$
-flag_pre$ = tapbufch$
 playing_note$ = tapeutil$
 last_note$ = tapflag$
 found_note1$ = utility$

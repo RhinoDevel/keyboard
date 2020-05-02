@@ -12,7 +12,7 @@ dec_addr4 = 0;main MOD $a
 
 def_pat_index = 0 ; default pattern index (for timbre and sometimes octave).
 
-; to be used with flag_pre$ variable:
+; to be used with flag_pre variable:
 ;
 flag_pre_pat_n = 1
 flag_pre_pat_n_neg = 255 - flag_pre_pat_n
@@ -113,12 +113,12 @@ no_exit
 
          cpx #59 ; ';' ; next-pattern key pressed?
          bne no_pat_n ; skips, if next-pattern key not pressed.
-         lda flag_pre$
+         lda flag_pre
          and #flag_pre_pat_n
          bne jmp_draw_on ; skips, if press already is processed.
-         lda flag_pre$
+         lda flag_pre
          ora #flag_pre_pat_n
-         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; rem. cur. key press to be alr. processed.
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
@@ -138,14 +138,14 @@ no_pat_n
 
          cpx #'?' ; last-pattern key pressed?
          bne no_pat_l
-         lda flag_pre$
+         lda flag_pre
          and #flag_pre_pat_l
          beq pat_l_helper
          jmp draw_on
 pat_l_helper
-         lda flag_pre$
+         lda flag_pre
          ora #flag_pre_pat_l
-         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; rem. cur. key press to be alr. processed.
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
@@ -160,27 +160,28 @@ no_pat_l
 
          cpx #'+' ; record button pressed?
          bne no_rec
-         lda flag_pre$
+         lda flag_pre
          and #flag_pre_rec
-         bne draw_on ; skips, if press already is processed.
-         lda flag_pre$
+         bne rec_jmp_draw_on ; skips, if press already is processed.
+         lda flag_pre
          ora #flag_pre_rec
-         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; rem. cur. key press to be alr. processed.
          lda flag_upd
          ora #flag_upd_rec
          sta flag_upd ; request update.
          ; (nothing to do, here)
+rec_jmp_draw_on
          jmp draw_on
 no_rec
 
          cpx #'=' ; play button pressed?
          bne no_play
-         lda flag_pre$
+         lda flag_pre
          and #flag_pre_play
          bne draw_on ; skips, if press already is processed.
-         lda flag_pre$
+         lda flag_pre
          ora #flag_pre_play
-         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; rem. cur. key press to be alr. processed.
          lda flag_upd
          ora #flag_upd_play
          sta flag_upd ; request update.
@@ -190,12 +191,12 @@ no_play
 
          cpx #'*' ; speed button pressed?
          bne no_speed
-         lda flag_pre$
+         lda flag_pre
          and #flag_pre_speed
          bne draw_on ; skips, if press already is processed.
-         lda flag_pre$
+         lda flag_pre
          ora #flag_pre_speed
-         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; rem. cur. key press to be alr. processed.
          lda flag_upd
          ora #flag_upd_speed
          sta flag_upd ; request update.
@@ -205,12 +206,12 @@ no_speed
 
          cpx #'/' ; loop button pressed?
          bne no_loop
-         lda flag_pre$
+         lda flag_pre
          and #flag_pre_loop
          bne draw_on ; skips, if press already is processed.
-         lda flag_pre$
+         lda flag_pre
          ora #flag_pre_loop
-         sta flag_pre$ ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; rem. cur. key press to be alr. processed.
          lda flag_upd
          ora #flag_upd_loop
          sta flag_upd ; request update.
@@ -247,25 +248,25 @@ sup_but_is_not_pressed ; supported button is not pressed.
  
          cpx #59 ; ';' ; next-pattern key?
          bne no_pat_n_2
-         lda flag_pre$ ; disable is-pressed flag.
+         lda flag_pre ; disable is-pressed flag.
          and #flag_pre_pat_n_neg
-         sta flag_pre$
+         sta flag_pre
          jmp drawnotpre
 no_pat_n_2 
 
          cpx #'?' ; last-pattern key?
          bne no_pat_l_2
-         lda flag_pre$
+         lda flag_pre
          and #flag_pre_pat_l_neg
-         sta flag_pre$
+         sta flag_pre
          jmp drawnotpre
 no_pat_l_2
 
          cpx #'+' ; record key?
          bne no_rec_2
-         lda flag_pre$ ; disable is-pressed flag.
+         lda flag_pre ; disable is-pressed flag.
          and #flag_pre_rec_neg
-         sta flag_pre$
+         sta flag_pre
          ;
          lda mode$ ; keep reversed on screen, if record mode is already enabled.
          cmp #mode_rec
@@ -275,9 +276,9 @@ no_rec_2
 
          cpx #'=' ; play key?
          bne no_play_2
-         lda flag_pre$ ; disable is-pressed flag.
+         lda flag_pre ; disable is-pressed flag.
          and #flag_pre_play_neg
-         sta flag_pre$
+         sta flag_pre
          ;
          lda mode$ ; keep reversed on screen, if play mode is already enabled.
          cmp #mode_play
@@ -287,17 +288,17 @@ no_play_2
 
          cpx #'*' ; speed key?
          bne no_speed_2
-         lda flag_pre$ ; disable is-pressed flag.
+         lda flag_pre ; disable is-pressed flag.
          and #flag_pre_speed_neg
-         sta flag_pre$
+         sta flag_pre
          jmp drawnotpre
 no_speed_2
 
          cpx #'/' ; loop key?
          bne no_loop_2
-         lda flag_pre$ ; disable is-pressed flag.
+         lda flag_pre ; disable is-pressed flag.
          and #flag_pre_loop_neg
-         sta flag_pre$
+         sta flag_pre
          ;
          lda loop + 1 ; keep reversed on screen, if loop playback is alr. enabled.
          bne next_key ; 0 = loop is disabled, 1 = loop is enabled.
@@ -825,7 +826,7 @@ init     ; *** initialize internal variables ***
 
          lda #0
 
-         sta flag_pre$ ; disables all flags.
+         sta flag_pre ; disables all flags.
          sta flag_upd ;
 
          sta mode$ ; set to normal mode (equals 0).
@@ -1032,6 +1033,7 @@ note_count_end
 ; --- variables ---
 ; -----------------
 
+flag_pre byte 0 ; 1 byte.
 flag_upd byte 0 ; 1 byte.
 
          ; delay:
