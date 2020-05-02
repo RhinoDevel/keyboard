@@ -847,18 +847,18 @@ init     ; *** initialize internal variables ***
          sec
          lda tom$
          sbc #<tune$
-         sta max_notes$
+         sta maxnotes
          lda tom$ + 1
          sbc #>tune$
-         sta max_notes$ + 1
+         sta maxnotes + 1
          ;
          sec
-         lda max_notes$
+         lda maxnotes
          sbc #2 ; hard-coded. byte count of end of tune marker.
-         sta max_notes$
-         lda max_notes$ + 1
+         sta maxnotes
+         lda maxnotes + 1
          sbc #0
-         sta max_notes$ + 1
+         sta maxnotes + 1
 
          ; calc. max. count of notes/pauses storable in ram:
          ;
@@ -872,8 +872,8 @@ init     ; *** initialize internal variables ***
          ;
          ldx #16 ; for each bit:
          ;
-divloop  asl max_notes$
-         rol max_notes$ + 1
+divloop  asl maxnotes
+         rol maxnotes + 1
          rol zero_word_buf1$
          rol zero_word_buf1$ + 1
          lda zero_word_buf1$
@@ -886,7 +886,7 @@ divloop  asl max_notes$
          ;
          sta zero_word_buf1$ + 1
          sty zero_word_buf1$
-         inc max_notes$
+         inc maxnotes
          ;
 divskip  dex
          bne divloop
@@ -974,12 +974,12 @@ note_count_end
          ldy #4 ; hard-coded
          lda #25 ; hard-coded
          sta zero_word_buf1$
-         lda max_notes$ + 1
+         lda maxnotes + 1
          jsr printby$
          ldy #4 ; hard-coded
          lda #27 ; hard-coded
          sta zero_word_buf1$
-         lda max_notes$
+         lda maxnotes
          jsr printby$
 
          jsr drawspeed ; draw playback speed.
@@ -1037,6 +1037,8 @@ flag_pre byte 0 ; 1 byte.
 flag_upd byte 0 ; 1 byte.
 
 mode     byte 0 ; 1 byte. 0 = normal, 1 = record, 2 = play.
+
+maxnotes word 0 ; 2 bytes. max. count of notes/pauses storable in ram.
 
          ; delay:
          ;
