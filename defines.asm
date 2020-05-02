@@ -24,7 +24,5 @@ max_notes$ = fp_acc1$ ; 2 bytes. max. count of notes/pauses storable in ram.
 note_count$ = fp_acc1_2$ ; 2 bytes. current count of notes/pauses stored in ram.
 note_nr$ = fp_acc1_4$ ; 2 bytes. current note's number (not index).
 
-flag_upd$ = fp_acc2$ ; 1 byte.
-
 ; TODO: some of these store data that can be stored outside of zero-page without
 ;       any performance decrease!

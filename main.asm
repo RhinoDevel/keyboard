@@ -27,7 +27,7 @@ flag_pre_speed_neg = 255 - flag_pre_speed
 flag_pre_loop = 32
 flag_pre_loop_neg = 255 - flag_pre_loop
 
-; to be used with flag_upd$ variable:
+; to be used with flag_upd variable:
 ;
 flag_upd_pat = 1
 flag_upd_pat_neg = 255 - flag_upd_pat
@@ -119,9 +119,9 @@ no_exit
          lda flag_pre$
          ora #flag_pre_pat_n
          sta flag_pre$ ; rem. cur. key press to be alr. processed.
-         lda flag_upd$
+         lda flag_upd
          ora #flag_upd_pat
-         sta flag_upd$ ; request update.
+         sta flag_upd ; request update.
          inc pat_index$
          lda #pattern_count$
          cmp pat_index$
@@ -146,9 +146,9 @@ pat_l_helper
          lda flag_pre$
          ora #flag_pre_pat_l
          sta flag_pre$ ; rem. cur. key press to be alr. processed.
-         lda flag_upd$
+         lda flag_upd
          ora #flag_upd_pat
-         sta flag_upd$ ; request update.
+         sta flag_upd ; request update.
          dec pat_index$
          lda #$ff
          cmp pat_index$
@@ -166,9 +166,9 @@ no_pat_l
          lda flag_pre$
          ora #flag_pre_rec
          sta flag_pre$ ; rem. cur. key press to be alr. processed.
-         lda flag_upd$
+         lda flag_upd
          ora #flag_upd_rec
-         sta flag_upd$ ; request update.
+         sta flag_upd ; request update.
          ; (nothing to do, here)
          jmp draw_on
 no_rec
@@ -181,9 +181,9 @@ no_rec
          lda flag_pre$
          ora #flag_pre_play
          sta flag_pre$ ; rem. cur. key press to be alr. processed.
-         lda flag_upd$
+         lda flag_upd
          ora #flag_upd_play
-         sta flag_upd$ ; request update.
+         sta flag_upd ; request update.
          ; (nothing to do, here)
          jmp draw_on
 no_play
@@ -196,9 +196,9 @@ no_play
          lda flag_pre$
          ora #flag_pre_speed
          sta flag_pre$ ; rem. cur. key press to be alr. processed.
-         lda flag_upd$
+         lda flag_upd
          ora #flag_upd_speed
-         sta flag_upd$ ; request update.
+         sta flag_upd ; request update.
          ; (nothing to do, here)
          jmp draw_on
 no_speed
@@ -211,9 +211,9 @@ no_speed
          lda flag_pre$
          ora #flag_pre_loop
          sta flag_pre$ ; rem. cur. key press to be alr. processed.
-         lda flag_upd$
+         lda flag_upd
          ora #flag_upd_loop
-         sta flag_upd$ ; request update.
+         sta flag_upd ; request update.
          ; (nothing to do, here)
          jmp draw_on
 no_loop
@@ -324,16 +324,16 @@ keyloopdone ; all keys got processed in loop.
 
          ; change/update mode, if necessary:
          ;
-         lda flag_upd$
+         lda flag_upd
          and #flag_upd_play
          beq mode_chk_rec ; no update because of play button necessary.
          ;
          ; update because of play button:
          ;
-         lda flag_upd$
+         lda flag_upd
          and #flag_upd_play_neg ; play button is handled.
          and #flag_upd_rec_neg ; record but. is handled (play button overrules).
-         sta flag_upd$
+         sta flag_upd
          ;
          lda mode$
          beq play_enable ; switch from normal to play mode (normal mode = 0).
@@ -367,15 +367,15 @@ play_enable
          ; check, if record mode is enabled (play update must not be necessary):
          ;
 mode_chk_rec
-         lda flag_upd$
+         lda flag_upd
          and #flag_upd_rec
          beq mode_no_upd ; no update because of record button necessary.
          ;
          ; update because of record button:
          ;
-         lda flag_upd$
+         lda flag_upd
          and #flag_upd_rec_neg ; record button is handled.
-         sta flag_upd$
+         sta flag_upd
          ;
          lda mode$
          beq rec_enable ; switch from normal to record mode (normal = 0).
@@ -420,15 +420,15 @@ mode_no_upd
 
          ; change speed, if necessary:
          ;
-         lda flag_upd$
+         lda flag_upd
          and #flag_upd_speed
          beq speed_no_upd ; no update because of speed button necessary.
          ;
          ; update because of speed button:
          ;
-         lda flag_upd$
+         lda flag_upd
          and #flag_upd_speed_neg ; speed button is handled.
-         sta flag_upd$
+         sta flag_upd
          ;
          inc speed + 1
          lda #5 ; hard-coded speed maximum is this minus 1.
@@ -443,15 +443,15 @@ speed_no_upd
 
          ; enable/disable loop playback, if necessary:
          ;
-         lda flag_upd$
+         lda flag_upd
          and #flag_upd_loop
          beq loop_no_upd ; no update because of loop button necessary.
          ;
          ; update because of loop button:
          ;
-         lda flag_upd$
+         lda flag_upd
          and #flag_upd_loop_neg ; loop button is handled.
-         sta flag_upd$
+         sta flag_upd
          ;
          lda loop + 1
          eor #1 ; toggles loop enabled/disabled.
@@ -569,12 +569,12 @@ play_timer_restart
 play_mode_stuff_end
 
 upd_pat_chk
-         lda flag_upd$ ; upd. shift pattern on change (for timbre & maybe octave).
+         lda flag_upd ; upd. shift pattern on change (for timbre & maybe octave).
          and #flag_upd_pat
          beq no_upd_pat
-         lda flag_upd$
+         lda flag_upd
          and #flag_upd_pat_neg
-         sta flag_upd$
+         sta flag_upd
          lda pattern$
          sta via_shift$
          jsr patdraw$ ; draws shift pattern.
@@ -826,7 +826,7 @@ init     ; *** initialize internal variables ***
          lda #0
 
          sta flag_pre$ ; disables all flags.
-         sta flag_upd$ ;
+         sta flag_upd ;
 
          sta mode$ ; set to normal mode (equals 0).
 
@@ -1027,6 +1027,12 @@ note_count_end
 ;
 ;         ; TODO: error check?
 ;         rts
+
+; -----------------
+; --- variables ---
+; -----------------
+
+flag_upd byte 0 ; 1 byte.
 
          ; delay:
          ;
