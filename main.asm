@@ -413,7 +413,7 @@ rec_enable
          ; (don't show 0 as note nr., keep showing current note/pause count)
          ;
          lda #rec_is_waiting ; indicates waiting for first note to be played by
-         sta tune_note$      ; user to start recording via timer.
+         sta tunenote      ; user to start recording via timer.
          lda #mode_rec
 mode_upd
          sta mode
@@ -651,7 +651,7 @@ no_upd_note
          ;
          ; record mode:
          ;
-         lda tune_note$
+         lda tunenote
          cmp #rec_is_waiting
          beq rec_is_waiting_for_first_note
          ;
@@ -662,7 +662,7 @@ no_upd_note
          ;
          ; timer ran out, take a measure:
          ;
-         lda tune_note$
+         lda tunenote
          cmp playing_note$
          bne rec_note_changed ; the last memorized note is no longer playing.
          ;
@@ -699,7 +699,7 @@ rec_save_countdown_msb
          bne rec_save_note
          inc tune_ptr$ + 1
 rec_save_note
-         lda tune_note$
+         lda tunenote
          sta (tune_ptr$),y
          inc note_nr
          bne rec_note_nr_inc_done
@@ -727,7 +727,7 @@ rec_next_note
          sta tune_countdown$
          sta tune_countdown$ + 1
          lda playing_note$
-         sta tune_note$
+         sta tunenote
 rec_restart_timer
          lda #<rec_freq
          sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
@@ -1041,8 +1041,11 @@ flag_upd byte 0 ; 1 byte.
 mode     byte 0 ; 1 byte. 0 = normal, 1 = record, 2 = play.
 
 maxnotes word 0 ; 2 bytes. max. count of notes/pauses storable in ram.
+
 note_nr  word 0 ; 2 bytes. current note's number (not index).
 note_cnt word 0 ; 2 bytes. current count of notes/pauses stored in ram.
+tunenote byte 0 ; 1 byte. it's the note's index in notes$ array.
+
          ; delay:
          ;
 ;         lda #$ff
