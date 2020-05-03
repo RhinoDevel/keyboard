@@ -989,8 +989,6 @@ note_count_end
       
          rts
 
-         ; does not seem to work with vice (uses c64 format??):
-         ;
 ;savetune lda #<tune$
 ;         sta $fb ; TODO: hard-coded!
 ;         lda #>tune$
