@@ -19,7 +19,6 @@ tune_countdown$ =  fp_acc3_3$ ; 2 bytes.
 tune_note$ = fp_acc3_5$ ; 1 byte. it's the note's index in notes$ array.
 
 note_count$ = fp_acc1_2$ ; 2 bytes. current count of notes/pauses stored in ram.
-note_nr$ = fp_acc1_4$ ; 2 bytes. current note's number (not index).
 
 ; TODO: some of these store data that can be stored outside of zero-page without
 ;       any performance decrease!

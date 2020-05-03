@@ -356,8 +356,8 @@ play_enable
          sta tune_countdown$
          lda #0
          sta tune_countdown$ + 1
-         sta note_nr$
-         sta note_nr$ + 1
+         sta note_nr
+         sta note_nr + 1
          lda #<rec_freq
          sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
          lda #>rec_freq
@@ -385,9 +385,9 @@ mode_chk_rec
          ;
          ; disable record mode:
          ;
-         lda note_nr$
+         lda note_nr
          bne store_eot_and_count
-         lda note_nr$ + 1
+         lda note_nr + 1
          beq normal_enable
 store_eot_and_count
          ldy #0
@@ -395,9 +395,9 @@ store_eot_and_count
          sta (tune_ptr$),y
          iny
          sta (tune_ptr$),y
-         lda note_nr$
+         lda note_nr
          sta note_count$
-         lda note_nr$ + 1
+         lda note_nr + 1
          sta note_count$ + 1
 normal_enable
          jsr drawnotecount
@@ -408,8 +408,8 @@ normal_enable
          ;
 rec_enable
          lda #0
-         sta note_nr$
-         sta note_nr$ + 1
+         sta note_nr
+         sta note_nr + 1
          ; (don't show 0 as note nr., keep showing current note/pause count)
          ;
          lda #rec_is_waiting ; indicates waiting for first note to be played by
@@ -463,10 +463,12 @@ loop_no_upd
          ;
          lda mode
          cmp #mode_play
-         bne play_mode_stuff_end
+         beq play_mode
+         jmp play_mode_stuff_end
          ;
          ; play mode:
          ;
+play_mode
          lda playing_note$
          sta found_note1$
          lda #note_none
@@ -532,8 +534,8 @@ play_loop
          lda #>tune$
          sta tune_ptr$ + 1
          ;ldy #0 ; (already set to 0, above)
-         sty note_nr$
-         sty note_nr$ + 1
+         sty note_nr
+         sty note_nr + 1
          jmp countdown_next_note ; ok, there is alw. at least one note stored.
          ;
          ; play next note:
@@ -553,9 +555,9 @@ play_tune_ptr_inc_done2
          inc tune_ptr$ + 1
 play_tune_ptr_inc_done3
          ;
-         inc note_nr$
+         inc note_nr
          bne play_note_nr_inc_done
-         inc note_nr$ + 1
+         inc note_nr + 1
 play_note_nr_inc_done
          ;
          jsr drawnotenr
@@ -699,9 +701,9 @@ rec_save_countdown_msb
 rec_save_note
          lda tune_note$
          sta (tune_ptr$),y
-         inc note_nr$
+         inc note_nr
          bne rec_note_nr_inc_done
-         inc note_nr$ + 1
+         inc note_nr + 1
 rec_note_nr_inc_done
          jsr drawnotenr
          inc tune_ptr$
@@ -787,12 +789,12 @@ drawnotenr
          ldy #2 ; hard-coded
          lda #25 ; hard-coded
          sta zero_word_buf1$
-         lda note_nr$ + 1
+         lda note_nr + 1
          jsr printby$
          ldy #2 ; hard-coded
          lda #27 ; hard-coded
          sta zero_word_buf1$
-         lda note_nr$
+         lda note_nr
          jmp printby$
 
 ; *****************
@@ -1039,6 +1041,7 @@ flag_upd byte 0 ; 1 byte.
 mode     byte 0 ; 1 byte. 0 = normal, 1 = record, 2 = play.
 
 maxnotes word 0 ; 2 bytes. max. count of notes/pauses storable in ram.
+note_nr  word 0 ; 2 bytes. current note's number (not index).
 
          ; delay:
          ;
