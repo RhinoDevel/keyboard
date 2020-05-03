@@ -744,6 +744,8 @@ exit     lda #0
          sta loop + 1 ; TODO: implementing keeping loop enabled, if wanted!
          sta timer2_low$ ; disables sound by timer reset.
          sta keybufnum$ ; (sometimes, the <left arrow> will still be printed..)
+         sta via_acr$ ; hard-coded. disables free-running mode
+                      ; (e.g. makes tape usable again).
          clrscr$
          lda #<goodbye$
          sta zero_word_buf2$
@@ -989,6 +991,8 @@ note_count_end
       
          rts
 
+; you need to disable free running mode before this (VIA ACR):
+;
 ;savetune lda #<tune$
 ;         sta $fb ; TODO: hard-coded!
 ;         lda #>tune$
