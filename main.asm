@@ -469,7 +469,7 @@ loop_no_upd
          ; play mode:
          ;
 play_mode
-         lda playing_note$
+         lda playingn
          sta fndnote1
          lda #note_none
          sta fndnote2
@@ -585,7 +585,7 @@ no_upd_pat
 
          ; update note to play, if necessary (pattern may alter octave, too):
          
-         ldy playing_note$
+         ldy playingn
          cpy #note_none
          bne a_note_is_playing
          ldy fndnote1
@@ -602,14 +602,14 @@ a_note_is_playing
          bne did_find_two_notes
          sty lastnote
          ldy fndnote1 ; just the one note found.
-         cpy playing_note$
+         cpy playingn
          beq no_upd_note ; the note is already playing (nothing to do).
          jmp do_upd_note ; it is not the same as the note playing. update!
 did_find_two_notes
-         cpy playing_note$ ; (expects found_note2 to be in y register).
+         cpy playingn ; (expects found_note2 to be in y register).
          beq other_and_playing_found
          ldy fndnote1
-         cpy playing_note$
+         cpy playingn
          bne do_upd_note ; two note (keys) found, where both are not the
                           ; playing note. this will always use fndnote1.
 
@@ -618,7 +618,7 @@ did_find_two_notes
          ldy fndnote2 ; reorder.
          sty fndnote1
 
-         ldy playing_note$ ; this is not necessary,
+         ldy playingn ; this is not necessary,
          sty fndnote2  ; if fndnote2 will not be used from here on.
 
 other_and_playing_found
@@ -629,9 +629,9 @@ other_and_playing_found
          beq no_upd_note
 
 do_upd_note
-         lda playing_note$
+         lda playingn
          sta lastnote
-         sty playing_note$
+         sty playingn
          lda #0
          cpy #note_none
          beq set_timer2_low
@@ -647,11 +647,12 @@ no_upd_note
          ;
          lda mode
          cmp #mode_rec
-         bne rec_mode_stuff_end
+         beq rec_mode
+         jmp rec_mode_stuff_end
          ;
          ; record mode:
          ;
-         lda tunenote
+rec_mode lda tunenote
          cmp #rec_is_waiting
          beq rec_is_waiting_for_first_note
          ;
@@ -663,7 +664,7 @@ no_upd_note
          ; timer ran out, take a measure:
          ;
          lda tunenote
-         cmp playing_note$
+         cmp playingn
          bne rec_note_changed ; the last memorized note is no longer playing.
          ;
          ; the last memorized note is still playing:
@@ -712,7 +713,7 @@ rec_note_nr_inc_done
          jmp rec_next_note
          ;
 rec_is_waiting_for_first_note
-         lda playing_note$
+         lda playingn
          cmp #note_none
          beq rec_mode_stuff_end ; still waiting for first note to play..
          ;
@@ -726,7 +727,7 @@ rec_next_note
          lda #0
          sta countdwn
          sta countdwn + 1
-         lda playing_note$
+         lda playingn
          sta tunenote
 rec_restart_timer
          lda #<rec_freq
@@ -834,7 +835,7 @@ init     ; *** initialize internal variables ***
          sta mode ; set to normal mode (equals 0).
 
          lda #note_none
-         sta playing_note$
+         sta playingn
          sta fndnote1
          sta fndnote2
          sta lastnote
@@ -1049,6 +1050,7 @@ countdwn word 0 ; 2 bytes. tune countdown.
 fndnote1 byte 0 ; 1 byte.
 fndnote2 byte 0 ; 1 byte.
 lastnote byte 0 ; 1 byte.
+playingn byte 0 ; 1 byte. the currently playing note.
 
          ; delay:
          ;
