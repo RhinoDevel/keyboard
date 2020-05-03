@@ -15,7 +15,6 @@ found_note1$ = utility$
 found_note2$ = receive$
 
 tune_ptr$ =  fp_acc3_1$ ; 2 bytes. initially set to tune$.
-tune_countdown$ =  fp_acc3_3$ ; 2 bytes.
 
 ; TODO: some of these store data that can be stored outside of zero-page without
 ;       any performance decrease!

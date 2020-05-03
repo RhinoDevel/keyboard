@@ -353,9 +353,9 @@ play_enable
          lda #>tune$
          sta tune_ptr$ + 1
          lda #1
-         sta tune_countdown$
+         sta countdwn
          lda #0
-         sta tune_countdown$ + 1
+         sta countdwn + 1
          sta note_nr
          sta note_nr + 1
          lda #<rec_freq
@@ -480,21 +480,21 @@ play_mode
 speed
          ldy #1;#3 ; TODO: increase this value to increase playback speed.
 countdown_dec
-         lda tune_countdown$
+         lda countdwn
          bne countdown_dec_lsb ; skip dec. msb, because lsb is not zero.
-         dec tune_countdown$ + 1 ; dec. msb, because lsb will underflow.
+         dec countdwn + 1 ; dec. msb, because lsb will underflow.
 countdown_dec_lsb
-         dec tune_countdown$ ; dec. lsb.
+         dec countdwn ; dec. lsb.
          bne countdown_y_dec
-         lda tune_countdown$ + 1
+         lda countdwn + 1
          beq countdown_next_note ; countdown already at zero, stop dec.
 countdown_y_dec
          dey
          bne countdown_dec
          ;
-         lda tune_countdown$
+         lda countdwn
          bne play_timer_restart
-         lda tune_countdown$ + 1
+         lda countdwn + 1
          bne play_timer_restart
          ;
          ; next note of tune (if there is one), please:
@@ -502,15 +502,15 @@ countdown_y_dec
 countdown_next_note
          ldy #0
          lda (tune_ptr$),y ; load next note's length's low byte.
-         sta tune_countdown$
+         sta countdwn
          inc tune_ptr$ ; incr. tune pointer to next note's length's high byte.
          bne play_tune_ptr_inc_done1
          inc tune_ptr$ + 1
 play_tune_ptr_inc_done1
          lda (tune_ptr$),y ; load next note's length's high byte.
-         sta tune_countdown$ + 1
+         sta countdwn + 1
          bne play_next_note ; it really is a note's length, if high byte not 0.
-         lda tune_countdown$
+         lda countdwn
          bne play_next_note ; it really is a note's length, if low byte not 0.
          ;
          ; reached end of tune
@@ -668,9 +668,9 @@ no_upd_note
          ;
          ; the last memorized note is still playing:
          ;
-         inc tune_countdown$
+         inc countdwn
          bne inc_countdown_done
-         inc tune_countdown$ + 1
+         inc countdwn + 1
 inc_countdown_done
          ;
          ; * TODO: implement handling of reached limit $ffff!
@@ -678,22 +678,22 @@ inc_countdown_done
          jmp rec_restart_timer
          ;
 rec_note_changed
-         lda tune_countdown$
+         lda countdwn
          bne rec_save_countdown
-         lda tune_countdown$ + 1
+         lda countdwn + 1
          beq rec_next_note ; last note did play shorter than one measure unit.
          ;
          ; last note played for at least one measure unit, save it:
          ;
 rec_save_countdown
-         lda tune_countdown$
+         lda countdwn
          ldy #0
          sta (tune_ptr$),y
          inc tune_ptr$
          bne rec_save_countdown_msb
          inc tune_ptr$ + 1
 rec_save_countdown_msb
-         lda tune_countdown$ + 1
+         lda countdwn + 1
          sta (tune_ptr$),y
          inc tune_ptr$
          bne rec_save_note
@@ -724,8 +724,8 @@ rec_is_waiting_for_first_note
          sta tune_ptr$ + 1
 rec_next_note
          lda #0
-         sta tune_countdown$
-         sta tune_countdown$ + 1
+         sta countdwn
+         sta countdwn + 1
          lda playing_note$
          sta tunenote
 rec_restart_timer
@@ -1045,6 +1045,7 @@ maxnotes word 0 ; 2 bytes. max. count of notes/pauses storable in ram.
 note_nr  word 0 ; 2 bytes. current note's number (not index).
 note_cnt word 0 ; 2 bytes. current count of notes/pauses stored in ram.
 tunenote byte 0 ; 1 byte. it's the note's index in notes$ array.
+countdwn word 0 ; 2 bytes. tune countdown.
 
          ; delay:
          ;
