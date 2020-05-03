@@ -7,12 +7,11 @@ target TGT_PETBV2;TGT_PETBV4
 ; --- system memory locations (basic v2 / rev.3 AND v4) ---
 ; ---------------------------------------------------------
 
-;adptr$ = 15 ; term. width & lim. for scanning src. columns (2 unused bytes).
+adptr$ = $0f ; term. width & lim. for scanning src. columns (2 unused bytes).
 tom$ = $34 ; pointer to top of memory / limit of basic.
 ;fp_acc3$ = $54 ; "floating-point accumulator" nr. 3 (6 bytes).
 fp_acc1$ = $5e ; floating-point accumulator nr. 1 (6 bytes).
 fp_acc1_2$ = $5e + 2 ; inside floating-point accumulator nr. 1.
-fp_acc1_4$ = $5e + 4 ; inside floating-point accumulator nr. 1.
 ;fp_acc2$ = $66 ; floating-point accumulator nr. 2 (6 bytes).
 keybufnum$ = $9e ; current number of characters in keyboard buffer.
 utility$ = $a2 ; not used / utility (1 unused byte).
