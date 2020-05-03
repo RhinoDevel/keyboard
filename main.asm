@@ -396,9 +396,9 @@ store_eot_and_count
          iny
          sta (tune_ptr$),y
          lda note_nr
-         sta note_count$
+         sta note_cnt
          lda note_nr + 1
-         sta note_count$ + 1
+         sta note_cnt + 1
 normal_enable
          jsr drawnotecount
          lda #mode_normal
@@ -773,12 +773,12 @@ drawnotecount
          ldy #2 ; hard-coded
          lda #25 ; hard-coded
          sta zero_word_buf1$
-         lda note_count$ + 1
+         lda note_cnt + 1
          jsr printby$
          ldy #2 ; hard-coded
          lda #27 ; hard-coded
          sta zero_word_buf1$
-         lda note_count$
+         lda note_cnt
          jmp printby$
 ;
 ; ******************
@@ -896,8 +896,8 @@ divskip  dex
          ; calc. current count of notes/pauses:
          ;
          ldy #0
-         sty note_count$
-         sty note_count$ + 1
+         sty note_cnt
+         sty note_cnt + 1
          lda #<tune$
          sta tune_ptr$
          lda #>tune$
@@ -921,9 +921,9 @@ note_count_ptr_inc_done
          dex
          bne note_count_inc_loop
          ;
-         inc note_count$
+         inc note_cnt
          bne note_count_cnt_inc_done
-         inc note_count$ + 1
+         inc note_cnt + 1
 note_count_cnt_inc_done
          jmp note_count_loop
 note_count_end
@@ -1042,7 +1042,7 @@ mode     byte 0 ; 1 byte. 0 = normal, 1 = record, 2 = play.
 
 maxnotes word 0 ; 2 bytes. max. count of notes/pauses storable in ram.
 note_nr  word 0 ; 2 bytes. current note's number (not index).
-
+note_cnt word 0 ; 2 bytes. current count of notes/pauses stored in ram.
          ; delay:
          ;
 ;         lda #$ff
