@@ -600,7 +600,7 @@ a_note_is_playing
          ldy fndnote2
          cpy #note_none
          bne did_find_two_notes
-         sty last_note$
+         sty lastnote
          ldy fndnote1 ; just the one note found.
          cpy playing_note$
          beq no_upd_note ; the note is already playing (nothing to do).
@@ -625,12 +625,12 @@ other_and_playing_found
          ;ldy fndnote1 ; just use this for toggling between both notes.
          ;
          ldy fndnote1
-         cpy last_note$
+         cpy lastnote
          beq no_upd_note
 
 do_upd_note
          lda playing_note$
-         sta last_note$
+         sta lastnote
          sty playing_note$
          lda #0
          cpy #note_none
@@ -837,7 +837,7 @@ init     ; *** initialize internal variables ***
          sta playing_note$
          sta fndnote1
          sta fndnote2
-         sta last_note$
+         sta lastnote
 
          ldy #def_pat_index ; TODO: keep pattern on exit / re-entry!
          sty pat_index$
@@ -1048,6 +1048,7 @@ tunenote byte 0 ; 1 byte. it's the note's index in notes$ array.
 countdwn word 0 ; 2 bytes. tune countdown.
 fndnote1 byte 0 ; 1 byte.
 fndnote2 byte 0 ; 1 byte.
+lastnote byte 0 ; 1 byte.
 
          ; delay:
          ;
