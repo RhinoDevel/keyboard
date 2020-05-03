@@ -7,22 +7,22 @@ target TGT_PETBV2;TGT_PETBV4
 ; --- system memory locations (basic v2 / rev.3 AND v4) ---
 ; ---------------------------------------------------------
 
-adptr$ = 15 ; term. width & lim. for scanning src. columns (2 unused bytes).
+;adptr$ = 15 ; term. width & lim. for scanning src. columns (2 unused bytes).
 tom$ = $34 ; pointer to top of memory / limit of basic.
 ;fp_acc3$ = $54 ; "floating-point accumulator" nr. 3 (6 bytes).
-fp_acc3_1$ = $54 + 1 ; inside of "floating-point accumulator" nr. 3.
-fp_acc3_3$ = $54 + 3 ; inside of "floating-point accumulator" nr. 3.
-;fp_acc1$ = $5e ; floating-point accumulator nr. 1 (6 bytes).
+fp_acc1$ = $5e ; floating-point accumulator nr. 1 (6 bytes).
+fp_acc1_2$ = $5e + 2 ; inside floating-point accumulator nr. 1.
+fp_acc1_4$ = $5e + 4 ; inside floating-point accumulator nr. 1.
 ;fp_acc2$ = $66 ; floating-point accumulator nr. 2 (6 bytes).
 keybufnum$ = $9e ; current number of characters in keyboard buffer.
-;utility$ = $a2 ; not used / utility (1 unused byte).
+utility$ = $a2 ; not used / utility (1 unused byte).
 ;tapflag$ = $ab ; end of tape input flag / flag for tape write (1 byte).
 ;tappari$ = $b1 ; tape character parity (1 byte).
 ;receive$ = $b2 ; byte received flag (1 byte).
-io_util$ = $b3 ; i/o utility / temporary save, e.g. by dos wedge (1 byte).
+;io_util$ = $b3 ; i/o utility / temporary save, e.g. by dos wedge (1 byte).
 ;tapbufch$ = $b4 ; tape buffer character / mlm.
 ;tapeutil$ = $ba ; tape utility (1 byte).
-tapbufin$ = $bb ; tape buf. #1 & #2 indices to next char (2 bytes).
+;tapbufin$ = $bb ; tape buf. #1 & #2 indices to next char (2 bytes).
 ;cursor_y$ = $c4 ; lsb of cursor screen line mapped memory location.
 ;cursor_x$ = $c6 ; cursor position into the screen line.
 
