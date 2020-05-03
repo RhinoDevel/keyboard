@@ -7,7 +7,6 @@
 
 zero_word_buf1$ = adptr$
 zero_word_buf2$ = tapbufin$
-pat_index$ = tappari$
 pattern$ = io_util$
 
 tune_ptr$ =  fp_acc3_1$ ; 2 bytes. initially set to tune$.

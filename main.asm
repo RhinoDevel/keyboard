@@ -122,14 +122,14 @@ no_exit
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
-         inc pat_index$
+         inc patindex
          lda #pattern_count$
-         cmp pat_index$
+         cmp patindex
          bne set_pattern
          lda #0
-         sta pat_index$
+         sta patindex
 set_pattern ; (also used by other pattern key handling..)
-         ldy pat_index$
+         ldy patindex
          lda patterns$,y
          sta pattern$
 jmp_draw_on
@@ -149,12 +149,12 @@ pat_l_helper
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
-         dec pat_index$
+         dec patindex
          lda #$ff
-         cmp pat_index$
+         cmp patindex
          bne set_pattern
          lda #pattern_count$ - 1
-         sta pat_index$
+         sta patindex
          bne set_pattern ; (always branches)
 no_pat_l
 
@@ -841,7 +841,7 @@ init     ; *** initialize internal variables ***
          sta lastnote
 
          ldy #def_pat_index ; TODO: keep pattern on exit / re-entry!
-         sty pat_index$
+         sty patindex
          lda patterns$,y
          sta pattern$
 
@@ -1051,6 +1051,8 @@ fndnote1 byte 0 ; 1 byte.
 fndnote2 byte 0 ; 1 byte.
 lastnote byte 0 ; 1 byte.
 playingn byte 0 ; 1 byte. the currently playing note.
+
+patindex byte 0 ; 1 byte. pattern index.
 
          ; delay:
          ;
