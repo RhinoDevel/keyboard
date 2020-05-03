@@ -11,8 +11,6 @@ pat_index$ = tappari$
 pattern$ = io_util$
 playing_note$ = tapeutil$
 last_note$ = tapflag$
-found_note1$ = utility$
-found_note2$ = receive$
 
 tune_ptr$ =  fp_acc3_1$ ; 2 bytes. initially set to tune$.
 

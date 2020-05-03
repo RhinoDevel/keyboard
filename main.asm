@@ -89,8 +89,8 @@ main     sei
 infloop ; infinite loop.
 
          ldx #note_none ; reset found notes to none. 
-         stx found_note1$
-         stx found_note2$
+         stx fndnote1
+         stx fndnote2
 
 keyloop ; loop through all buttons.
 
@@ -221,18 +221,18 @@ no_loop
 
          ; pressed key must be a note key at this point.
 
-         ldy found_note1$
+         ldy fndnote1
          cpy #note_none
          bne found_note1_already_set
          ldy keynote$,x ; gets note's index in array (never #note_none, here).
-         sty found_note1$
+         sty fndnote1
          jmp draw_on
 found_note1_already_set
-         ldy found_note2$
+         ldy fndnote2
          cpy #note_none
          bne draw_on
          ldy keynote$,x ; gets note's index in array (never #note_none, here).
-         sty found_note2$
+         sty fndnote2
 
 draw_on ldy keyposx$,x ; draw key as pressed and go on.
          sty zero_word_buf1$
@@ -470,9 +470,9 @@ loop_no_upd
          ;
 play_mode
          lda playing_note$
-         sta found_note1$
+         sta fndnote1
          lda #note_none
-         sta found_note2$
+         sta fndnote2
          ;
          bit via_ifr$ ; did timer one time out?
          bvc play_mode_stuff_end ; no, it did not time out.
@@ -548,7 +548,7 @@ play_tune_ptr_inc_done2
          ;
          ldy #0
          lda (tune_ptr$),y
-         sta found_note1$
+         sta fndnote1
          ;
          inc tune_ptr$
          bne play_tune_ptr_inc_done3
@@ -588,43 +588,43 @@ no_upd_pat
          ldy playing_note$
          cpy #note_none
          bne a_note_is_playing
-         ldy found_note1$
+         ldy fndnote1
 
 a_note_is_playing
-         ldy found_note1$
+         ldy fndnote1
          cpy #note_none
          beq do_upd_note ; no note (key) found. disable currently playing note.
          
          ; one note (key) was found.
          
-         ldy found_note2$
+         ldy fndnote2
          cpy #note_none
          bne did_find_two_notes
          sty last_note$
-         ldy found_note1$ ; just the one note found.
+         ldy fndnote1 ; just the one note found.
          cpy playing_note$
          beq no_upd_note ; the note is already playing (nothing to do).
          jmp do_upd_note ; it is not the same as the note playing. update!
 did_find_two_notes
          cpy playing_note$ ; (expects found_note2 to be in y register).
          beq other_and_playing_found
-         ldy found_note1$
+         ldy fndnote1
          cpy playing_note$
          bne do_upd_note ; two note (keys) found, where both are not the
-                          ; playing note. this will always use found_note1$.
+                          ; playing note. this will always use fndnote1.
 
          ; playing note (key) and other note (key) found (in this order).
 
-         ldy found_note2$ ; reorder.
-         sty found_note1$
+         ldy fndnote2 ; reorder.
+         sty fndnote1
 
          ldy playing_note$ ; this is not necessary,
-         sty found_note2$  ; if found_note2$ will not be used from here on.
+         sty fndnote2  ; if fndnote2 will not be used from here on.
 
 other_and_playing_found
-         ;ldy found_note1$ ; just use this for toggling between both notes.
+         ;ldy fndnote1 ; just use this for toggling between both notes.
          ;
-         ldy found_note1$
+         ldy fndnote1
          cpy last_note$
          beq no_upd_note
 
@@ -835,8 +835,8 @@ init     ; *** initialize internal variables ***
 
          lda #note_none
          sta playing_note$
-         sta found_note1$
-         sta found_note2$
+         sta fndnote1
+         sta fndnote2
          sta last_note$
 
          ldy #def_pat_index ; TODO: keep pattern on exit / re-entry!
@@ -1046,6 +1046,8 @@ note_nr  word 0 ; 2 bytes. current note's number (not index).
 note_cnt word 0 ; 2 bytes. current count of notes/pauses stored in ram.
 tunenote byte 0 ; 1 byte. it's the note's index in notes$ array.
 countdwn word 0 ; 2 bytes. tune countdown.
+fndnote1 byte 0 ; 1 byte.
+fndnote2 byte 0 ; 1 byte.
 
          ; delay:
          ;
