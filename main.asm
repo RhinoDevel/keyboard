@@ -991,48 +991,39 @@ note_count_end
       
          rts
 
-; you need to disable free running mode before this (VIA ACR):
+; you need to enable irq's and disable free running mode before this (VIA ACR):
 ;
-;savetune lda #<tune$
-;         sta $fb ; TODO: hard-coded!
-;         lda #>tune$
-;         sta $fc
-;
-;         lda tune_ptr$ ; TODO: does work after playing whole tune, only!
-;         sta $c9 ; TODO: hard-coded!
-;         lda tune_ptr$ + 1 ; TODO: does work after playing whole tune, only!
-;         sta $ca
-;
-;         ldy #0
-;         lda #"t"
-;         sta $033a,y ; TODO: hard-coded!
-;         iny
-;         lda #"u"
-;         sta $033a,y ; TODO: hard-coded!
-;         iny
-;         lda #"n"
-;         sta $033a,y ; TODO: hard-coded!
-;         iny
-;         lda #"e"
-;         sta $033a,y ; TODO: hard-coded!
-;         iny 
-;
-;         lda #1
-;         sta $d4 ; TODO: hard-coded!
-;
-;         sty $d1 ; TODO: hard-coded! could use 0 for no filename.
-;
-;         lda #<$033a
-;         sta $da ; TODO: hard-coded!
-;         lda #>$033a
-;         sta $db ; TODO: hard-coded!
-;
-;         ldx #1
-;         dex
-;         jmp $f703 ; TODO: hard-coded!
-;
-;         ; TODO: error check?
-;         rts
+savetune lda #<tune$
+         sta tapesave$
+         lda #>tune$
+         sta tapesave$ + 1
+
+         lda tune_ptr$ ; TODO: correctly set after playing whole tune, only!
+         sta tape_end$
+         lda tune_ptr$ + 1 ; TODO: correctly set after playing whole tune, only!
+         sta tape_end$ + 1
+
+         lda #1 ; hard-coded to tape nr. 1.
+         sta devicenr$
+
+         lda #4 ; hard-coded, see constant, below.
+         sta fnamelen$ ; TODO: hard-coded! could use 0 for no filename.
+
+         lda #<filename
+         sta fnameptr$
+         lda #>filename
+         sta fnameptr$ + 1
+
+         ldx #0
+         jmp cas_save$
+
+         rts
+
+; -----------------
+; --- constants ---
+; -----------------
+
+filename text "tune" ; 4 bytes.
 
 ; -----------------
 ; --- variables ---

@@ -24,6 +24,11 @@ utility$ = $a2 ; not used / utility (1 unused byte).
 ;tapbufin$ = $bb ; tape buf. #1 & #2 indices to next char (2 bytes).
 ;cursor_y$ = $c4 ; lsb of cursor screen line mapped memory location.
 ;cursor_x$ = $c6 ; cursor position into the screen line.
+tape_end$ = $c9 ; pointer to end address of bytes to store on tape (2 bytes).
+fnamelen$ = $d1 ; length of file name (1 byte).
+devicenr$ = $d4 ; current device nr. (1 byte).
+fnameptr$ = $da ; pointer to start of filename (2 bytes).
+tapesave$ = $fb ; pointer to start address of bytes to store on tape (2 bytes).
 
 sob$ = $0401 ; default start address of basic program / text area.
 
@@ -52,6 +57,12 @@ chrin$ = $ffe4 ; get one character.
 
 ifdef TGT_PETBV2
 
+; ------------------------------------------
+; --- system memory locations (basic v2) ---
+; ------------------------------------------
+
+cas_save$ = $f703 ; save to cassette.
+
 ; -------------------------
 ; --- system properties ---
 ; -------------------------
@@ -61,6 +72,12 @@ line_len$ = 40 ; count of characters per line.
 endif ;TGT_PETBV2
 
 ifdef TGT_PETBV4 ; assuming 80 columns!!
+
+; ------------------------------------------
+; --- system memory locations (basic v4) ---
+; ------------------------------------------
+
+cas_save$ = $f742 ; save to cassette.
 
 ; -------------------------
 ; --- system properties ---
