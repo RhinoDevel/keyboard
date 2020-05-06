@@ -12,6 +12,7 @@ tom$ = $34 ; pointer to top of memory / limit of basic.
 ;fp_acc3$ = $54 ; "floating-point accumulator" nr. 3 (6 bytes).
 fp_acc1$ = $5e ; floating-point accumulator nr. 1 (6 bytes).
 fp_acc1_2$ = $5e + 2 ; inside floating-point accumulator nr. 1.
+fp_acc1_4$ = $5e + 4 ; inside floating-point accumulator nr. 1.
 ;fp_acc2$ = $66 ; floating-point accumulator nr. 2 (6 bytes).
 keybufnum$ = $9e ; current number of characters in keyboard buffer.
 utility$ = $a2 ; not used / utility (1 unused byte).
@@ -63,26 +64,14 @@ ifdef TGT_PETBV2
 
 cas_save$ = $f703 ; save to cassette.
 
-; -------------------------
-; --- system properties ---
-; -------------------------
-
-line_len$ = 40 ; count of characters per line.
-
 endif ;TGT_PETBV2
 
-ifdef TGT_PETBV4 ; assuming 80 columns!!
+ifdef TGT_PETBV4
 
 ; ------------------------------------------
 ; --- system memory locations (basic v4) ---
 ; ------------------------------------------
 
 cas_save$ = $f742 ; save to cassette.
-
-; -------------------------
-; --- system properties ---
-; -------------------------
-
-line_len$ = 80 ; count of characters per line.
 
 endif ;TGT_PETBV4

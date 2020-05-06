@@ -827,7 +827,30 @@ drawnotea
 ; *** init ***
 ; ************
 ;
-init     ; *** initialize internal variables ***
+init     ; *** find out, if 40 or 80 column machine ***
+
+         ldy #80 ; initialize y with value for 80 column machine.
+         ;
+         lda #$c0 ; first check..
+         sta screen_ram$
+         cmp screen_ram$ + 1024
+         bne set_line_len ; does not mirror, 80 column machine.
+         ;
+         ; seems to mirror, recheck with another value (value could have already
+         ; been stored there):
+         ;
+         lda #$dd
+         sta screen_ram$
+         cmp screen_ram$ + 1024
+         bne set_line_len ; does NOT mirror (1. val. was there before), 80 cols.
+         ;
+         ; did mirror twice.
+         ;
+         ldy #40 ; set value for 40 column machine.
+set_line_len
+         sty line_len$
+
+         ; *** initialize internal variables ***
 
          lda #0
 
@@ -944,6 +967,18 @@ note_count_end
 
          lda #12; hard-coded. enable graphics mode (character set to use).
          sta via_pcr$
+
+         ; Remove blank(s) between adjacent lines, if this machine has 80 cols.
+         ; (because these must have the 6845 crt controller chip):
+         ;
+         lda #80
+         cmp line_len$
+         bne charscan_done
+         lda #9 ; hard-coded: 6845's maximum scanline address.
+         sta 59520 ; hard-coded: 6845's address register.
+         lda #7 ; 7 scanlines per character <-> no blanks between adj. lines.
+         sta 59521 ; hard-coded: 6845's register file.
+charscan_done
 
          ; *** draw initial screen ***
 

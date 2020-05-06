@@ -48,7 +48,7 @@ get_mem_addr$
          beq @add_col
          dey
          clc
-         adc #line_len$
+         adc line_len$
          bcc @loop
          inx
          bcs @loop ; (always loops)
