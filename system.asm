@@ -1,8 +1,6 @@
 
 ; marcel timm, rhinodevel, 2020mar18
 
-target TGT_PETBV2;TGT_PETBV4
-
 ; ---------------------------------------------------------
 ; --- system memory locations (basic v2 / rev.3 AND v4) ---
 ; ---------------------------------------------------------
@@ -13,7 +11,7 @@ tom$ = $34 ; pointer to top of memory / limit of basic.
 fp_acc1$ = $5e ; floating-point accumulator nr. 1 (6 bytes).
 fp_acc1_2$ = $5e + 2 ; inside floating-point accumulator nr. 1.
 fp_acc1_4$ = $5e + 4 ; inside floating-point accumulator nr. 1.
-;fp_acc2$ = $66 ; floating-point accumulator nr. 2 (6 bytes).
+fp_acc2$ = $66 ; floating-point accumulator nr. 2 (6 bytes).
 keybufnum$ = $9e ; current number of characters in keyboard buffer.
 utility$ = $a2 ; not used / utility (1 unused byte).
 ;tapflag$ = $ab ; end of tape input flag / flag for tape write (1 byte).
@@ -56,22 +54,18 @@ via_ifr$ = $e84d ; via's interrupt flag register.
 chrout$ = $ffd2 ; write a character to the screen.
 chrin$ = $ffe4 ; get one character.
 
-ifdef TGT_PETBV2
+vec_nmi$ = $fffa
+;vec_res$ = $fffc
+;vec_irq$ = $fffe
 
 ; ------------------------------------------
 ; --- system memory locations (basic v2) ---
 ; ------------------------------------------
 
-cas_save$ = $f703 ; save to cassette.
-
-endif ;TGT_PETBV2
-
-ifdef TGT_PETBV4
+v2_cas_save$ = $f703 ; save to cassette.
 
 ; ------------------------------------------
 ; --- system memory locations (basic v4) ---
 ; ------------------------------------------
 
-cas_save$ = $f742 ; save to cassette.
-
-endif ;TGT_PETBV4
+v4_cas_save$ = $f742 ; save to cassette.

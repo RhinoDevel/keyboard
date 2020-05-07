@@ -827,7 +827,36 @@ drawnotea
 ; *** init ***
 ; ************
 ;
-init     ; *** find out, if 40 or 80 column machine ***
+init     ; *** find out, which basic version (2 or 4) and setup stuff ***
+         ;
+         ; no support for v1, yet (just ignoring the possibility)!
+
+         ; prepare for v4:
+         ;
+         lda #<v4_cas_save$
+         sta cas_save$
+         lda #>v4_cas_save$
+         sta cas_save$ + 1
+         ; (add more, when necessary)
+         lda #'4'
+         sta basic_version$
+         ;
+         lda vec_nmi$
+         cmp #<$fcfe ; hard-coded: lower byte of basic v2 nmi handling address.
+         bne basic_setup_done ; assuming v4 ($fd49).
+         ;
+         ; prepare for (change to) v2:
+         ;
+         lda #<v2_cas_save$
+         sta cas_save$
+         lda #>v2_cas_save$
+         sta cas_save$ + 1
+         ; (add more, when necessary)
+         lda #'2'
+         sta basic_version$
+basic_setup_done
+
+         ; *** find out, if 40 or 80 column machine ***
 
          ldy #80 ; initialize y with value for 80 column machine.
          ;
@@ -1050,7 +1079,7 @@ savetune lda #<tune$
          sta fnameptr$ + 1
 
          ldx #0
-         jmp cas_save$
+         jmp (cas_save$)
 
          rts
 
