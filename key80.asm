@@ -73,7 +73,7 @@ key80_row$
          byte $ff ; <
           byte $ff ; =
          byte $ff ; >
-          byte $ffs ; ?
+          byte $ff ; ?
 
 ; ---------------------------------------------------------------
 ; --- inverted keyboard decoding codes for 80 column machines ---
@@ -85,7 +85,7 @@ key80_row$
 ; - not compatible with 40 column machines.
 ;
 ; 7f bf df ef f7 fb fd fe ff
-; 80 40 
+; 80 40 20 10 08 04 02 01 00
 ;
 key80_neg$
          byte $ff ; @
@@ -96,8 +96,8 @@ key80_neg$
          byte $02 ; e
          byte $ff ; f
          byte $04 ; g
-         byte $04 ; h
-         byte $08 ; i
+         byte $08 ; h
+         byte $20 ; i
          byte $08 ; j
          byte $ff ; k
          byte $ff ; l
@@ -106,36 +106,36 @@ key80_neg$
          byte $ff ; o
          byte $ff ; p
          byte $01 ; q
-         byte $02 ; r
-         byte $01 ; s
+         byte $04 ; r
+         byte $02 ; s
          byte $04 ; t
          byte $08 ; u
          byte $02 ; v
-         byte $01 ; w
-         byte $01 ; x
-         byte $04 ; y
+         byte $02 ; w
+         byte $02 ; x
+         byte $08 ; y
          byte $01 ; z
          byte $ff ; [
          byte $ff ; \
          byte $ff ; ]
          byte $ff ; <up arrow>
-         byte $20 ; <left arrow>
+         byte $01 ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
-         byte $01 ; <quotation mark>
-         byte $02 ; #
-         byte $ff ; $
-         byte $04 ; %
-         byte $08 ; &
-         byte $04 ; '
+          byte $ff ; <quotation mark>
+          byte $ff ; #
+          byte $ff ; $
+          byte $ff ; %
+          byte $ff ; &
+          byte $ff ; '
          byte $ff ; (
          byte $ff ; )
-         byte $80 ; *
-         byte $80 ; +
+          byte $ff ; *
+          byte $ff ; +
          byte $08 ; ,
          byte $ff ; -
          byte $ff ; .
-         byte $80 ; /
+         byte $40 ; /
          byte $ff ; 0
          byte $ff ; 1
          byte $ff ; 2
@@ -147,8 +147,8 @@ key80_neg$
          byte $ff ; 8
          byte $ff ; 9
          byte $ff ; :
-         byte $10 ; ;
+         byte $40 ; ;
          byte $ff ; <
-         byte $80 ; =
+          byte $ff ; =
          byte $ff ; >
-         byte $10 ; ?
+          byte $ff ; ?

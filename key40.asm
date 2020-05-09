@@ -1,15 +1,16 @@
 
 ; marcel timm, rhinodevel, 2020mar20
 
-; ------------------------------------------------------
-; --- decode table row of supported keyboard buttons ---
-; ------------------------------------------------------
+; -----------------------------------------------------------------------------
+; --- decode table row of supported keyboard buttons for 40 column machines ---
+; -----------------------------------------------------------------------------
 
 ; - index equals screen (not petscii) code.
 ; - value of $ff means not supported.
-; - not compatible with 8032.
+; - not compatible with 80 column machines.
 ;
-key_row$ byte $ff ; @
+key40_row$
+         byte $ff ; @
          byte $ff ; a
          byte $06 ; b
          byte $06 ; c
@@ -74,15 +75,16 @@ key_row$ byte $ff ; @
          byte $ff ; >
          byte $07 ; ?
 
-; ----------------------------------------
-; --- inverted keyboard decoding codes ---
-; ----------------------------------------
+; ---------------------------------------------------------------
+; --- inverted keyboard decoding codes for 40 column machines ---
+; ---------------------------------------------------------------
 
 ; - index equals screen (not petscii) code.
 ; - value of $ff means not supported.
-; - not compatible with 8032.
+; - not compatible with 80 column machines.
 ;
-key_neg$ byte $ff ; @
+key40_neg$
+         byte $ff ; @
          byte $ff ; a
          byte $04 ; b
          byte $02 ; c

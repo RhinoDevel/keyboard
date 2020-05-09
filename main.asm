@@ -100,6 +100,8 @@ keyloop ; loop through all buttons.
          jmp next_key
 supported ; the button to check is supported.
 
+         txa ; stupid..
+         tay ;
          jsr but_pre$ ; check, if supported button is pressed or not pressed.
          beq sup_but_is_pressed
          jmp sup_but_is_not_pressed
@@ -996,6 +998,27 @@ note_count_end
 
          lda #12; hard-coded. enable graphics mode (character set to use).
          sta via_pcr$
+
+         lda #<key80_row$
+         sta key_row$
+         lda #>key80_row$
+         sta key_row$ + 1
+         lda #<key80_neg$
+         sta key_neg$
+         lda #>key80_neg$
+         sta key_neg$ + 1
+         lda #80
+         cmp line_len$
+         beq init_key_ptrs_done
+         lda #<key40_row$
+         sta key_row$
+         lda #>key40_row$
+         sta key_row$ + 1
+         lda #<key40_neg$
+         sta key_neg$
+         lda #>key40_neg$
+         sta key_neg$ + 1
+init_key_ptrs_done
 
          ; Works, but unfortunately leads to an unsteady image (at least on some
          ; machines:
