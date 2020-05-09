@@ -997,17 +997,20 @@ note_count_end
          lda #12; hard-coded. enable graphics mode (character set to use).
          sta via_pcr$
 
-         ; Remove blank(s) between adjacent lines, if this machine has 80 cols.
-         ; (because these must have the 6845 crt controller chip):
+         ; Works, but unfortunately leads to an unsteady image (at least on some
+         ; machines:
          ;
-         lda #80
-         cmp line_len$
-         bne charscan_done
-         lda #9 ; hard-coded: 6845's maximum scanline address.
-         sta 59520 ; hard-coded: 6845's address register.
-         lda #7 ; 7 scanlines per character <-> no blanks between adj. lines.
-         sta 59521 ; hard-coded: 6845's register file.
-charscan_done
+;         ; Remove blank(s) between adjacent lines, if this machine has 80 cols.
+;         ; (because these must have the 6845 crt controller chip):
+;         ;
+;         lda #80
+;         cmp line_len$
+;         bne charscan_done
+;         lda #9 ; hard-coded: 6845's maximum scanline address.
+;         sta 59520 ; hard-coded: 6845's address register.
+;         lda #7 ; 7 scanlines per character <-> no blanks between adj. lines.
+;         sta 59521 ; hard-coded: 6845's register file.
+;charscan_done
 
          ; *** draw initial screen ***
 
