@@ -742,7 +742,13 @@ rec_mode_stuff_end
 
          ; exit application (show "goodbye"):
          ;
-exit     lda #0
+exit     lda #80
+         cmp line_len$
+         bne exit_graph_done
+         jsr v4_graph_off$ ; (disables graphics mode, enables blank lines)
+exit_graph_done
+         
+         lda #0
          sta loop + 1 ; TODO: implementing keeping loop enabled, if wanted!
          sta timer2_low$ ; disables sound by timer reset.
          sta keybufnum$ ; (sometimes, the <left arrow> will still be printed..)
@@ -996,9 +1002,6 @@ note_count_end
          lda pattern$
          sta via_shift$
 
-         lda #12; hard-coded. enable graphics mode (character set to use).
-         sta via_pcr$
-
          lda #<key80_row$
          sta key_row$
          lda #>key80_row$
@@ -1020,20 +1023,17 @@ note_count_end
          sta key_neg$ + 1
 init_key_ptrs_done
 
-         ; Works, but unfortunately leads to an unsteady image (at least on some
-         ; machines:
+         lda #12; hard-coded. enable graphics mode (character set to use).
+         sta via_pcr$
+
+         ; Remove blank(s) between adjacent lines, if this machine has 80 cols.
+         ; (because these must have the 6845 crt controller chip):
          ;
-;         ; Remove blank(s) between adjacent lines, if this machine has 80 cols.
-;         ; (because these must have the 6845 crt controller chip):
-;         ;
-;         lda #80
-;         cmp line_len$
-;         bne charscan_done
-;         lda #9 ; hard-coded: 6845's maximum scanline address.
-;         sta 59520 ; hard-coded: 6845's address register.
-;         lda #7 ; 7 scanlines per character <-> no blanks between adj. lines.
-;         sta 59521 ; hard-coded: 6845's register file.
-;charscan_done
+         lda #80
+         cmp line_len$
+         bne init_graph_done
+         jsr v4_graph_on$ ; (also sets graphics mode, as done manually above..)
+init_graph_done
 
          ; *** draw initial screen ***
 

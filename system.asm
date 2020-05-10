@@ -70,4 +70,6 @@ v2_cas_save$ = $f703 ; save to cassette.
 ; --- system memory locations (basic v4) ---
 ; ------------------------------------------
 
+v4_graph_off$ = $e07a ; enable lower/upper case mode and add blanks betw. lines.
+v4_graph_on$ = $e082 ; enable upper case / graphics mode and remove blanks.
 v4_cas_save$ = $f742 ; save to cassette.
