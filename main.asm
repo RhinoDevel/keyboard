@@ -747,7 +747,10 @@ exit     lda #80
          bne exit_graph_done
          jsr v4_graph_off$ ; (disables graphics mode, enables blank lines)
 exit_graph_done
-         
+         ;
+         ; (not re-enabling first char. rom, because of "goodbye" screen using
+         ;  at-sign..)
+         ;
          lda #0
          sta loop + 1 ; TODO: implementing keeping loop enabled, if wanted!
          sta timer2_low$ ; disables sound by timer reset.
