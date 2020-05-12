@@ -1026,12 +1026,20 @@ init_key_ptrs_done
          lda #12; hard-coded. enable graphics mode (character set to use).
          sta via_pcr$
 
-         ; Remove blank(s) between adjacent lines, if this machine has 80 cols.
-         ; (because these must have the 6845 crt controller chip):
-         ;
          lda #80
          cmp line_len$
          bne init_graph_done
+         ;
+         ; hard-coded: enable second char. rom, if available (e.g. switch from
+         ;             german rom to english rom on 8032-SK with german DIN
+         ;             keyboard (do this before enabling graphics mode!):
+         ;
+         lda #chr_alt_rom$
+         jsr chrout$
+         ;
+         ; this machine has 80 cols., remove blank(s) between adjacent lines
+         ; (because these must have the 6845 crt controller chip):
+         ;
          jsr v4_graph_on$ ; (also sets graphics mode, as done manually above..)
 init_graph_done
 
