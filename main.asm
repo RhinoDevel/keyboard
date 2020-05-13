@@ -325,7 +325,7 @@ drawnotpre ; draw key as not pressed and go on.
          tax
 
 next_key inx
-         cpx #64 ; TODO: hard-coded (for screen codes 0 - 63)!
+         cpx #64 ; hard-coded (for screen codes 0 - 63)!
          beq keyloopdone ; no more keys to check.
          jmp keyloop ; still more keys to check.
 
