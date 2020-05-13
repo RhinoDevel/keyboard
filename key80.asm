@@ -44,12 +44,12 @@ key80_row$
          byte $09 ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
-          byte $ff ; <quotation mark>
-          byte $ff ; #
-          byte $ff ; $
-          byte $ff ; %
-          byte $ff ; &
-          byte $ff ; '
+         byte $ff ; <quotation mark>
+         byte $ff ; #
+         byte $ff ; $
+         byte $ff ; %
+         byte $ff ; &
+         byte $ff ; '
          byte $ff ; (
          byte $ff ; )
           byte $ff ; *
@@ -60,12 +60,12 @@ key80_row$
          byte $08 ; /
          byte $ff ; 0
          byte $ff ; 1
-         byte $ff ; 2
-         byte $ff ; 3
+         byte $00 ; 2
+         byte $09 ; 3
          byte $ff ; 4
-         byte $ff ; 5
-         byte $ff ; 6
-         byte $ff ; 7
+         byte $00 ; 5
+         byte $09 ; 6
+         byte $01 ; 7
          byte $ff ; 8
          byte $ff ; 9
          byte $ff ; :
@@ -122,12 +122,12 @@ key80_neg$
          byte $01 ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
-          byte $ff ; <quotation mark>
-          byte $ff ; #
-          byte $ff ; $
-          byte $ff ; %
-          byte $ff ; &
-          byte $ff ; '
+         byte $ff ; <quotation mark>
+         byte $ff ; #
+         byte $ff ; $
+         byte $ff ; %
+         byte $ff ; &
+         byte $ff ; '
          byte $ff ; (
          byte $ff ; )
           byte $ff ; *
@@ -138,12 +138,12 @@ key80_neg$
          byte $40 ; /
          byte $ff ; 0
          byte $ff ; 1
-         byte $ff ; 2
-         byte $ff ; 3
+         byte $01 ; 2
+         byte $02 ; 3
          byte $ff ; 4
-         byte $ff ; 5
-         byte $ff ; 6
-         byte $ff ; 7
+         byte $02 ; 5
+         byte $04 ; 6
+         byte $04 ; 7
          byte $ff ; 8
          byte $ff ; 9
          byte $ff ; :

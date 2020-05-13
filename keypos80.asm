@@ -1,14 +1,15 @@
 
-; marcel timm, rhinodevel, 2020mar24
+; marcel timm, rhinodevel, 2020may12
 
-; ---------------------------------
-; --- key x-positions on screen ---
-; ---------------------------------
+; --------------------------------------------------------
+; --- key x-positions on screen for 80 column machines ---
+; --------------------------------------------------------
 
 ; - index equals screen (not petscii) code.
 ; - value of $ff means not supported.
 ;
-keyposx$ byte $ff ; @
+keyposx80$
+         byte $ff ; @
          byte $ff ; a
          byte $0c ; b
          byte $08 ; c
@@ -42,12 +43,12 @@ keyposx$ byte $ff ; @
          byte $1f ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
-         byte $03 ; <quotation mark>
-         byte $05 ; #
+         byte $ff ; <quotation mark>
+         byte $ff ; #
          byte $ff ; $
-         byte $09 ; %
-         byte $0d ; &
-         byte $0b ; '
+         byte $ff ; %
+         byte $ff ; &
+         byte $ff ; '
          byte $ff ; (
          byte $ff ; )
          byte $1f ; *
@@ -58,12 +59,12 @@ keyposx$ byte $ff ; @
          byte $1f ; /
          byte $ff ; 0
          byte $ff ; 1
-         byte $ff ; 2
-         byte $ff ; 3
+         byte $03 ; 2
+         byte $05 ; 3
          byte $ff ; 4
-         byte $ff ; 5
-         byte $ff ; 6
-         byte $ff ; 7
+         byte $09 ; 5
+         byte $0b ; 6
+         byte $0d ; 7
          byte $ff ; 8
          byte $ff ; 9
          byte $ff ; :
@@ -73,14 +74,15 @@ keyposx$ byte $ff ; @
          byte $ff ; >
          byte $17 ; ?
 
-; ---------------------------------
-; --- key y-positions on screen ---
-; ---------------------------------
+; --------------------------------------------------------
+; --- key y-positions on screen for 80 column machines ---
+; --------------------------------------------------------
 
 ; - index equals screen (not petscii) code.
 ; - value of $ff means not supported.
 ;
-keyposy$ byte $ff ; @
+keyposy80$
+         byte $ff ; @
          byte $ff ; a
          byte $0a ; b
          byte $0a ; c
@@ -114,12 +116,12 @@ keyposy$ byte $ff ; @
          byte $01 ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
-         byte $04 ; <quotation mark>
-         byte $04 ; #
+         byte $ff ; <quotation mark>
+         byte $ff ; #
          byte $ff ; $
-         byte $04 ; %
-         byte $04 ; &
-         byte $04 ; '
+         byte $ff ; %
+         byte $ff ; &
+         byte $ff ; '
          byte $ff ; (
          byte $ff ; )
          byte $07 ; *
@@ -130,12 +132,12 @@ keyposy$ byte $ff ; @
          byte $09 ; /
          byte $ff ; 0
          byte $ff ; 1
-         byte $ff ; 2
-         byte $ff ; 3
+         byte $04 ; 2
+         byte $04 ; 3
          byte $ff ; 4
-         byte $ff ; 5
-         byte $ff ; 6
-         byte $ff ; 7
+         byte $04 ; 5
+         byte $04 ; 6
+         byte $04 ; 7
          byte $ff ; 8
          byte $ff ; 9
          byte $ff ; :

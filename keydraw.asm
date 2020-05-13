@@ -1,7 +1,7 @@
 
 ; marcel timm, rhinodevel, 2020mar21
 
-; - needs tables keyposx$ and keyposy$.
+; - needs pointers keyposx$ and keyposy$.
 ; - calls pos_draw$() and uses zero_word_buf1$.
 
 ; --------------
@@ -24,14 +24,17 @@
 ;
 defm keydraw$
          ldx #0
-@loop    lda keyposx$,x
+@loop    txa ; copy index to y register for indirect addressing.
+         tay ;
+         lda (keyposx$),y
          cmp #$ff
          beq @next
          sta zero_word_buf1$
-         ldy keyposy$,x
+         lda (keyposy$),y
+         tay
          txa
-         jsr pos_draw$
-         tax
+         jsr pos_draw$ ; (keeps content of a)
+         tax ; restore index to x.
 @next    inx
          cpx #64 ; TODO: hard-coded (for screen codes 0 - 63)!
          bne @loop

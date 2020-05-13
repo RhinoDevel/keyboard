@@ -94,14 +94,14 @@ infloop ; infinite loop.
 
 keyloop ; loop through all buttons.
 
-         lda keyposx$,x ; skip (currently) unsupported/unused buttons.
+         txa ; for indirect addressing here and in but_pre$(), below.
+         tay ;
+         lda (keyposx$),y ; skip (currently) unsupported/unused buttons.
          cmp #$ff
          bne supported
          jmp next_key
 supported ; the button to check is supported.
 
-         txa ; stupid..
-         tay ;
          jsr but_pre$ ; check, if supported button is pressed or not pressed.
          beq sup_but_is_pressed
          jmp sup_but_is_not_pressed
@@ -236,9 +236,12 @@ found_note1_already_set
          ldy keynote$,x ; gets note's index in array (never #note_none, here).
          sty fndnote2
 
-draw_on ldy keyposx$,x ; draw key as pressed and go on.
-         sty zero_word_buf1$
-         ldy keyposy$,x
+draw_on  txa ; for indirect addressing.
+         tay ;
+         lda (keyposx$),y ; draw key as pressed and go on.
+         sta zero_word_buf1$
+         lda (keyposy$),y
+         tay
          txa
          pha
          jsr rev_on$
@@ -308,10 +311,13 @@ no_speed_2
 no_loop_2 
 
 
-drawnotpre ; draw key as not pressed and go on
-         ldy keyposx$,x
-         sty zero_word_buf1$
-         ldy keyposy$,x
+drawnotpre ; draw key as not pressed and go on.
+         txa ; for indirect addressing.
+         tay ;
+         lda (keyposx$),y
+         sta zero_word_buf1$
+         lda (keyposy$),y
+         tay
          txa
          pha
          jsr rev_off$
@@ -754,7 +760,11 @@ exit_graph_done
          lda #0
          sta loop + 1 ; TODO: implementing keeping loop enabled, if wanted!
          sta timer2_low$ ; disables sound by timer reset.
+
+         ; TODO: does not seem to work(?):
+         ;
          sta keybufnum$ ; (sometimes, the <left arrow> will still be printed..)
+
          sta via_acr$ ; hard-coded. disables free-running mode
                       ; (e.g. makes tape usable again).
          clrscr$
@@ -1013,9 +1023,20 @@ note_count_end
          sta key_neg$
          lda #>key80_neg$
          sta key_neg$ + 1
+         ;
+         lda #<keyposx80$
+         sta keyposx$
+         lda #>keyposx80$
+         sta keyposx$ + 1
+         lda #<keyposy80$
+         sta keyposy$
+         lda #>keyposy80$
+         sta keyposy$ + 1
+         ;
          lda #80
          cmp line_len$
          beq init_key_ptrs_done
+         ;
          lda #<key40_row$
          sta key_row$
          lda #>key40_row$
@@ -1024,6 +1045,15 @@ note_count_end
          sta key_neg$
          lda #>key40_neg$
          sta key_neg$ + 1
+         ;
+         lda #<keyposx40$
+         sta keyposx$
+         lda #>keyposx40$
+         sta keyposx$ + 1
+         lda #<keyposy40$
+         sta keyposy$
+         lda #>keyposy40$
+         sta keyposy$ + 1
 init_key_ptrs_done
 
          lda #12; hard-coded. enable graphics mode (character set to use).

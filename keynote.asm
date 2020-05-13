@@ -7,6 +7,8 @@
 
 ; - index equals screen (not petscii) code.
 ; - value of $ff means not supported.
+; - holds some 40 & 80 column machine specific indices
+;   (no problem, if no reuse of keys with different notes).
 ;
 keynote$ byte $ff ; @
          byte $ff ; a
@@ -42,12 +44,12 @@ keynote$ byte $ff ; @
          byte $ff ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
-         byte 13 ; <quotation mark> * 2. c#
-         byte 15 ; # * 2. d#
+         byte 13 ; 40 columns: <quotation mark> * 2. c#
+         byte 15 ; 40 columns: # * 2. d#
          byte $ff ; $
-         byte 18 ; % * 2. f#
-         byte 22 ; & * 2. a#
-         byte 20 ; ' * 2. g#
+         byte 18 ; 40 columns: % * 2. f#
+         byte 22 ; 40 columns: & * 2. a#
+         byte 20 ; 40 columns: ' * 2. g#
          byte $ff ; (
          byte $ff ; )
          byte $ff ; *
@@ -58,12 +60,12 @@ keynote$ byte $ff ; @
          byte $ff ; /
          byte $ff ; 0
          byte $ff ; 1
-         byte $ff ; 2
-         byte $ff ; 3
+         byte 13 ; 80 columns: 2 * 2. c#
+         byte 15 ; 80 columns: 3 * 2. d#
          byte $ff ; 4
-         byte $ff ; 5
-         byte $ff ; 6
-         byte $ff ; 7
+         byte 18 ; 80 columns: 5 * 2. f#
+         byte 20 ; 80 columns: 6 * 2. a#
+         byte 22 ; 80 columns: 7 * 2. g#
          byte $ff ; 8
          byte $ff ; 9
          byte $ff ; :
