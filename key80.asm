@@ -55,8 +55,8 @@ key80_row$
           byte $ff ; *
           byte $ff ; +
          byte $07 ; ,
-         byte $ff ; -
-         byte $ff ; .
+         byte $00 ; -
+         byte $06 ; .
          byte $08 ; /
          byte $ff ; 0
          byte $ff ; 1
@@ -69,11 +69,11 @@ key80_row$
          byte $ff ; 8
          byte $ff ; 9
          byte $ff ; :
-         byte $02 ; ;
+         byte $ff ; ;
          byte $ff ; <
           byte $ff ; =
          byte $ff ; >
-          byte $ff ; ?
+         byte $ff ; ?
 
 ; ---------------------------------------------------------------
 ; --- inverted keyboard decoding codes for 80 column machines ---
@@ -133,8 +133,8 @@ key80_neg$
           byte $ff ; *
           byte $ff ; +
          byte $08 ; ,
-         byte $ff ; -
-         byte $ff ; .
+         byte $08 ; -
+         byte $08 ; .
          byte $40 ; /
          byte $ff ; 0
          byte $ff ; 1
@@ -147,8 +147,8 @@ key80_neg$
          byte $ff ; 8
          byte $ff ; 9
          byte $ff ; :
-         byte $40 ; ;
+         byte $ff ; ;
          byte $ff ; <
           byte $ff ; =
          byte $ff ; >
-          byte $ff ; ?
+         byte $ff ; ?

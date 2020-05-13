@@ -54,8 +54,8 @@ keyposx80$
          byte $1f ; *
          byte $1f ; +
          byte $12 ; ,
-         byte $ff ; -
-         byte $ff ; .
+         byte $17 ; -
+         byte $15 ; .
          byte $1f ; /
          byte $ff ; 0
          byte $ff ; 1
@@ -68,11 +68,11 @@ keyposx80$
          byte $ff ; 8
          byte $ff ; 9
          byte $ff ; :
-         byte $15 ; ;
+         byte $ff ; ;
          byte $ff ; <
          byte $1f ; =
          byte $ff ; >
-         byte $17 ; ?
+         byte $ff ; ?
 
 ; --------------------------------------------------------
 ; --- key y-positions on screen for 80 column machines ---
@@ -127,8 +127,8 @@ keyposy80$
          byte $07 ; *
          byte $03 ; +
          byte $0a ; ,
-         byte $ff ; -
-         byte $ff ; .
+         byte $0a ; -
+         byte $0a ; .
          byte $09 ; /
          byte $ff ; 0
          byte $ff ; 1
@@ -141,8 +141,8 @@ keyposy80$
          byte $ff ; 8
          byte $ff ; 9
          byte $ff ; :
-         byte $0a ; ;
+         byte $ff ; ;
          byte $ff ; <
          byte $05 ; =
          byte $ff ; >
-         byte $0a ; ?
+         byte $ff ; ?
