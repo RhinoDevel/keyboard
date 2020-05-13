@@ -486,7 +486,7 @@ play_mode
          bvc play_mode_stuff_end ; no, it did not time out.
          ;
 speed
-         ldy #1;#3 ; TODO: increase this value to increase playback speed.
+         ldy #1 ; (byte value will be changed in-place to modify playback speed)
 countdown_dec
          lda countdwn
          bne countdown_dec_lsb ; skip dec. msb, because lsb is not zero.
