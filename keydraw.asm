@@ -36,7 +36,7 @@ defm keydraw$
          jsr pos_draw$ ; (keeps content of a)
          tax ; restore index to x.
 @next    inx
-         cpx #64 ; TODO: hard-coded (for screen codes 0 - 63)!
+         cpx #64 ; hard-coded (for screen codes 0 - 63)!
          bne @loop
          endm 
 
