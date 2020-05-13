@@ -1122,6 +1122,8 @@ init_graph_done
       
          rts
 
+; TODO: integrate into application (also loading):
+;
 ; you need to enable irq's and disable free running mode before this (VIA ACR):
 ;
 savetune lda #<tune$
