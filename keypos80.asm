@@ -25,7 +25,7 @@ keyposx80$
          byte $10 ; m
          byte $0e ; n
          byte $ff ; o
-         byte $ff ; p
+         byte $1f ; p
          byte $02 ; q
          byte $08 ; r
          byte $05 ; s
@@ -36,11 +36,11 @@ keyposx80$
          byte $06 ; x
          byte $0c ; y
          byte $04 ; z
-         byte $ff ; [
+         byte $1f ; [
          byte $ff ; \
-         byte $ff ; ]
+         byte $1f ; ]
          byte $ff ; <up arrow>
-         byte $1f ; <left arrow>
+         byte $ff ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
          byte $ff ; <quotation mark>
@@ -56,8 +56,8 @@ keyposx80$
          byte $12 ; ,
          byte $17 ; -
          byte $15 ; .
-         byte $1f ; /
-         byte $ff ; 0
+         byte $ff ; /
+         byte $1f ; 0
          byte $ff ; 1
          byte $03 ; 2
          byte $05 ; 3
@@ -66,11 +66,11 @@ keyposx80$
          byte $0b ; 6
          byte $0d ; 7
          byte $ff ; 8
-         byte $ff ; 9
+         byte $1f ; 9
          byte $ff ; :
          byte $ff ; ;
          byte $ff ; <
-         byte $1f ; =
+         byte $ff ; =
          byte $ff ; >
          byte $ff ; ?
 
@@ -98,7 +98,7 @@ keyposy80$
          byte $0a ; m
          byte $0a ; n
          byte $ff ; o
-         byte $ff ; p
+         byte $01 ; p
          byte $06 ; q
          byte $06 ; r
          byte $08 ; s
@@ -109,11 +109,11 @@ keyposy80$
          byte $0a ; x
          byte $06 ; y
          byte $0a ; z
-         byte $ff ; [
+         byte $05 ; [
          byte $ff ; \
-         byte $ff ; ]
+         byte $03 ; ]
          byte $ff ; <up arrow>
-         byte $01 ; <left arrow>
+         byte $ff ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
          byte $ff ; <quotation mark>
@@ -124,13 +124,13 @@ keyposy80$
          byte $ff ; '
          byte $ff ; (
          byte $ff ; )
-         byte $07 ; *
-         byte $03 ; +
+         byte $ff ; *
+         byte $ff ; +
          byte $0a ; ,
          byte $0a ; -
          byte $0a ; .
-         byte $09 ; /
-         byte $ff ; 0
+         byte $ff ; /
+         byte $09 ; 0
          byte $ff ; 1
          byte $04 ; 2
          byte $04 ; 3
@@ -139,10 +139,10 @@ keyposy80$
          byte $04 ; 6
          byte $04 ; 7
          byte $ff ; 8
-         byte $ff ; 9
+         byte $07 ; 9
          byte $ff ; :
          byte $ff ; ;
          byte $ff ; <
-         byte $05 ; =
+         byte $ff ; =
          byte $ff ; >
          byte $ff ; ?

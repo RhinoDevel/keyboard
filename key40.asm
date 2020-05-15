@@ -26,7 +26,7 @@ key40_row$
          byte $06 ; m
          byte $07 ; n
          byte $ff ; o
-         byte $ff ; p
+         byte $03 ; p
          byte $02 ; q
          byte $03 ; r
          byte $05 ; s
@@ -41,7 +41,7 @@ key40_row$
          byte $ff ; \
          byte $ff ; ]
          byte $ff ; <up arrow>
-         byte $00 ; <left arrow>
+         byte $ff ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
          byte $01 ; <quotation mark>
@@ -50,14 +50,14 @@ key40_row$
          byte $00 ; %
          byte $00 ; &
          byte $01 ; '
-         byte $ff ; (
-         byte $ff ; )
-         byte $05 ; *
-         byte $07 ; +
+         byte $00 ; (
+         byte $01 ; )
+         byte $ff ; *
+         byte $ff ; +
          byte $07 ; ,
          byte $ff ; -
          byte $ff ; .
-         byte $03 ; /
+         byte $ff ; /
          byte $ff ; 0
          byte $ff ; 1
          byte $ff ; 2
@@ -70,9 +70,9 @@ key40_row$
          byte $ff ; 9
          byte $ff ; :
          byte $06 ; ;
-         byte $ff ; <
-         byte $09 ; =
-         byte $ff ; >
+         byte $09 ; <
+         byte $ff ; =
+         byte $08 ; >
          byte $07 ; ?
 
 ; ---------------------------------------------------------------
@@ -100,7 +100,7 @@ key40_neg$
          byte $08 ; m
          byte $04 ; n
          byte $ff ; o
-         byte $ff ; p
+         byte $10 ; p
          byte $01 ; q
          byte $02 ; r
          byte $01 ; s
@@ -115,7 +115,7 @@ key40_neg$
          byte $ff ; \
          byte $ff ; ]
          byte $ff ; <up arrow>
-         byte $20 ; <left arrow>
+         byte $ff ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
          byte $01 ; <quotation mark>
@@ -124,15 +124,15 @@ key40_neg$
          byte $04 ; %
          byte $08 ; &
          byte $04 ; '
-         byte $ff ; (
-         byte $ff ; )
-         byte $80 ; *
-         byte $80 ; +
+         byte $10 ; (
+         byte $10 ; )
+         byte $ff ; *
+         byte $ff ; +
          byte $08 ; ,
          byte $ff ; -
          byte $ff ; .
-         byte $80 ; /
-         byte $ff ; 0
+         byte $ff ; /
+         byte $40 ; 0
          byte $ff ; 1
          byte $ff ; 2
          byte $ff ; 3
@@ -141,10 +141,10 @@ key40_neg$
          byte $ff ; 6
          byte $ff ; 7
          byte $ff ; 8
-         byte $ff ; 9
+         byte $80 ; 9
          byte $ff ; :
          byte $10 ; ;
-         byte $ff ; <
-         byte $80 ; =
-         byte $ff ; >
+         byte $08 ; <
+         byte $ff ; =
+         byte $10 ; >
          byte $10 ; ?

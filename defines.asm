@@ -14,5 +14,6 @@ key_row$ = fp_acc2_2$ ; 2 bytes.
 key_neg$ = fp_acc2_4$ ; 2 bytes.
 keyposx$ = fp_acc3$ ; 2 bytes.
 keyposy$ = fp_acc3_2$ ; 2 bytes.
+but$ = fp_acc3_3$ ; 2 bytes
 
 pattern$ = utility$ ; 1 byte. no need to be in zero page!

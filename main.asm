@@ -108,12 +108,22 @@ supported ; the button to check is supported.
 
 sup_but_is_pressed ; supported button is pressed.
 
-         cpx #31 ; <left arrow> ; does the user want to exit?
+         ; does the user want to exit?
+         ;
+         txa
+         ldy #but_i_exit$
+         cmp (but$),y
+         ;
          bne no_exit
          jmp exit
 no_exit
 
-         cpx #59 ; ';' ; next-pattern key pressed?
+         ; next-pattern key pressed?
+         ;
+         ;txa
+         ldy #but_i_next_pat$
+         cmp (but$),y
+         ;
          bne no_pat_n ; skips, if next-pattern key not pressed.
          lda flag_pre
          and #flag_pre_pat_n
@@ -138,7 +148,12 @@ jmp_draw_on
          jmp draw_on
 no_pat_n
 
-         cpx #'?' ; last-pattern key pressed?
+         ; last-pattern key pressed?
+         ;
+         ;txa
+         ldy #but_i_last_pat$
+         cmp (but$),y
+         ;
          bne no_pat_l
          lda flag_pre
          and #flag_pre_pat_l
@@ -160,7 +175,12 @@ pat_l_helper
          bne set_pattern ; (always branches)
 no_pat_l
 
-         cpx #'+' ; record button pressed?
+         ; record button pressed?
+         ;
+         ;txa
+         ldy #but_i_rec$
+         cmp (but$),y
+         ;
          bne no_rec
          lda flag_pre
          and #flag_pre_rec
@@ -176,7 +196,12 @@ rec_jmp_draw_on
          jmp draw_on
 no_rec
 
-         cpx #'=' ; play button pressed?
+         ; play button pressed?
+         ;
+         ;txa
+         ldy #but_i_play$
+         cmp (but$),y
+         ;
          bne no_play
          lda flag_pre
          and #flag_pre_play
@@ -191,7 +216,12 @@ no_rec
          jmp draw_on
 no_play
 
-         cpx #'*' ; speed button pressed?
+         ; speed button pressed?
+         ;
+         ;txa
+         ldy #but_i_speed$
+         cmp (but$),y
+         ;
          bne no_speed
          lda flag_pre
          and #flag_pre_speed
@@ -206,7 +236,12 @@ no_play
          jmp draw_on
 no_speed
 
-         cpx #'/' ; loop button pressed?
+         ; loop button pressed?
+         ;
+         ;txa
+         ldy #but_i_loop$
+         cmp (but$),y
+         ;
          bne no_loop
          lda flag_pre
          and #flag_pre_loop
@@ -251,7 +286,12 @@ draw_on  txa ; for indirect addressing.
 
 sup_but_is_not_pressed ; supported button is not pressed.
  
-         cpx #59 ; ';' ; next-pattern key?
+         ; next-pattern key?
+         ;
+         txa
+         ldy #but_i_next_pat$
+         cmp (but$),y
+         ;
          bne no_pat_n_2
          lda flag_pre ; disable is-pressed flag.
          and #flag_pre_pat_n_neg
@@ -259,7 +299,12 @@ sup_but_is_not_pressed ; supported button is not pressed.
          jmp drawnotpre
 no_pat_n_2 
 
-         cpx #'?' ; last-pattern key?
+         ; last-pattern key?
+         ;
+         ;txa
+         ldy #but_i_last_pat$
+         cmp (but$),y
+         ;
          bne no_pat_l_2
          lda flag_pre
          and #flag_pre_pat_l_neg
@@ -267,7 +312,12 @@ no_pat_n_2
          jmp drawnotpre
 no_pat_l_2
 
-         cpx #'+' ; record key?
+         ; record key?
+         ;
+         ;txa
+         ldy #but_i_rec$
+         cmp (but$),y
+         ;
          bne no_rec_2
          lda flag_pre ; disable is-pressed flag.
          and #flag_pre_rec_neg
@@ -279,7 +329,12 @@ no_pat_l_2
          jmp drawnotpre
 no_rec_2
 
-         cpx #'=' ; play key?
+         ; play key?
+         ;
+         ;txa
+         ldy #but_i_play$
+         cmp (but$),y
+         ;
          bne no_play_2
          lda flag_pre ; disable is-pressed flag.
          and #flag_pre_play_neg
@@ -291,7 +346,12 @@ no_rec_2
          jmp drawnotpre
 no_play_2
 
-         cpx #'*' ; speed key?
+         ; speed key?
+         ;
+         ;txa
+         ldy #but_i_speed$
+         cmp (but$),y
+         ;
          bne no_speed_2
          lda flag_pre ; disable is-pressed flag.
          and #flag_pre_speed_neg
@@ -299,7 +359,12 @@ no_play_2
          jmp drawnotpre
 no_speed_2
 
-         cpx #'/' ; loop key?
+         ; loop key?
+         ;
+         ;txa
+         ldy #but_i_loop$
+         cmp (but$),y
+         ;
          bne no_loop_2
          lda flag_pre ; disable is-pressed flag.
          and #flag_pre_loop_neg
@@ -1033,6 +1098,11 @@ note_count_end
          lda #>keyposy80$
          sta keyposy$ + 1
          ;
+         lda #<but80$
+         sta but$
+         lda #>but80$
+         sta but$ + 1
+         ;
          lda #80
          cmp line_len$
          beq init_key_ptrs_done
@@ -1054,6 +1124,11 @@ note_count_end
          sta keyposy$
          lda #>keyposy40$
          sta keyposy$ + 1
+         ;
+         lda #<but40$
+         sta but$
+         lda #>but40$
+         sta but$ + 1
 init_key_ptrs_done
 
          lda #12; hard-coded. enable graphics mode (character set to use).
