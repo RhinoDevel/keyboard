@@ -8,13 +8,13 @@
 ; - index equals screen (not petscii) code.
 ; - not compatible with 80 column machines.
 ;
-but40$   byte 'p' ; exit
+but40$   byte ')' ; exit
 
-         byte '(' ; speed
-         byte ')' ; loop
+         byte 'k' ; speed
+         byte 'l' ; loop
          
-         byte '<' ; play
-         byte '>' ; record
+         byte 'p' ; play
+         byte 'o' ; record
 
          byte 59 ; ';' ; last pattern
          byte '?' ; next pattern
