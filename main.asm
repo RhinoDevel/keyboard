@@ -1208,6 +1208,10 @@ savetune lda #<tune$
          sta tapesave$ + 1
          sta zero_word_buf1$ + 1 ; to find end of tune address, below.
 
+         ; word buffer in zero-page was filled with tune start address, above.
+         ; find end of tune marker and store resulting end address for saving to
+         ; tape in the correct place inside zero page:
+         ;
          lda #0 ; (two zero bytes represent the end of tune marker)
 savetune_loop
          ldy #0
@@ -1234,7 +1238,7 @@ savetune_end_found ; end of tune marker (two zeros) was found.
          bne savetune_inc2_done
          inc zero_word_buf1$ + 1
 savetune_inc2_done
-
+         ;
          lda zero_word_buf1$
          sta tape_end$
          lda zero_word_buf1$ + 1
@@ -1244,7 +1248,7 @@ savetune_inc2_done
          sta devicenr$
 
          lda #4 ; hard-coded, see constant, below.
-         sta fnamelen$ ; TODO: hard-coded! could use 0 for no filename.
+         sta fnamelen$
 
          lda #<filename
          sta fnameptr$
