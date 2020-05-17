@@ -928,8 +928,8 @@ init     ; *** find out, which basic version (2 or 4) and setup stuff ***
          lda #>v4_cas_save$
          sta cas_save + 1
          ; (add more, when necessary)
-         lda #'4'
-         sta basic_version$
+;         lda #'4'
+;         sta basic_version$
          ;
          lda vec_nmi$
          cmp #<$fcfe ; hard-coded: lower byte of basic v2 nmi handling address.
@@ -946,8 +946,8 @@ init     ; *** find out, which basic version (2 or 4) and setup stuff ***
          lda #>v2_cas_save$
          sta cas_save + 1
          ; (add more, when necessary)
-         lda #'2'
-         sta basic_version$
+;         lda #'2'
+;         sta basic_version$
 basic_setup_done
 
          ; *** find out, if 40 or 80 column machine ***

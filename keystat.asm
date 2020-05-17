@@ -126,10 +126,15 @@ keystat$ byte 1
          byte 125 ; bottom-right edge.
 
          byte 24
-         byte 32
-         byte 8
-         text 'basic v'
-basic_version$
-         byte '0' ; hack: to be filled by init().
+         byte 0
+         byte 4
+         text 'v1.0'
+
+;         byte 24
+;         byte 32
+;         byte 8
+;         text 'basic v'
+;basic_version$
+;         byte '0' ; hack: to be filled by init().
 
          byte $ff ; end marker.
