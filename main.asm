@@ -1203,12 +1203,41 @@ init_graph_done
 ;
 savetune lda #<tune$
          sta tapesave$
+         sta zero_word_buf1$ ; to find end of tune address, below.
          lda #>tune$
          sta tapesave$ + 1
+         sta zero_word_buf1$ + 1 ; to find end of tune address, below.
 
-         lda tune_ptr$ ; TODO: correctly set after playing whole tune, only!
+         lda #0 ; (two zero bytes represent the end of tune marker)
+savetune_loop
+         ldy #0
+         cmp (zero_word_buf1$),y
+         bne savetune_not_zero ; not the end of tune marker, low byte is not 0.
+         iny
+         cmp (zero_word_buf1$),y
+         beq savetune_end_found ; branches, if end of tune marker found.
+savetune_not_zero ; end of tune marker not found.
+         ldx #3 ; increment pointer to next note/pause or end of tune marker.
+         ;
+         ; hard-coded (above): length of one note/pause entry is three bytes.
+         ;
+savetune_next_inc
+         inc zero_word_buf1$
+         bne savetune_inc_done
+         inc zero_word_buf1$ + 1
+savetune_inc_done
+         dex
+         bne savetune_next_inc
+         jmp savetune_loop ; check next note/pause or end of tune marker.
+savetune_end_found ; end of tune marker (two zeros) was found.
+         inc zero_word_buf1$
+         bne savetune_inc2_done
+         inc zero_word_buf1$ + 1
+savetune_inc2_done
+
+         lda zero_word_buf1$
          sta tape_end$
-         lda tune_ptr$ + 1 ; TODO: correctly set after playing whole tune, only!
+         lda zero_word_buf1$ + 1
          sta tape_end$ + 1
 
          lda #1 ; hard-coded to tape nr. 1.
@@ -1254,6 +1283,7 @@ lastnote byte 0 ; 1 byte.
 playingn byte 0 ; 1 byte. the currently playing note.
 
 patindex byte 0 ; 1 byte. pattern index.
+
 
 cas_save word 0 ; 2 byte. will hold address of tape save routine after init().
 
