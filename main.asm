@@ -920,9 +920,9 @@ init     ; *** find out, which basic version (2 or 4) and setup stuff ***
          ; prepare for v4:
          ;
          lda #<v4_cas_save$
-         sta cas_save$
+         sta cas_save
          lda #>v4_cas_save$
-         sta cas_save$ + 1
+         sta cas_save + 1
          ; (add more, when necessary)
          lda #'4'
          sta basic_version$
@@ -934,9 +934,9 @@ init     ; *** find out, which basic version (2 or 4) and setup stuff ***
          ; prepare for (change to) v2:
          ;
          lda #<v2_cas_save$
-         sta cas_save$
+         sta cas_save
          lda #>v2_cas_save$
-         sta cas_save$ + 1
+         sta cas_save + 1
          ; (add more, when necessary)
          lda #'2'
          sta basic_version$
@@ -1223,7 +1223,7 @@ savetune lda #<tune$
          sta fnameptr$ + 1
 
          ldx #0
-         jmp (cas_save$)
+         jmp (cas_save)
 
          rts
 
@@ -1254,6 +1254,8 @@ lastnote byte 0 ; 1 byte.
 playingn byte 0 ; 1 byte. the currently playing note.
 
 patindex byte 0 ; 1 byte. pattern index.
+
+cas_save word 0 ; 2 byte. will hold address of tape save routine after init().
 
          ; delay:
          ;
