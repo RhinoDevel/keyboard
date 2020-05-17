@@ -919,6 +919,10 @@ init     ; *** find out, which basic version (2 or 4) and setup stuff ***
 
          ; prepare for v4:
          ;
+         lda #<v4_cas_load$
+         sta cas_load
+         lda #>v4_cas_load$
+         sta cas_load + 1
          lda #<v4_cas_save$
          sta cas_save
          lda #>v4_cas_save$
@@ -933,6 +937,10 @@ init     ; *** find out, which basic version (2 or 4) and setup stuff ***
          ;
          ; prepare for (change to) v2:
          ;
+         lda #<v2_cas_load$
+         sta cas_load
+         lda #>v2_cas_load$
+         sta cas_load + 1
          lda #<v2_cas_save$
          sta cas_save
          lda #>v2_cas_save$
@@ -971,6 +979,16 @@ set_line_len
 
          sta flag_pre ; disables all flags.
          sta flag_upd ;
+
+         ; maybe some of these are not really necessary, here:
+         ;
+         sta note_nr
+         sta note_nr + 1
+         ;
+         sta tunenote   
+         ;
+         sta countdwn
+         sta countdwn + 1
 
          sta mode ; set to normal mode (equals 0).
 
@@ -1209,6 +1227,7 @@ savetune lda #<tune$
          sta zero_word_buf1$ + 1 ; to find end of tune address, below.
 
          ; word buffer in zero-page was filled with tune start address, above.
+         ;
          ; find end of tune marker and store resulting end address for saving to
          ; tape in the correct place inside zero page:
          ;
@@ -1238,6 +1257,10 @@ savetune_end_found ; end of tune marker (two zeros) was found.
          bne savetune_inc2_done
          inc zero_word_buf1$ + 1
 savetune_inc2_done
+         inc zero_word_buf1$
+         bne savetune_inc3_done
+         inc zero_word_buf1$ + 1
+savetune_inc3_done
          ;
          lda zero_word_buf1$
          sta tape_end$
@@ -1255,8 +1278,28 @@ savetune_inc2_done
          lda #>filename
          sta fnameptr$ + 1
 
-         ldx #0
+         ldx #0 ; really necessary?
          jmp (cas_save)
+
+         rts
+
+; TODO: integrate into application (also saving):
+;
+; you need to enable irq's and disable free running mode before this (VIA ACR):
+;
+loadtune lda #1 ; hard-coded to tape nr. 1.
+         sta devicenr$
+
+         lda #4 ; hard-coded, see constant, below.
+         sta fnamelen$
+
+         lda #<filename
+         sta fnameptr$
+         lda #>filename
+         sta fnameptr$ + 1
+
+         ldx #0 ; really necessary?
+         jmp (cas_load)
 
          rts
 
@@ -1288,7 +1331,7 @@ playingn byte 0 ; 1 byte. the currently playing note.
 
 patindex byte 0 ; 1 byte. pattern index.
 
-
+cas_load word 0 ; 2 byte. will hold address of tape load routine after init().
 cas_save word 0 ; 2 byte. will hold address of tape save routine after init().
 
          ; delay:
