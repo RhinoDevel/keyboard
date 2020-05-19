@@ -826,9 +826,9 @@ exit_graph_done
          sta loop + 1 ; TODO: implementing keeping loop enabled, if wanted!
          sta timer2_low$ ; disables sound by timer reset.
 
-         ; TODO: does not seem to work(?):
+         sta keybufnum$
          ;
-         sta keybufnum$ ; (sometimes, the <left arrow> will still be printed..)
+         ; (sometimes, the exit button char. will still be printed..)
 
          sta via_acr$ ; hard-coded. disables free-running mode
                       ; (e.g. makes tape usable again).
