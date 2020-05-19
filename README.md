@@ -110,30 +110,30 @@ musical keyboard is useful for:
 
 ## Ideas for future improvements
 
-- Make **saving and loading** records possible from inside the application.
+- [ ] Make **saving and loading** records possible from inside the application.
 
-- Add two **limit checks** currently missing (max. note/pause length should not
+- [ ] Add two **limit checks** currently missing (max. note/pause length should not
   exceed approximately 11 seconds and there is no check, if there is enough
   memory to record further).
 
-- Show numbers in **decimal**.
+- [ ] Show numbers in **decimal**.
 
-- Add effect: **Vibrato**.
+- [ ] Add effect: **Vibrato**.
 
-- Add effect: **"Arpeggio"** (press two note buttons to let the associated musical
+- [ ] Add effect: **"Arpeggio"** (press two note buttons to let the associated musical
               notes alternate quickly).
 
-- Optionally save records together with an **IRQ-based background music player** to
+- [ ] Optionally save records together with an **IRQ-based background music player** to
   be able to run and play records on their on.
 
-- Create **library with tunes** (*maybe with YOUR help?*). Playing and recording
+- [ ] Create **library with tunes** (*maybe with YOUR help?*). Playing and recording
   melodies from C64 games would be cool..
               
-- **BASIC v1** support.
+- [x] **BASIC v1** support.
 
-- **Chiclet keyboard** layout support.
+- [ ] **Chiclet keyboard** layout support.
 
-- **Reduce binary size** by improving source code.
+- [ ] **Reduce binary size** by improving source code.
 
 ## Successfully tested with
 
