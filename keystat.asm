@@ -128,7 +128,7 @@ keystat$ byte 1
          byte 24
          byte 0
          byte 4
-         text 'v1.0'
+         text 'v1.1'
 
 ;         byte 24
 ;         byte 32
