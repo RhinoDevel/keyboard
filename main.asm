@@ -913,7 +913,11 @@ drawnotea
 ; *** init ***
 ; ************
 ;
-init     ; *** find out, which basic version (2 or 4) and setup stuff ***
+init     
+
+ifdef TGT_PETBV2
+
+         ; *** find out, which basic version (2 or 4) and setup stuff ***
          ;
          ; no support for v1, yet (just ignoring the possibility)!
 
@@ -949,6 +953,26 @@ init     ; *** find out, which basic version (2 or 4) and setup stuff ***
 ;         lda #'2'
 ;         sta basic_version$
 basic_setup_done
+
+endif ;TGT_PETBV2
+         
+ifdef TGT_NONE
+
+         ; prepare for v1:
+         ;
+         lda #<v1_cas_load$
+         sta cas_load
+         lda #>v1_cas_load$
+         sta cas_load + 1
+         lda #<v1_cas_save$
+         sta cas_save
+         lda #>v1_cas_save$
+         sta cas_save + 1
+         ; (add more, when necessary)
+;         lda #'1'
+;         sta basic_version$         
+
+endif ;TGT_NONE
 
          ; *** find out, if 40 or 80 column machine ***
 
