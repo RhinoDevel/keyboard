@@ -131,6 +131,8 @@ musical keyboard is useful for:
               
 - [x] **BASIC v1** support.
 
+- [ ] Reduce screen updates to avoid **"snow"** on the PET 2001.
+
 - [ ] **Chiclet keyboard** layout support.
 
 - [ ] **Reduce binary size** by improving source code.
