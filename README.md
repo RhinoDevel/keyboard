@@ -1,7 +1,9 @@
 # RhinoDevel's Musical Keyboard v1.0
 A musical keyboard for Commodore PET/CBM 8-bit machines with record function and more.
 
-[Download current release v1.0, here!](https://github.com/RhinoDevel/keyboard/releases/download/v1.0/keyboard.prg)
+[Click here for a short YouTube VIDEO showing v1.0's features.](https://youtu.be/egCiv15q_0s)
+
+[DOWNLOAD current release v1.0, here!](https://github.com/RhinoDevel/keyboard/releases/download/v1.0/keyboard.prg)
 
 ![Screenshot of RhinoDevel's Keyboard](/40col-v1_0.jpg?raw=true)
 
@@ -21,7 +23,7 @@ musical keyboard is useful for:
 
 - **Record** your melody in realtime (instead of using a tracker or something),
   save it to tape and integrate it into your own software/game as background
-  music via a simple IRQ routine.
+  music via a simple IRQ routine (the recording rate currently is higher than IRQ's 50/60 Hz, but there should be a way to solve this problem).
 
 ## Features
 
@@ -118,13 +120,13 @@ musical keyboard is useful for:
 
 - [ ] Show numbers in **decimal**.
 
-- [ ] Add effect: **Vibrato**.
+- [ ] Add effect: **Vibrato** (got it already working, some fine tuning necessary).
 
 - [ ] Add effect: **"Arpeggio"** (press two note buttons to let the associated musical
               notes alternate quickly).
 
 - [ ] Optionally save records together with an **IRQ-based background music player** to
-  be able to run and play records on their on.
+  be able to run and play records on their own. As the recording rate currently is higher than IRQ's 50/60 Hz, there may be some more changes necessary for this. But I already got an IRQ-based player ready (needs some polishing before release).
 
 - [ ] Create **library with tunes** (*maybe with YOUR help?*). Playing and recording
   melodies from C64 games would be cool..
