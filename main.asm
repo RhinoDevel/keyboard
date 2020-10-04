@@ -50,16 +50,6 @@ mode_normal = 0
 mode_rec = 1
 mode_play = 2
 
-; span between recorded points in time:
-;
-step_len = 16 ; 16 * 256 microseconds = 4096 microseconds = ~244 Hz.
-;
-; TODO: the actual step length will almost never be the wanted length in
-;       microseconds the way this is currently implemented!
-;       if we want this, we need to use an actual IRQ routine or wait for an
-;       event (timer running out or screen retrace started) before looping in
-;       the "infinite loop".
-
 rec_is_waiting = $ee ; value indicates rec. mode waiting for first note.
 
 note_none = $ff ; represents a pause "note" / no note.
@@ -95,17 +85,23 @@ main     sei
    
          jsr init
 
+         wait_for_retrace$
+
 infloop ; infinite loop.
+
+         wait_for_no_retrace$
+         ;
+         ; (starting together with beam on the upper left side of screen)
 
          ldx #note_none ; reset found notes to none. 
          stx fndnote1
          stx fndnote2
 
          inx ; (just works, as long as note_none equals #$ff)
-         ;
-         ; register x must hold 0, here!
-         ;
+         
 keyloop ; loop through all buttons.
+
+         ; register x must hold 0, here!
 
          txa ; for indirect addressing here and in but_pre$(), below.
          tay ;
@@ -444,7 +440,6 @@ play_enable
          sta countdwn + 1
          sta note_nr
          sta note_nr + 1
-         sta step_ini ; to signalize that step_beg was not initialized, yet.
          lda #mode_play
          bne mode_upd ; (always branches, because play mode value is not zero)
          ;
@@ -491,7 +486,6 @@ normal_enable
          ;
 rec_enable
          lda #0
-         sta step_ini ; to signalize that step_beg was not initialized, yet.
          sta note_nr
          sta note_nr + 1
          ; (don't show 0 as note nr., keep showing current note/pause count)
@@ -557,24 +551,6 @@ play_mode
          sta fndnote1
          lda #note_none
          sta fndnote2
-         ;
-         lda step_ini
-         bne play_step_check
-         inc step_ini
-         lda timer1_high$ ; load timer high byte decremented all 256 microsecs.
-         sta step_beg     ; just setup step_beg.
-         jmp play_mode_stuff_end
-play_step_check
-         lda step_beg
-         sec              ; prepare for subtraction.
-         sbc timer1_high$ ; subtract current timer high byte value
-                          ; from stored last step value to get time since then
-                          ; into register a (multiply content of a after this
-                          ; with 256 to get timespan in microsecs.).
-         cmp step_len     ; compare with timespan to be between steps.
-         bcc play_mode_stuff_end ; skip and wait a while longer,
-                                 ; if not enough time went by.
-         sty step_beg
          ;
 speed
          ldy #1 ; (byte value will be changed in-place to modify playback speed)
@@ -798,24 +774,6 @@ rec_mode lda tunenote
          beq rec_is_waiting_for_first_note
          ;
          ; record is already running:
-         ;
-         lda step_ini
-         bne rec_step_check
-         inc step_ini
-         lda timer1_high$ ; load timer high byte decremented all 256 microsecs.
-         sta step_beg     ; just setup step_beg.
-         jmp rec_mode_stuff_end
-rec_step_check
-         lda step_beg
-         sec              ; prepare for subtraction.
-         sbc timer1_high$ ; subtract current timer high byte value
-                          ; from stored last step value to get time since then
-                          ; into register a (multiply content of a after this
-                          ; with 256 to get timespan in microsecs.).
-         cmp step_len     ; compare with timespan to be between steps.
-         bcc rec_mode_stuff_end ; skip and wait a while longer,
-                                ; if not enough time went by.
-         sty step_beg
          ;
          ; next recording step reached, take a measure:
          ;
@@ -1425,9 +1383,6 @@ filename text "tune" ; 4 bytes.
 ; -----------------
 
 ;vibr_beg byte 0 ; 1 byte. used for vibrato.
-
-step_ini byte 0 ; 1 byte. 0 = step_beg was not initialized, 1 = it was init.
-step_beg byte 0 ; 1 byte. used to store point in time of last recorded step.
 
 flag_pre byte 0 ; 1 byte.
 flag_upd byte 0 ; 1 byte.

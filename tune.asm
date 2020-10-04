@@ -7,9 +7,16 @@
 
 ; stores changes of tune:
 
-tune$    word 50 ; length of note (or pause) in multiples of rec_freq.
+tune$    word 50 ; length of note (or pause) in multiples of recording step.
                  ;
-                 ; max. value: rec_freq * 65535 = 327.675 seconds.
+                 ; max. value: recording step * 65535 = ~1310 seconds,
+                 ;             with recording step = 1 / 50 hz = 0.02 seconds.
+                 ;             OR
+                 ;             (1 / 60 hz) * 65535 = ~1092 seconds.
+                 ;             <=>
+                 ;             recording step and resulting max. value depend on
+                 ;             machine type (either 60 hz or 50 hz screen
+                 ;             retrace frequency).
                  ;
                  ; 0 = end of tune marker.
          ;
