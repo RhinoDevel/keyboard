@@ -100,7 +100,7 @@ via_pcr$ = $e84c ; via's peripheral control register.
 ; poke 59468, 12 for graphics mode (basic v2 / v4).
 ; poke 59468, 14 for lower-case mode (basic v2 / v4).
 
-via_ifr$ = $e84d ; via's interrupt flag register.
+;via_ifr$ = $e84d ; via's interrupt flag register.
 
 chrout$ = $ffd2 ; write a character to the screen.
 chrin$ = $ffe4 ; get one character.

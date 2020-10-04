@@ -50,7 +50,17 @@ mode_normal = 0
 mode_rec = 1
 mode_play = 2
 
-rec_freq = 5000 ; microseconds (not really the frequency, but the reciprocal..)
+; span between recorded points in time:
+;
+step_len = 16 ; 16 * 256 microseconds = 4096 microseconds = ~244 Hz.
+;
+; TODO: the actual step length will almost never be the wanted length in
+;       microseconds the way this is currently implemented!
+;       if we want this, we need to use an actual IRQ routine or wait for an
+;       event (timer running out or screen retrace started) before looping in
+;       the "infinite loop".
+
+
 rec_is_waiting = $ee ; value indicates rec. mode waiting for first note.
 
 note_none = $ff ; represents a pause "note" / no note.
@@ -431,10 +441,7 @@ play_enable
          sta countdwn + 1
          sta note_nr
          sta note_nr + 1
-         lda #<rec_freq
-         sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
-         lda #>rec_freq
-         sta timer1_high$ ; clears interrupt flag and starts timer.
+         sta step_ini ; to signalize that step_beg was not initialized, yet.
          lda #mode_play
          bne mode_upd ; (always branches, because play mode value is not zero)
          ;
@@ -481,6 +488,7 @@ normal_enable
          ;
 rec_enable
          lda #0
+         sta step_ini ; to signalize that step_beg was not initialized, yet.
          sta note_nr
          sta note_nr + 1
          ; (don't show 0 as note nr., keep showing current note/pause count)
@@ -547,8 +555,23 @@ play_mode
          lda #note_none
          sta fndnote2
          ;
-         bit via_ifr$ ; did timer one time out?
-         bvc play_mode_stuff_end ; no, it did not time out.
+         lda step_ini
+         bne play_step_check
+         inc step_ini
+         lda timer1_high$ ; load timer high byte decremented all 256 microsecs.
+         sta step_beg     ; just setup step_beg.
+         jmp play_mode_stuff_end
+play_step_check
+         lda step_beg
+         sec              ; prepare for subtraction.
+         sbc timer1_high$ ; subtract current timer high byte value
+                          ; from stored last step value to get time since then
+                          ; into register a (multiply content of a after this
+                          ; with 256 to get timespan in microsecs.).
+         cmp step_len     ; compare with timespan to be between steps.
+         bcc play_mode_stuff_end ; skip and wait a while longer,
+                                 ; if not enough time went by.
+         sty step_beg
          ;
 speed
          ldy #1 ; (byte value will be changed in-place to modify playback speed)
@@ -566,9 +589,9 @@ countdown_y_dec
          bne countdown_dec
          ;
          lda countdwn
-         bne play_timer_restart
+         bne play_mode_stuff_end
          lda countdwn + 1
-         bne play_timer_restart
+         bne play_mode_stuff_end
          ;
          ; next note of tune (if there is one), please:
          ;
@@ -634,14 +657,6 @@ play_tune_ptr_inc_done3
 play_note_nr_inc_done
          ;
          jsr drawnotenr
-         ;
-         ; restart timer:
-         ;
-play_timer_restart
-         lda #<rec_freq
-         sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
-         lda #>rec_freq
-         sta timer1_high$ ; clears interrupt flag and starts timer.
 play_mode_stuff_end
 
 upd_pat_chk
@@ -717,8 +732,8 @@ no_upd_note
 ; * TODO: TEST: VIBRATO:
 ;
 
-; VIBRATO WITH TIMER1 (NORMAL MODE, ONLY..):
-;
+;; VIBRATO WITH TIMER1 (NORMAL MODE, ONLY..):
+;;
 ;         lda timer1_high$ ; load timer high byte incremented all 256 microsecs.
 ;         tay              ; save timer value for later.
 ;         sec              ; prepare for subtraction.
@@ -731,37 +746,38 @@ no_upd_note
 ;         bcc vibr_end     ; skip and wait a while longer before modifying
 ;                          ; vibrato again, if not enough time went by.
 ;         ;
-;        sty vibr_beg
+;         sty vibr_beg
 
-; VIBRATO VIA RETRACE IRQ: TODO: reduce frequency via counter variable!
-;
-         lda via_b$
-         and #$20
-         ldy vibr_int
-         beq vibr_off
-         cmp #$20
-         jmp vibr_chk 
-vibr_off cmp #0
-vibr_chk bne vibr_end
-         tya
-         eor #$ff
-         and #$20
-         sta vibr_int
-         ;
-         ldy playingn
-         cpy #note_none
-         beq vibr_end
-         ;
-         lda notes$,y ; loads notes' timer 2 low byte value.
-         clc
-vibrato  adc #2 ; will get altered in-place, below. ; * TODO: make this value note-dependent?
-         sta timer2_low$ ; modify frequency in one "direction".
-         lda vibrato+1
-         eor #$ff ; flip between (e.g.) 10 and 245 (negative value).
-         clc      ;
-         adc #1   ;
-         sta vibrato+1 ; update for next freq.-change in other "direction".
-vibr_end         
+;; VIBRATO VIA RETRACE IRQ: TODO: reduce frequency via counter variable!
+;;
+;         lda via_b$
+;         and #$20
+;         ldy vibr_int
+;         beq vibr_off
+;         cmp #$20
+;         jmp vibr_chk 
+;vibr_off cmp #0
+;vibr_chk bne vibr_end
+;         tya
+;         eor #$ff
+;         and #$20
+;         sta vibr_int
+
+;         ;
+;         ldy playingn
+;         cpy #note_none
+;         beq vibr_end
+;         ;
+;         lda notes$,y ; loads notes' timer 2 low byte value.
+;         clc
+;vibrato  adc #2 ; will get altered in-place, below. ; * TODO: make this value note-dependent?
+;         sta timer2_low$ ; modify frequency in one "direction".
+;         lda vibrato+1
+;         eor #$ff ; flip between (e.g.) 10 and 245 (negative value).
+;         clc      ;
+;         adc #1   ;
+;         sta vibrato+1 ; update for next freq.-change in other "direction".
+;vibr_end         
 
 ; * TODO: implement handling of reached recording byte limit!
 ;
@@ -780,10 +796,25 @@ rec_mode lda tunenote
          ;
          ; record is already running:
          ;
-         bit via_ifr$ ; did timer one time out?
-         bvc rec_mode_stuff_end ; no, it did not time out.
+         lda step_ini
+         bne rec_step_check
+         inc step_ini
+         lda timer1_high$ ; load timer high byte decremented all 256 microsecs.
+         sta step_beg     ; just setup step_beg.
+         jmp rec_mode_stuff_end
+rec_step_check
+         lda step_beg
+         sec              ; prepare for subtraction.
+         sbc timer1_high$ ; subtract current timer high byte value
+                          ; from stored last step value to get time since then
+                          ; into register a (multiply content of a after this
+                          ; with 256 to get timespan in microsecs.).
+         cmp step_len     ; compare with timespan to be between steps.
+         bcc rec_mode_stuff_end ; skip and wait a while longer,
+                                ; if not enough time went by.
+         sty step_beg
          ;
-         ; timer ran out, take a measure:
+         ; next recording step reached, take a measure:
          ;
          lda tunenote
          cmp playingn
@@ -798,7 +829,7 @@ inc_countdown_done
          ;
          ; * TODO: implement handling of reached limit $ffff!
          ;
-         jmp rec_restart_timer
+         jmp rec_mode_stuff_end
          ;
 rec_note_changed
          lda countdwn
@@ -851,11 +882,6 @@ rec_next_note
          sta countdwn + 1
          lda playingn
          sta tunenote
-rec_restart_timer
-         lda #<rec_freq
-         sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
-         lda #>rec_freq
-         sta timer1_high$ ; clears interrupt flag and starts timer.
 rec_mode_stuff_end
 
          jmp infloop ; restart infinite key processing loop.
@@ -1165,6 +1191,14 @@ note_count_end
          lda #0
          sta timer2_low$ ; disables sound by timer reset.
 
+         ; this should not be necessary, because timers are always running:
+         ;
+         ;; make sure that timer 1 is running:
+         ;;
+         lda #$ff
+         sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
+         sta timer1_high$ ; clears interrupt flag and starts timer.
+
          lda #16 ; hard-coded. enable free running mode.
          sta via_acr$
 
@@ -1381,13 +1415,17 @@ loadtune lda #1 ; hard-coded to tape nr. 1.
 ; -----------------
 
 filename text "tune" ; 4 bytes.
-vibr_int byte 128 ; vibr_int * 256 microseconds.
+;vibr_int byte 128 ; vibr_int * 256 microseconds.
 
 ; -----------------
 ; --- variables ---
 ; -----------------
 
-vibr_beg byte 0 ; 1 byte. used for vibrato.
+
+;vibr_beg byte 0 ; 1 byte. used for vibrato.
+
+step_ini byte 0 ; 1 byte. 0 = step_beg was not initialized, 1 = it was init.
+step_beg byte 0 ; 1 byte. used to store point in time of last recorded step.
 
 flag_pre byte 0 ; 1 byte.
 flag_upd byte 0 ; 1 byte.
