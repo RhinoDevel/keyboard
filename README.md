@@ -23,7 +23,7 @@ musical keyboard is useful for:
 
 - **Record** your melody in realtime (instead of using a tracker or something),
   save it to tape and integrate it into your own software/game as background
-  music via a simple IRQ routine (the recording rate currently is higher than IRQ's 50/60 Hz, but there should be a way to solve this problem).
+  music via a simple IRQ routine (the recording frequency equals the IRQ's 50/60 Hz).
 
 ## Features
 
@@ -114,9 +114,7 @@ musical keyboard is useful for:
 
 - [ ] Make **saving and loading** records possible from inside the application.
 
-- [ ] Add two **limit checks** currently missing (max. note/pause length should not
-  exceed approximately 11 seconds and there is no check, if there is enough
-  memory to record further).
+- [ ] Add check, if there is enough memory to record further.
 
 - [ ] Show numbers in **decimal**.
 
@@ -126,7 +124,7 @@ musical keyboard is useful for:
               notes alternate quickly).
 
 - [ ] Optionally save records together with an **IRQ-based background music player** to
-  be able to run and play records on their own. As the recording rate currently is higher than IRQ's 50/60 Hz, there may be some more changes necessary for this. But I already got an IRQ-based player ready (needs some polishing before release).
+  be able to run and play records on their own. I already got an IRQ-based player ready (needs some polishing before release).
 
 - [ ] Create **library with tunes** (*maybe with YOUR help?*). Playing and recording
   melodies from C64 games would be cool..
