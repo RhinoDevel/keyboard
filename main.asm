@@ -1424,7 +1424,6 @@ filename text "tune" ; 4 bytes.
 ; --- variables ---
 ; -----------------
 
-
 ;vibr_beg byte 0 ; 1 byte. used for vibrato.
 
 step_ini byte 0 ; 1 byte. 0 = step_beg was not initialized, 1 = it was init.
@@ -1450,12 +1449,3 @@ patindex byte 0 ; 1 byte. pattern index.
 
 cas_load word 0 ; 2 byte. will hold address of tape load routine after init().
 cas_save word 0 ; 2 byte. will hold address of tape save routine after init().
-
-         ; delay:
-         ;
-;         lda #$ff
-;         sta timer1_low$ ; (reading would also clear interrupt flag)
-;         lda #$07
-;         sta timer1_high$ ; clears interrupt flag and starts timer.
-;timeout bit via_ifr$ ; did timer one time out?
-;         bvc timeout
