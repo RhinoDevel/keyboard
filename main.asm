@@ -788,7 +788,10 @@ rec_mode lda tunenote
          inc countdwn + 1
 inc_countdown_done
          ;
-         ; * TODO: implement handling of reached limit $ffff!
+         ; don't care about theoretically reachable limit of $ffff,
+         ; because step length equals screen retrace cycle time which is at
+         ; least 1 / 60 hz = ~16,6667 ms. => $ffff would be reached after
+         ; ~18 minutes.
          ;
          jmp rec_mode_stuff_end
          ;
