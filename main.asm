@@ -60,7 +60,6 @@ step_len = 16 ; 16 * 256 microseconds = 4096 microseconds = ~244 Hz.
 ;       event (timer running out or screen retrace started) before looping in
 ;       the "infinite loop".
 
-
 rec_is_waiting = $ee ; value indicates rec. mode waiting for first note.
 
 note_none = $ff ; represents a pause "note" / no note.
@@ -102,6 +101,10 @@ infloop ; infinite loop.
          stx fndnote1
          stx fndnote2
 
+         inx ; (just works, as long as note_none equals #$ff)
+         ;
+         ; register x must hold 0, here!
+         ;
 keyloop ; loop through all buttons.
 
          txa ; for indirect addressing here and in but_pre$(), below.
