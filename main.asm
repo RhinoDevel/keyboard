@@ -708,55 +708,32 @@ set_timer2_low
          jsr drawnotea ; draws currently playing note.
 no_upd_note
          
-; * TODO: TEST: VIBRATO:
-;
-
-;; VIBRATO WITH TIMER1 (NORMAL MODE, ONLY..):
-;;
-;         lda timer1_high$ ; load timer high byte incremented all 256 microsecs.
-;         tay              ; save timer value for later.
-;         sec              ; prepare for subtraction.
-;         sbc vibr_beg     ; subtract from timer high byte value stored after
-;                          ; last vibrato modification to get time since then
-;                          ; into register a (multiply content of a after this
-;                          ; subtraction with 256 to get timespan in microsecs.).
-;         cmp vibr_int     ; compare with timespan to be between vibrato
-;                          ; modifications.
-;         bcc vibr_end     ; skip and wait a while longer before modifying
-;                          ; vibrato again, if not enough time went by.
-;         ;
-;         sty vibr_beg
-
-;; VIBRATO VIA RETRACE IRQ: TODO: reduce frequency via counter variable!
-;;
-;         lda via_b$
-;         and #$20
-;         ldy vibr_int
-;         beq vibr_off
-;         cmp #$20
-;         jmp vibr_chk 
-;vibr_off cmp #0
-;vibr_chk bne vibr_end
-;         tya
-;         eor #$ff
-;         and #$20
-;         sta vibr_int
-
-;         ;
-;         ldy playingn
-;         cpy #note_none
-;         beq vibr_end
-;         ;
-;         lda notes$,y ; loads notes' timer 2 low byte value.
-;         clc
-;vibrato  adc #2 ; will get altered in-place, below. ; * TODO: make this value note-dependent?
-;         sta timer2_low$ ; modify frequency in one "direction".
-;         lda vibrato+1
-;         eor #$ff ; flip between (e.g.) 10 and 245 (negative value).
-;         clc      ;
-;         adc #1   ;
-;         sta vibrato+1 ; update for next freq.-change in other "direction".
-;vibr_end         
+         ; vibrato (neither note-dependent, nor speed-dependent):
+         ;
+         lda vibr_beg
+         sec
+         sbc timer1_high$
+         cmp vibr_int     ; compare with timespan to be between vibrato
+                          ; modifications.
+         bcc vibr_end     ; skip and wait a while longer before modifying
+                          ; vibrato again, if not enough time went by.
+         lda timer1_high$
+         sta vibr_beg
+         ;
+         ldy playingn
+         cpy #note_none
+         beq vibr_end
+         ;
+         lda notes$,y ; loads notes' timer 2 low byte value.
+         clc
+vibrato  adc #2 ; will get altered in-place, below.
+         sta timer2_low$ ; modify frequency in one "direction".
+         lda vibrato+1
+         eor #$ff ; flip between (e.g.) 10 and 245 (negative value).
+         clc      ;
+         adc #1   ;
+         sta vibrato+1 ; update for next freq.-change in other "direction".
+vibr_end         
 
 ; * TODO: implement handling of reached recording byte limit!
 ;
@@ -1379,13 +1356,13 @@ loadtune lda #1 ; hard-coded to tape nr. 1.
 ; -----------------
 
 filename text "tune" ; 4 bytes.
-;vibr_int byte 128 ; vibr_int * 256 microseconds.
 
 ; -----------------
 ; --- variables ---
 ; -----------------
 
-;vibr_beg byte 0 ; 1 byte. used for vibrato.
+vibr_int byte 128 ; vibr_int * 256 microseconds.
+vibr_beg byte 0 ; 1 byte. used for vibrato.
 
 flag_pre byte 0 ; 1 byte.
 flag_upd byte 0 ; 1 byte.
