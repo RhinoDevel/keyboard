@@ -84,6 +84,7 @@ screen_ram$ = $8000 ; start of video ram.
 
 pia1porta$ = $e810
 pia1portb$ = $e812
+pia1ctrlb$ = $e813
 
 via_b$ = $e840 ; via port b.
 
