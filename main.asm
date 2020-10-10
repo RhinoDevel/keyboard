@@ -85,13 +85,12 @@ main     sei
    
          jsr init
 
-         wait_for_retrace$
+         wait_for_retrace_flag$ ; to make sure that first iterations starts when
+                                ; flag just got set to one (draw started).
 
 infloop ; infinite loop.
 
-         wait_for_no_retrace$
-         ;
-         ; (starting together with beam on the upper left side of screen)
+         wait_for_retrace_flag$ ; TODO: Sometimes too slow!
 
          ldx #note_none ; reset found notes to none. 
          stx fndnote1
@@ -708,32 +707,32 @@ set_timer2_low
          jsr drawnotea ; draws currently playing note.
 no_upd_note
          
-         ; vibrato (neither note-dependent, nor speed-dependent):
-         ;
-         lda vibr_beg
-         sec
-         sbc timer1_high$
-         cmp vibr_int     ; compare with timespan to be between vibrato
-                          ; modifications.
-         bcc vibr_end     ; skip and wait a while longer before modifying
-                          ; vibrato again, if not enough time went by.
-         lda timer1_high$
-         sta vibr_beg
-         ;
-         ldy playingn
-         cpy #note_none
-         beq vibr_end
-         ;
-         lda notes$,y ; loads notes' timer 2 low byte value.
-         clc
-vibrato  adc #2 ; will get altered in-place, below.
-         sta timer2_low$ ; modify frequency in one "direction".
-         lda vibrato+1
-         eor #$ff ; flip between (e.g.) 10 and 245 (negative value).
-         clc      ;
-         adc #1   ;
-         sta vibrato+1 ; update for next freq.-change in other "direction".
-vibr_end         
+;         ; vibrato (neither note-dependent, nor speed-dependent):
+;         ;
+;         lda vibr_beg
+;         sec
+;         sbc timer1_high$
+;         cmp vibr_int     ; compare with timespan to be between vibrato
+;                          ; modifications.
+;         bcc vibr_end     ; skip and wait a while longer before modifying
+;                          ; vibrato again, if not enough time went by.
+;         lda timer1_high$
+;         sta vibr_beg
+;         ;
+;         ldy playingn
+;         cpy #note_none
+;         beq vibr_end
+;         ;
+;         lda notes$,y ; loads notes' timer 2 low byte value.
+;         clc
+;vibrato  adc #2 ; will get altered in-place, below.
+;         sta timer2_low$ ; modify frequency in one "direction".
+;         lda vibrato+1
+;         eor #$ff ; flip between (e.g.) 10 and 245 (negative value).
+;         clc      ;
+;         adc #1   ;
+;         sta vibrato+1 ; update for next freq.-change in other "direction".
+;vibr_end         
 
 ; * TODO: implement handling of reached recording byte limit!
 ;
