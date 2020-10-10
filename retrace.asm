@@ -5,9 +5,26 @@
 ; --- macros ---
 ; --------------
 
+; *********************************
+; *** wait for retrace irq flag ***
+; *********************************
+
+defm wait_for_retrace_flag$
+@wait_fl bit pia1ctrlb$ ; load bit 7 into n flag/bit of status register.
+         bpl @wait_fl ; loop as long as flag is not set.
+         ;
+         ; flag cb1 is set to 1.
+         ;
+         bit pia1portb$ ; unset flag by reading port b.
+         endm
+
 ; ****************************
 ; *** wait for retrace irq ***
 ; ****************************
+;
+; not reliable on cbm/pets with crtc, because signal state does not represent
+; the whole drawing or retrace time (its actually the vsync/vdrive signal on
+; crtc machines or maybe the inverted vsync/vdrive signal, not sure..).
 
 defm wait_for_retrace$
 @wait_ri lda via_b$
@@ -18,6 +35,10 @@ defm wait_for_retrace$
 ; *******************************
 ; *** wait for no retrace irq ***
 ; *******************************
+;
+; not reliable on cbm/pets with crtc, because signal state does not represent
+; the whole drawing or retrace time (its actually the vsync/vdrive signal on
+; crtc machines or maybe the inverted vsync/vdrive signal, not sure..).
 
 defm wait_for_no_retrace$
 @waitnri lda via_b$
