@@ -18,30 +18,33 @@ defm wait_for_retrace_flag$
          bit pia1portb$ ; unset flag by reading port b.
          endm
 
-; ****************************
-; *** wait for retrace irq ***
-; ****************************
+; Keep these macros commented-out as reference (they do work on non-CRTC
+; machines):
 ;
-; not reliable on cbm/pets with crtc, because signal state does not represent
-; the whole drawing or retrace time (its actually the vsync/vdrive signal on
-; crtc machines or maybe the inverted vsync/vdrive signal, not sure..).
-
-defm wait_for_retrace$
-@wait_ri lda via_b$
-         and #$20 ; bit 5 is retrace-in.
-         beq @wait_ri ; wait for bit 5 being 1.
-         endm
-
-; *******************************
-; *** wait for no retrace irq ***
-; *******************************
+;; ****************************
+;; *** wait for retrace irq ***
+;; ****************************
+;;
+;; not reliable on cbm/pets with crtc, because signal state does not represent
+;; the whole drawing or retrace time (its actually the vsync/vdrive signal on
+;; crtc machines or maybe the inverted vsync/vdrive signal, not sure..).
 ;
-; not reliable on cbm/pets with crtc, because signal state does not represent
-; the whole drawing or retrace time (its actually the vsync/vdrive signal on
-; crtc machines or maybe the inverted vsync/vdrive signal, not sure..).
-
-defm wait_for_no_retrace$
-@waitnri lda via_b$
-         and #$20 ; bit 5 is retrace-in.
-         bne @waitnri ; wait for bit 5 being 0.
-         endm
+;defm wait_for_retrace$
+;@wait_ri lda via_b$
+;         and #$20 ; bit 5 is retrace-in.
+;         beq @wait_ri ; wait for bit 5 being 1.
+;         endm
+;
+;; *******************************
+;; *** wait for no retrace irq ***
+;; *******************************
+;;
+;; not reliable on cbm/pets with crtc, because signal state does not represent
+;; the whole drawing or retrace time (its actually the vsync/vdrive signal on
+;; crtc machines or maybe the inverted vsync/vdrive signal, not sure..).
+;
+;defm wait_for_no_retrace$
+;@waitnri lda via_b$
+;         and #$20 ; bit 5 is retrace-in.
+;         bne @waitnri ; wait for bit 5 being 0.
+;         endm
