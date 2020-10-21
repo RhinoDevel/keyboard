@@ -1,6 +1,8 @@
 
 ; marcel timm, rhinodevel, 2020mar18
 
+; toggle between these targets for v2/v4 or v1 assembly:
+;
 target TGT_PETBV2
 ;target TGT_NONE
 
