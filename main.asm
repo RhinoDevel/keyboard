@@ -1723,26 +1723,6 @@ loadtune lda #1 ; hard-coded to tape nr. 1.
 
          rts
 
-;; a               = row's data (1 byte).
-;; zero_word_buf1$ = column in keyboard matrix (1 byte).
-;; x               = screen code of button's character (1 byte).
-;; zero_word_buf2$ = absolute address of character in screen ram.
-;; y               = index of note in notes$ (1 byte).
-;;
-;but_note_func
-;         and zero_word_buf1$     ; => z-flag = 0, if pressed(!). 1, if not.
-;         beq @pressed            ; branches, if pressed.
-;         ldy #0
-;         txa
-;         bpl @draw               ; (always branches, here)
-;@pressed tya
-;         jsr trysetfndnote
-;         ldy #0
-;         txa
-;         ora #%10000000          ; invert character.
-;@draw    sta (zero_word_buf2$),y
-;         rts
-
 ; -----------------
 ; --- constants ---
 ; -----------------
