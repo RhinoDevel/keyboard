@@ -18,7 +18,7 @@ notes$   byte 250 ; 1. c
          byte 139 ; 1. a#
          byte 132 ; 1. b
 
-         byte 124 ; 2. c
+         byte 124 ; 2. c ; index 12
          byte 117 ; 2. c#
          byte 110 ; 2. d
          byte 104 ; 2. d#

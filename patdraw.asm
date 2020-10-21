@@ -1,7 +1,7 @@
 
 ; marcel timm, rhinodevel, 2020mar22
 
-; - calls pos_draw$() and uses pattern$
+; - calls pos_draw$() and uses pattern$.
 
 ; ---------------
 ; --- defines ---
@@ -60,7 +60,7 @@ patdraw$ ldx #8
          clc
          adc #column - 1; add pattern start column to offset.
          sta zero_word_buf1$
-         lda #%10100000 ; inverted space.
+         lda #chr_rev_spc$
          jsr pos_draw$
          pla
          tax
@@ -76,7 +76,7 @@ patdraw$ ldx #8
          clc
          adc #column - 1 ; add pattern start column to offset.
          sta zero_word_buf1$
-         lda #%00100000 ; space.
+         lda #chr_spc$
          jsr pos_draw$
          pla
          tax

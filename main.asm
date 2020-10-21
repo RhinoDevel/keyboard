@@ -1,6 +1,108 @@
 
 ; marcel timm, rhinodevel, 2020mar17
 
+; TODO: reduce memory usage by doing something smarter for key handling 40/80!
+
+; ---------------------------------------
+; --- TODO: move these to a new file: ---
+; ---------------------------------------
+
+; offsets of note buttons from video/screen ram start:
+;
+vram_offset40_cis2$ = 40 *  4 +  3
+vram_offset40_dis2$ = 40 *  4 +  5
+vram_offset40_fis2$ = 40 *  4 +  9
+vram_offset40_gis2$ = 40 *  4 + 11
+vram_offset40_ais2$ = 40 *  4 + 13
+;
+vram_offset40_c02b$ = 40 *  6 +  2
+vram_offset40_d002$ = 40 *  6 +  4
+vram_offset40_e002$ = 40 *  6 +  6
+vram_offset40_f002$ = 40 *  6 +  8
+vram_offset40_g002$ = 40 *  6 + 10
+vram_offset40_a002$ = 40 *  6 + 12
+vram_offset40_b002$ = 40 *  6 + 14
+vram_offset40_c003$ = 40 *  6 + 16
+;
+vram_offset40_cis1$ = 40 *  8 +  5
+vram_offset40_dis1$ = 40 *  8 +  7
+vram_offset40_fis1$ = 40 *  8 + 11
+vram_offset40_gis1$ = 40 *  8 + 13
+vram_offset40_ais1$ = 40 *  8 + 15
+;
+vram_offset40_c001$ = 40 * 10 +  4
+vram_offset40_d001$ = 40 * 10 +  6
+vram_offset40_e001$ = 40 * 10 +  8
+vram_offset40_f001$ = 40 * 10 + 10
+vram_offset40_g001$ = 40 * 10 + 12
+vram_offset40_a001$ = 40 * 10 + 14
+vram_offset40_b001$ = 40 * 10 + 16
+vram_offset40_c02a$ = 40 * 10 + 18
+
+; offset of other buttons from video/screen ram start:
+;
+vram_offset40_exit$ = 40 *  1 + 31
+vram_offset40_reco$ = 40 *  3 + 31
+vram_offset40_play$ = 40 *  5 + 31
+vram_offset40_spee$ = 40 *  7 + 31
+vram_offset40_loop$ = 40 *  9 + 31
+;
+vram_offset40_patl$ = 40 * 10 + 21
+vram_offset40_patn$ = 40 * 10 + 23
+
+; offset of non-button elements from video/screen ram start:
+;
+vram_offset40_val_spee$ = 40 *  7 + 35
+vram_offset40_note_pre$ = 40 *  3 + 16
+
+; offsets of note buttons from video/screen ram start:
+;
+vram_offset80_cis2$ = 80 *  4 +  3
+vram_offset80_dis2$ = 80 *  4 +  5
+vram_offset80_fis2$ = 80 *  4 +  9
+vram_offset80_gis2$ = 80 *  4 + 11
+vram_offset80_ais2$ = 80 *  4 + 13
+;
+vram_offset80_c02b$ = 80 *  6 +  2
+vram_offset80_d002$ = 80 *  6 +  4
+vram_offset80_e002$ = 80 *  6 +  6
+vram_offset80_f002$ = 80 *  6 +  8
+vram_offset80_g002$ = 80 *  6 + 10
+vram_offset80_a002$ = 80 *  6 + 12
+vram_offset80_b002$ = 80 *  6 + 14
+vram_offset80_c003$ = 80 *  6 + 16
+;
+vram_offset80_cis1$ = 80 *  8 +  5
+vram_offset80_dis1$ = 80 *  8 +  7
+vram_offset80_fis1$ = 80 *  8 + 11
+vram_offset80_gis1$ = 80 *  8 + 13
+vram_offset80_ais1$ = 80 *  8 + 15
+;
+vram_offset80_c001$ = 80 * 10 +  4
+vram_offset80_d001$ = 80 * 10 +  6
+vram_offset80_e001$ = 80 * 10 +  8
+vram_offset80_f001$ = 80 * 10 + 10
+vram_offset80_g001$ = 80 * 10 + 12
+vram_offset80_a001$ = 80 * 10 + 14
+vram_offset80_b001$ = 80 * 10 + 16
+vram_offset80_c02a$ = 80 * 10 + 18
+
+; offset of other buttons from video/screen ram start:
+;
+vram_offset80_exit$ = 80 *  1 + 31
+vram_offset80_reco$ = 80 *  3 + 31
+vram_offset80_play$ = 80 *  5 + 31
+vram_offset80_spee$ = 80 *  7 + 31
+vram_offset80_loop$ = 80 *  9 + 31
+;
+vram_offset80_patl$ = 80 * 10 + 21
+vram_offset80_patn$ = 80 * 10 + 23
+
+; offset of non-button elements from video/screen ram start:
+;
+vram_offset80_val_spee$ = 80 *  7 + 35
+vram_offset80_note_pre$ = 80 *  3 + 16
+
 ; ---------------
 ; --- defines ---
 ; ---------------
@@ -54,6 +156,34 @@ rec_is_waiting = $ee ; value indicates rec. mode waiting for first note.
 
 note_none = $ff ; represents a pause "note" / no note.
 
+; --------------
+; --- macros ---
+; --------------
+
+; *********************************************************
+; *** macro to handle note button pressed / not pressed ***
+; *********************************************************
+;
+; "input":    x = row's data.
+;
+; parameters: 1 = column in keyboard matrix (1 byte).
+;             2 = screen code of button's character (1 byte).
+;             3 = offset of character in video ram.
+;             4 = index of note in notes$ (1 byte).
+;             5 = inverted screen code of button's character (1 byte).         
+;
+defm     but_note
+         txa              ; reset a to row's data.
+         and #/1          ; => z-flag = 0, if pressed(!). 1, if not pressed.
+         beq @pressed     ; branches, if pressed.
+         lda #/2
+         bpl @draw        ; (always branches, here)
+@pressed lda #/4
+         jsr trysetfndnote
+         lda #/5
+@draw    sta screen_ram$ + /3    
+         endm
+
 ; ----------------------
 ; --- basic "loader" ---
 ; ----------------------
@@ -81,8 +211,18 @@ bas_next word 0
 ; *** main ***
 ; ************
 
-main     sei
-   
+main
+         ; initialization stuff to be done before disabling interrupt service
+         ; routine (because "jsr chrout$" does somehow cause waiting for retrace
+         ; flag to not work correctly):
+         ;
+         jsr init_basic
+         jsr init_linelen
+         jsr init_graphic80
+         clrscr$
+
+         sei
+
          jsr init
 
          wait_for_retrace_flag$ ; to make sure that first iterations starts when
@@ -90,84 +230,245 @@ main     sei
 
 infloop ; infinite loop.
 
-         wait_for_retrace_flag$ ; TODO: Sometimes too slow!
+         wait_for_retrace_flag$
 
-         ldx #note_none ; reset found notes to none. 
-         stx fndnote1
-         stx fndnote2
+         lda #note_none ; reset found notes to none. 
+         sta fndnote1
+         sta fndnote2
 
-         inx ; (just works, as long as note_none equals #$ff)
-         
-keyloop ; loop through all buttons.
+         ; ********************
+         ; *** key handling ***
+         ; ********************
 
-         ; register x must hold 0, here!
+         bit linelen$ + 1
+         bvc keyhandling40
+         jmp keyhandling80
 
-         txa ; for indirect addressing here and in but_pre$(), below.
-         tay ;
-         lda (keyposx$),y ; skip (currently) unsupported/unused buttons.
-         cmp #$ff
-         bne supported
-         jmp next_key
-supported ; the button to check is supported.
+         ; *******************************
+         ; *** for 40 column machines: ***
+         ; *******************************
 
-         jsr but_pre$ ; check, if supported button is pressed or not pressed.
-         beq sup_but_is_pressed
-         jmp sup_but_is_not_pressed
+keyhandling40
 
-sup_but_is_pressed ; supported button is pressed.
+         ; *** row 0: ***
 
-         ; does the user want to exit?
+         lda #0         ; set keyboard row to check (seems to be the way to do
+         sta pia1porta$ ; this, just "overwrite" whole port a with row nr.
+                        ; 0-9).
+         lda pia1portb$ ; loads row's data.
+         tax            ; store row's data in x register for reuse.
+
+         but_note 2, '#', vram_offset40_dis2$, 15, 163
+         but_note 4, '%', vram_offset40_fis2$, 18, 165
+         but_note 8, '&', vram_offset40_ais2$, 22, 166
+
+         ; *** row 1: ***
+
+         lda #1     
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note 1, '"', vram_offset40_cis2$, 13, 162
+         but_note 4, ''', vram_offset40_gis2$, 20, 167
+
+         ; exit
+         ;
+         ; )
          ;
          txa
-         ldy #but_i_exit$
-         cmp (but$),y
-         ;
-         bne no_exit
+         and #$10
+         bne exitcheckdone40
+         ;lda #41 + 128                         ; 41 = ')'. this is more or less
+         ;sta screen_ram$ + vram_offset40_exit$ ; academic (no one sees this..).
          jmp exit
-no_exit
+exitcheckdone40
 
-         ; next-pattern key pressed?
+         ; *** row 2: ***
+
+         lda #2     
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note 1, 'q', vram_offset40_c02b$, 12, 145 ; (2 buttons used)
+         but_note 2, 'e', vram_offset40_e002$, 16, 133
+         but_note 4, 't', vram_offset40_g002$, 19, 148 
+         but_note 8, 'u', vram_offset40_b002$, 23, 149
+
+         ; record
          ;
-         ;txa
-         ldy #but_i_next_pat$
-         cmp (but$),y
+         ; o
          ;
-         bne no_pat_n ; skips, if next-pattern key not pressed.
+         txa
+         and #$10
+         beq pres2_10
+         lda flag_pre ; disable is-pressed flag.
+         and #flag_pre_rec_neg
+         sta flag_pre
+         lda mode ; keep reversed on screen, if record mode is already enabled.
+         cmp #mode_rec
+         beq done2_10
+         lda #'o'
+         sta screen_ram$ + vram_offset40_reco$
+         jmp done2_10
+pres2_10 lda flag_pre
+         and #flag_pre_rec
+         bne done2_10 ; skips, if press already is processed.
          lda flag_pre
-         and #flag_pre_pat_n
-         bne jmp_draw_on ; skips, if press already is processed.
-         lda flag_pre
-         ora #flag_pre_pat_n
+         ora #flag_pre_rec
          sta flag_pre ; rem. cur. key press to be alr. processed.
          lda flag_upd
-         ora #flag_upd_pat
+         ora #flag_upd_rec
          sta flag_upd ; request update.
-         inc patindex
-         lda #pattern_count$
-         cmp patindex
-         bne set_pattern
-         lda #0
-         sta patindex
-set_pattern ; (also used by other pattern key handling..)
-         ldy patindex
-         lda patterns$,y
-         sta pattern$
-jmp_draw_on
-         jmp draw_on
-no_pat_n
+         lda #$0f + 128 ; $0f = 'o'.
+         sta screen_ram$ + vram_offset40_reco$ 
+done2_10
 
-         ; last-pattern key pressed?
+         ; *** row 3: ***
+
+         lda #3
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note 1, 'w', vram_offset40_d002$, 14, 151
+         but_note 2, 'r', vram_offset40_f002$, 17, 146
+         but_note 4, 'y', vram_offset40_a002$, 21, 153
+         but_note 8, 'i', vram_offset40_c003$, 24, 137 ; (highest note)
+
+         ; play
          ;
-         ;txa
-         ldy #but_i_last_pat$
-         cmp (but$),y
+         ; p
          ;
-         bne no_pat_l
+         txa
+         and #$10
+         beq pres3_10
+         lda flag_pre ; disable is-pressed flag.
+         and #flag_pre_play_neg
+         sta flag_pre
+         lda mode ; keep reversed on screen, if play mode is already enabled.
+         cmp #mode_play
+         beq done3_10
+         lda #'p'
+         sta screen_ram$ + vram_offset40_play$
+         jmp done3_10
+pres3_10 lda flag_pre
+         and #flag_pre_play
+         bne done3_10 ; skips, if press already is processed.
          lda flag_pre
+         ora #flag_pre_play
+         sta flag_pre ; rem. cur. key press to be alr. processed.
+         lda flag_upd
+         ora #flag_upd_play
+         sta flag_upd ; request update.
+         lda #$10 + 128 ; $10 = 'p'.
+         sta screen_ram$ + vram_offset40_play$
+done3_10
+
+         ; *** row 4: ***
+
+         lda #4
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note 2, 'd', vram_offset40_dis1$,  3, 132
+         but_note 4, 'g', vram_offset40_fis1$,  6, 135
+         but_note 8, 'j', vram_offset40_ais1$, 10, 138
+
+         ; loop
+         ;
+         ; l
+         ;
+         txa
+         and #$10
+         beq pres4_10
+         lda flag_pre ; disable is-pressed flag.
+         and #flag_pre_loop_neg
+         sta flag_pre
+         lda loop_val + 1 ; keep rev. on screen, if loop playback is alr. enabl.
+         bne done4_10 ; 0 = loop is disabled, 1 = loop is enabled.
+         lda #'l'
+         sta screen_ram$ + vram_offset40_loop$
+         jmp done4_10
+pres4_10 lda flag_pre
+         and #flag_pre_loop
+         bne done4_10 ; skips, if press already is processed.
+         lda flag_pre
+         ora #flag_pre_loop
+         sta flag_pre ; rem. cur. key press to be alr. processed.
+         lda flag_upd
+         ora #flag_upd_loop
+         sta flag_upd ; request update.
+         lda #$0c + 128 ; $0c = 'l'.
+         sta screen_ram$ + vram_offset40_loop$
+done4_10
+
+         ; *** row 5: ***
+
+         lda #5
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note 1, 's', vram_offset40_cis1$,  1, 147
+         but_note 4, 'h', vram_offset40_gis1$,  8, 136
+
+         ; speed
+         ;
+         ; k
+         ;
+         txa
+         and #8
+         beq pres5_08
+         lda flag_pre ; disable is-pressed flag.
+         and #flag_pre_speed_neg
+         sta flag_pre
+         lda #'k'
+         sta screen_ram$ + vram_offset40_spee$
+         jmp done5_08
+pres5_08 lda flag_pre
+         and #flag_pre_speed
+         bne done5_08 ; skips, if press already is processed.
+         lda flag_pre
+         ora #flag_pre_speed
+         sta flag_pre ; rem. cur. key press to be alr. processed.
+         lda flag_upd
+         ora #flag_upd_speed
+         sta flag_upd ; request update.
+         lda #$0b + 128 ; $0b = 'k'.
+         sta screen_ram$ + vram_offset40_spee$
+done5_08
+
+         ; *** row 6: ***
+
+         lda #6
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note 1, 'z', vram_offset40_c001$,  0, 154 ; (lowest note)
+         but_note 2, 'c', vram_offset40_e001$,  4, 131
+         but_note 4, 'b', vram_offset40_g001$,  7, 130
+         but_note 8, 'm', vram_offset40_b001$, 11, 141
+
+         ; last-pattern
+         ;
+         ; ;
+         ;
+         txa
+         and #$10
+         beq pres6_10
+         lda flag_pre
+         and #flag_pre_pat_l_neg
+         sta flag_pre
+         lda #$3b ; $3b = ';'.
+         sta screen_ram$ + vram_offset40_patl$
+         jmp done6_10
+pres6_10 lda flag_pre
          and #flag_pre_pat_l
-         beq pat_l_helper
-         jmp draw_on
-pat_l_helper
+         bne done6_10
          lda flag_pre
          ora #flag_pre_pat_l
          sta flag_pre ; rem. cur. key press to be alr. processed.
@@ -177,232 +478,387 @@ pat_l_helper
          dec patindex
          lda #$ff
          cmp patindex
-         bne set_pattern
+         bne set_pattern_l
          lda #pattern_count$ - 1
          sta patindex
-         bne set_pattern ; (always branches)
-no_pat_l
+set_pattern_l
+         ldy patindex
+         lda patterns$,y
+         sta pattern$
+         lda #$3b + 128 ; $3b = ';'.
+         sta screen_ram$ + vram_offset40_patl$
+done6_10
 
-         ; record button pressed?
+         ; *** row 7: ***
+
+         lda #7
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note 1, 'x', vram_offset40_d001$,  2, 152
+         but_note 2, 'v', vram_offset40_f001$,  5, 150
+         but_note 4, 'n', vram_offset40_a001$,  9, 142
+         
+         but_note 8,  44, vram_offset40_c02a$, 12, 172
          ;
-         ;txa
-         ldy #but_i_rec$
-         cmp (but$),y
+         ; 44 = ',' (2 buttons used).
+
+         ; next-pattern
          ;
-         bne no_rec
+         ; ?
+         ;
+         txa
+         and #$10
+         beq pres7_10
+         lda flag_pre ; disable is-pressed flag.
+         and #flag_pre_pat_n_neg
+         sta flag_pre
+         lda #'?'
+         sta screen_ram$ + vram_offset40_patn$
+         jmp done7_10
+pres7_10 lda flag_pre
+         and #flag_pre_pat_n
+         bne done7_10 ; skips, if press already is processed.
          lda flag_pre
-         and #flag_pre_rec
-         bne rec_jmp_draw_on ; skips, if press already is processed.
-         lda flag_pre
-         ora #flag_pre_rec
+         ora #flag_pre_pat_n
          sta flag_pre ; rem. cur. key press to be alr. processed.
          lda flag_upd
-         ora #flag_upd_rec
+         ora #flag_upd_pat
          sta flag_upd ; request update.
-         ; (nothing to do, here)
-rec_jmp_draw_on
-         jmp draw_on
-no_rec
+         inc patindex
+         lda #pattern_count$
+         cmp patindex
+         bne set_pattern_n
+         lda #0
+         sta patindex
+set_pattern_n
+         ldy patindex
+         lda patterns$,y
+         sta pattern$
+         lda #$3f + 128 ; $3f = '?'.
+         sta screen_ram$ + vram_offset40_patn$
+done7_10
+         
+         jmp keyhandling_done
 
-         ; play button pressed?
-         ;
-         ;txa
-         ldy #but_i_play$
-         cmp (but$),y
-         ;
-         bne no_play
-         lda flag_pre
-         and #flag_pre_play
-         bne draw_on ; skips, if press already is processed.
-         lda flag_pre
-         ora #flag_pre_play
-         sta flag_pre ; rem. cur. key press to be alr. processed.
-         lda flag_upd
-         ora #flag_upd_play
-         sta flag_upd ; request update.
-         ; (nothing to do, here)
-         jmp draw_on
-no_play
+         ; *******************************
+         ; *** for 80 column machines: ***
+         ; *******************************
 
-         ; speed button pressed?
+keyhandling80
+
+         ; *** row 0: ***
+
+         lda #0
+         sta pia1porta$          
+         lda pia1portb$
+         tax
+
+         but_note   1, '2', vram_offset80_cis2$, 13, 178
+         but_note   2, '5', vram_offset80_fis2$, 18, 181
+
+         ; *** row 1: ***
+
+         lda #1     
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note   4, '7', vram_offset80_ais2$, 22, 183   
+
+         ; exit
          ;
-         ;txa
-         ldy #but_i_speed$
-         cmp (but$),y
+         ; '0'
          ;
-         bne no_speed
+         txa
+         and #8
+         bne exitcheckdone80
+         ;lda #48 + 128                         ; 48 = '0'. this is more or less
+         ;sta screen_ram$ + vram_offset80_exit$ ; academic (no one sees this..).
+         jmp exit
+exitcheckdone80
+
+         ; *** row 2: ***
+
+         lda #2     
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note   2, 's', vram_offset80_cis1$,  1, 147
+         but_note   8, 'h', vram_offset80_gis1$,  8, 136
+
+         ; speed
+         ;
+         ; k
+         ;
+         txa
+         and #$20
+         beq pres2_20_80
+         lda flag_pre ; disable is-pressed flag.
+         and #flag_pre_speed_neg
+         sta flag_pre
+         lda #'k'
+         sta screen_ram$ + vram_offset80_spee$
+         jmp don2_20_80
+pres2_20_80
          lda flag_pre
          and #flag_pre_speed
-         bne draw_on ; skips, if press already is processed.
+         bne don2_20_80 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_speed
          sta flag_pre ; rem. cur. key press to be alr. processed.
          lda flag_upd
          ora #flag_upd_speed
          sta flag_upd ; request update.
-         ; (nothing to do, here)
-         jmp draw_on
-no_speed
+         lda #$0b + 128 ; $0b = 'k'.
+         sta screen_ram$ + vram_offset80_spee$
+don2_20_80
 
-         ; loop button pressed?
+         ; *** row 3: ***
+
+         lda #3
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note   2, 'd', vram_offset80_dis1$,  3, 132
+         but_note   4, 'g', vram_offset80_fis1$,  6, 135
+         but_note   8, 'j', vram_offset80_ais1$, 10, 138
+ 
+         ; loop
          ;
-         ;txa
-         ldy #but_i_loop$
-         cmp (but$),y
+         ; l
          ;
-         bne no_loop
-         lda flag_pre
+         txa
+         and #$20
+         beq pres3_20_80
+         lda flag_pre ; disable is-pressed flag.
+         and #flag_pre_loop_neg
+         sta flag_pre
+         lda loop_val + 1 ; keep rev. on screen, if loop playback is alr. enabl.
+         bne done3_20_80 ; 0 = loop is disabled, 1 = loop is enabled.
+         lda #'l'
+         sta screen_ram$ + vram_offset80_loop$
+         jmp done3_20_80
+pres3_20_80
+        lda flag_pre
          and #flag_pre_loop
-         bne draw_on ; skips, if press already is processed.
+         bne done3_20_80 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_loop
          sta flag_pre ; rem. cur. key press to be alr. processed.
          lda flag_upd
          ora #flag_upd_loop
          sta flag_upd ; request update.
-         ; (nothing to do, here)
-         jmp draw_on
-no_loop
+         lda #$0c + 128 ; $0c = 'l'.
+         sta screen_ram$ + vram_offset80_loop$
+done3_20_80
 
-         ; pressed key must be a note key at this point.
+         ; *** row 4: ***
 
-         ldy fndnote1
-         cpy #note_none
-         bne found_note1_already_set
-         ldy keynote$,x ; gets note's index in array (never #note_none, here).
-         sty fndnote1
-         jmp draw_on
-found_note1_already_set
-         ldy fndnote2
-         cpy #note_none
-         bne draw_on
-         ldy keynote$,x ; gets note's index in array (never #note_none, here).
-         sty fndnote2
-
-draw_on  txa ; for indirect addressing.
-         tay ;
-         lda (keyposx$),y ; draw key as pressed and go on.
-         sta zero_word_buf1$
-         lda (keyposy$),y
-         tay
-         txa
-         pha
-         jsr rev_on$
-         pla
+         lda #4
+         sta pia1porta$
+         lda pia1portb$
          tax
-         jmp next_key
 
-sup_but_is_not_pressed ; supported button is not pressed.
- 
-         ; next-pattern key?
+         but_note   2, 'w', vram_offset80_d002$, 14, 151
+         but_note   4, 'r', vram_offset80_f002$, 17, 146
+         but_note   8, 'y', vram_offset80_a002$, 21, 153
+         but_note $20, 'i', vram_offset80_c003$, 24, 137
+      
+         ; play
+         ;
+         ; p
          ;
          txa
-         ldy #but_i_next_pat$
-         cmp (but$),y
-         ;
-         bne no_pat_n_2
-         lda flag_pre ; disable is-pressed flag.
-         and #flag_pre_pat_n_neg
-         sta flag_pre
-         jmp drawnotpre
-no_pat_n_2 
-
-         ; last-pattern key?
-         ;
-         ;txa
-         ldy #but_i_last_pat$
-         cmp (but$),y
-         ;
-         bne no_pat_l_2
-         lda flag_pre
-         and #flag_pre_pat_l_neg
-         sta flag_pre
-         jmp drawnotpre
-no_pat_l_2
-
-         ; record key?
-         ;
-         ;txa
-         ldy #but_i_rec$
-         cmp (but$),y
-         ;
-         bne no_rec_2
-         lda flag_pre ; disable is-pressed flag.
-         and #flag_pre_rec_neg
-         sta flag_pre
-         ;
-         lda mode ; keep reversed on screen, if record mode is already enabled.
-         cmp #mode_rec
-         beq next_key
-         jmp drawnotpre
-no_rec_2
-
-         ; play key?
-         ;
-         ;txa
-         ldy #but_i_play$
-         cmp (but$),y
-         ;
-         bne no_play_2
+         and #$40
+         beq pres4_40_80
          lda flag_pre ; disable is-pressed flag.
          and #flag_pre_play_neg
          sta flag_pre
-         ;
          lda mode ; keep reversed on screen, if play mode is already enabled.
          cmp #mode_play
-         beq next_key
-         jmp drawnotpre
-no_play_2
+         beq done4_40_80
+         lda #'p'
+         sta screen_ram$ + vram_offset80_play$
+         jmp done4_40_80
+pres4_40_80
+         lda flag_pre
+         and #flag_pre_play
+         bne done4_40_80 ; skips, if press already is processed.
+         lda flag_pre
+         ora #flag_pre_play
+         sta flag_pre ; rem. cur. key press to be alr. processed.
+         lda flag_upd
+         ora #flag_upd_play
+         sta flag_upd ; request update.
+         lda #$10 + 128 ; $10 = 'p'.
+         sta screen_ram$ + vram_offset80_play$
+done4_40_80
 
-         ; speed key?
-         ;
-         ;txa
-         ldy #but_i_speed$
-         cmp (but$),y
-         ;
-         bne no_speed_2
-         lda flag_pre ; disable is-pressed flag.
-         and #flag_pre_speed_neg
-         sta flag_pre
-         jmp drawnotpre
-no_speed_2
+         ; *** row 5: ***
 
-         ; loop key?
-         ;
-         ;txa
-         ldy #but_i_loop$
-         cmp (but$),y
-         ;
-         bne no_loop_2
-         lda flag_pre ; disable is-pressed flag.
-         and #flag_pre_loop_neg
-         sta flag_pre
-         ;
-         lda loop + 1 ; keep reversed on screen, if loop playback is alr. enabled.
-         bne next_key ; 0 = loop is disabled, 1 = loop is enabled.
-         ;jmp drawnotpre
-no_loop_2 
-
-
-drawnotpre ; draw key as not pressed and go on.
-         txa ; for indirect addressing.
-         tay ;
-         lda (keyposx$),y
-         sta zero_word_buf1$
-         lda (keyposy$),y
-         tay
-         txa
-         pha
-         jsr rev_off$
-         pla
+         lda #5
+         sta pia1porta$
+         lda pia1portb$
          tax
 
-next_key inx
-         cpx #64 ; hard-coded (for screen codes 0 - 63)!
-         beq keyloopdone ; no more keys to check.
-         jmp keyloop ; still more keys to check.
+         but_note   1, 'q', vram_offset80_c02b$, 12, 145
+         but_note   2, 'e', vram_offset80_e002$, 16, 133
+         but_note   4, 't', vram_offset80_g002$, 19, 148
+         but_note   8, 'u', vram_offset80_b002$, 23, 149
+     
+         ; record
+         ;
+         ; o
+         ;
+         txa
+         and #$20
+         beq pres5_20_80
+         lda flag_pre ; disable is-pressed flag.
+         and #flag_pre_rec_neg
+         sta flag_pre
+         lda mode ; keep reversed on screen, if record mode is already enabled.
+         cmp #mode_rec
+         beq done5_20_80
+         lda #'o'
+         sta screen_ram$ + vram_offset80_reco$
+         jmp done5_20_80
+pres5_20_80 
+         lda flag_pre
+         and #flag_pre_rec
+         bne done5_20_80 ; skips, if press already is processed.
+         lda flag_pre
+         ora #flag_pre_rec
+         sta flag_pre ; rem. cur. key press to be alr. processed.
+         lda flag_upd
+         ora #flag_upd_rec
+         sta flag_upd ; request update.
+         lda #$0f + 128 ; $0f = 'o'.
+         sta screen_ram$ + vram_offset80_reco$ 
+done5_20_80
 
-keyloopdone ; all keys got processed in loop.
+         ; *** row 6: ***
+
+         lda #6
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note   2, 'c', vram_offset80_e001$,  4, 131
+         but_note   4, 'b', vram_offset80_g001$,  7, 130
+
+         ; last-pattern
+         ;
+         ; .
+         ;
+         txa
+         and #8
+         beq pres6_8_80
+         lda flag_pre
+         and #flag_pre_pat_l_neg
+         sta flag_pre
+         lda #'.'
+         sta screen_ram$ + vram_offset80_patl$
+         jmp done6_8_80
+pres6_8_80
+         lda flag_pre
+         and #flag_pre_pat_l
+         bne done6_8_80
+         lda flag_pre
+         ora #flag_pre_pat_l
+         sta flag_pre ; rem. cur. key press to be alr. processed.
+         lda flag_upd
+         ora #flag_upd_pat
+         sta flag_upd ; request update.
+         dec patindex
+         lda #$ff
+         cmp patindex
+         bne set_pattern_l_80
+         lda #pattern_count$ - 1
+         sta patindex
+set_pattern_l_80
+         ldy patindex
+         lda patterns$,y
+         sta pattern$
+         lda #46 + 128 ; 46 = '.'.
+         sta screen_ram$ + vram_offset80_patl$
+done6_8_80
+
+         ; *** row 7: ***
+
+         lda #7
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note   1, 'z', vram_offset80_c001$,  0, 154
+         but_note   2, 'v', vram_offset80_f001$,  5, 150
+         but_note   4, 'n', vram_offset80_a001$,  9, 142
+         but_note   8,  44, vram_offset80_c02a$, 12, 172 ; 44 = ','
+
+         ; *** row 8: ***
+
+         lda #8
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note   2, 'x', vram_offset80_d001$,  2, 152
+         but_note   8, 'm', vram_offset80_b001$, 11, 141
+
+         ; next-pattern
+         ;
+         ; /
+         ;
+         txa
+         and #$40
+         beq pres8_40_80
+         lda flag_pre ; disable is-pressed flag.
+         and #flag_pre_pat_n_neg
+         sta flag_pre
+         lda #'/'
+         sta screen_ram$ + vram_offset80_patn$
+         jmp done8_40_80
+pres8_40_80
+         lda flag_pre
+         and #flag_pre_pat_n
+         bne done8_40_80 ; skips, if press already is processed.
+         lda flag_pre
+         ora #flag_pre_pat_n
+         sta flag_pre ; rem. cur. key press to be alr. processed.
+         lda flag_upd
+         ora #flag_upd_pat
+         sta flag_upd ; request update.
+         inc patindex
+         lda #pattern_count$
+         cmp patindex
+         bne set_pattern_n_80
+         lda #0
+         sta patindex
+set_pattern_n_80
+         ldy patindex
+         lda patterns$,y
+         sta pattern$
+         lda #47 + 128 ; 47 = '/'.
+         sta screen_ram$ + vram_offset80_patn$
+done8_40_80
+
+         ; *** row 9: ***
+
+         lda #9
+         sta pia1porta$
+         lda pia1portb$
+         tax
+
+         but_note   2, '3', vram_offset80_dis2$, 15, 179
+         but_note   4, '6', vram_offset80_gis2$, 20, 182
+
+keyhandling_done
+
+         ; ---
 
          ; change/update mode, if necessary:
          ;
@@ -531,9 +987,9 @@ speed_no_upd
          and #flag_upd_loop_neg ; loop button is handled.
          sta flag_upd
          ;
-         lda loop + 1
+         lda loop_val + 1
          eor #1 ; toggles loop enabled/disabled.
-         sta loop + 1
+         sta loop_val + 1
 loop_no_upd
 
          ; do play mode stuff (before playing note), if play mode is active:
@@ -591,7 +1047,7 @@ play_tune_ptr_inc_done1
          ; (high and low byte are zero, which is the end of tune marker).
          ;
 
-loop     lda #0 ; 0 = don't loop, 1 = loop.
+loop_val lda #0 ; 0 = don't loop, 1 = loop. value will be changed in-place.
          bne play_loop
          ; 
          ; stop playback and enter normal mode:
@@ -685,11 +1141,9 @@ did_find_two_notes
          sty fndnote1
 
          ldy playingn ; this is not necessary,
-         sty fndnote2  ; if fndnote2 will not be used from here on.
+         sty fndnote2 ; if fndnote2 will not be used from here on.
 
 other_and_playing_found
-         ;ldy fndnote1 ; just use this for toggling between both notes.
-         ;
          ldy fndnote1
          cpy lastnote
          beq no_upd_note
@@ -828,17 +1282,8 @@ rec_mode_stuff_end
 
          ; exit application (show "goodbye"):
          ;
-exit     lda #80
-         cmp line_len$
-         bne exit_graph_done
-         jsr v4_graph_off$ ; (disables graphics mode, enables blank lines)
-exit_graph_done
-         ;
-         ; (not re-enabling first char. rom, because of "goodbye" screen using
-         ;  at-sign..)
-         ;
-         lda #0
-         sta loop + 1 ; TODO: implementing keeping loop enabled, if wanted!
+exit     lda #0
+         sta loop_val + 1 ; TODO: implementing keeping loop enabled, if wanted!
          sta timer2_low$ ; disables sound by timer reset.
 
          sta keybufnum$
@@ -847,13 +1292,54 @@ exit_graph_done
 
          sta via_acr$ ; hard-coded. disables free-running mode
                       ; (e.g. makes tape usable again).
-         clrscr$
+
+         jsr clrscr_own$
+
          lda #<goodbye$
          sta zero_word_buf2$
          lda #>goodbye$
          sta zero_word_buf2$ + 1
          jsr keydrawstat$
+
          cli
+
+         ; doing this after re-enabling interrupt service routine,
+         ; because of problems with chrout$ and waiting for retrace (see above):
+         ;
+         bit linelen$ + 1
+         bvc exit_graph_done
+         jsr v4_graph_off$ ; (disables graphics mode, enables blank lines)
+exit_graph_done
+         ;
+         ; (not re-enabling first char. rom, because of "goodbye" screen using
+         ;  at-sign..)
+
+         rts
+
+; *********************
+; *** trysetfndnote ***
+; ***               ***
+; *** a = input     ***
+; *** y = used      ***
+; *** sets fndnote1 ***
+; *** or fndnote2,  ***
+; *** if not both   ***
+; *** already set.  ***
+; *********************
+;
+trysetfndnote
+         ldy fndnote1
+         cpy #note_none
+         bne fndnote1_already_set
+         sta fndnote1 ; save note's index from a (must not be #note_none, here).
+         rts
+fndnote1_already_set
+         ldy fndnote2
+         cpy #note_none
+         beq fndnote2_not_set
+         rts ; two notes were already found.  
+fndnote2_not_set
+         sta fndnote2 ; save note's index from a (must not be #note_none, here).
          rts
 
 ; *****************
@@ -861,13 +1347,16 @@ exit_graph_done
 ; *****************
 ;
 drawspeed
-         ldy #7 ; hard-coded
-         lda #35 ; hard-coded
-         sta zero_word_buf1$
          lda speed + 1
          clc
          adc #'0'
-         jmp pos_draw$
+         bit linelen$ + 1
+         bvc drawspeed40
+         sta screen_ram$ + vram_offset80_val_spee$
+         rts
+drawspeed40
+         sta screen_ram$ + vram_offset40_val_spee$
+         rts
 
 ; *********************
 ; *** drawnotecount ***
@@ -924,11 +1413,11 @@ drawnotea
          ldy #3 ; hard-coded         
          jmp printby$
 
-; ************
-; *** init ***
-; ************
+; ******************
+; *** init_basic ***
+; ******************
 ;
-init     
+init_basic
 
 ifdef TGT_PETBV2
 
@@ -947,8 +1436,8 @@ ifdef TGT_PETBV2
          lda #>v4_cas_save$
          sta cas_save + 1
          ; (add more, when necessary)
-;         lda #'4'
-;         sta basic_version$
+         lda #'4'
+         sta basic_version$
          ;
          lda vec_nmi$
          cmp #<$fcfe ; hard-coded: lower byte of basic v2 nmi handling address.
@@ -965,8 +1454,8 @@ ifdef TGT_PETBV2
          lda #>v2_cas_save$
          sta cas_save + 1
          ; (add more, when necessary)
-;         lda #'2'
-;         sta basic_version$
+         lda #'2'
+         sta basic_version$
 basic_setup_done
 
 endif ;TGT_PETBV2
@@ -984,11 +1473,18 @@ ifdef TGT_NONE
          lda #>v1_cas_save$
          sta cas_save + 1
          ; (add more, when necessary)
-;         lda #'1'
-;         sta basic_version$         
+         lda #'1'
+         sta basic_version$         
 
 endif ;TGT_NONE
 
+         rts
+
+; ********************
+; *** init_linelen ***
+; ********************
+;
+init_linelen
          ; *** find out, if 40 or 80 column machine ***
 
          ldy #80 ; initialize y with value for 80 column machine.
@@ -1010,9 +1506,37 @@ endif ;TGT_NONE
          ;
          ldy #40 ; set value for 40 column machine.
 set_line_len
-         sty line_len$
+         sty linelen$ + 1
+         rts
 
-         ; *** initialize internal variables ***
+; **********************
+; *** init_graphic80 ***
+; **********************
+;
+init_graphic80
+         bit linelen$ + 1
+         bvc init_graph_done ; do nothing, if 40 line machine.
+         ;
+         ; hard-coded: enable second char. rom, if available (e.g. switch from
+         ;             german rom to english rom on 8032-sk with german din
+         ;             keyboard (do this before enabling graphics mode!):
+         ;
+         lda #chr_alt_rom$
+         jsr chrout$
+         ;
+         ; this machine has 80 cols., remove blank(s) between adjacent lines
+         ; (because these must have the 6845 crt controller chip):
+         ;
+         jsr v4_graph_on$ ; (also sets graphics mode,
+                          ;  as done elsewhere during init..)
+init_graph_done
+         rts
+
+; ************
+; *** init ***
+; ************
+;
+init     ; *** initialize internal variables ***
 
          lda #0
 
@@ -1131,13 +1655,13 @@ note_count_end
          lda #0
          sta timer2_low$ ; disables sound by timer reset.
 
-         ; this should not be necessary, because timers are always running:
-         ;
-         ;; make sure that timer 1 is running:
-         ;;
-         lda #$ff
-         sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
-         sta timer1_high$ ; clears interrupt flag and starts timer.
+;         ; this should not be necessary, because timers are always running:
+;         ;
+;         ; make sure that timer 1 is running:
+;         ;
+;         lda #$ff
+;         sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
+;         sta timer1_high$ ; clears interrupt flag and starts timer.
 
          lda #16 ; hard-coded. enable free running mode.
          sta via_acr$
@@ -1145,80 +1669,12 @@ note_count_end
          lda pattern$
          sta via_shift$
 
-         lda #<key80_row$
-         sta key_row$
-         lda #>key80_row$
-         sta key_row$ + 1
-         lda #<key80_neg$
-         sta key_neg$
-         lda #>key80_neg$
-         sta key_neg$ + 1
-         ;
-         lda #<keyposx80$
-         sta keyposx$
-         lda #>keyposx80$
-         sta keyposx$ + 1
-         lda #<keyposy80$
-         sta keyposy$
-         lda #>keyposy80$
-         sta keyposy$ + 1
-         ;
-         lda #<but80$
-         sta but$
-         lda #>but80$
-         sta but$ + 1
-         ;
-         lda #80
-         cmp line_len$
-         beq init_key_ptrs_done
-         ;
-         lda #<key40_row$
-         sta key_row$
-         lda #>key40_row$
-         sta key_row$ + 1
-         lda #<key40_neg$
-         sta key_neg$
-         lda #>key40_neg$
-         sta key_neg$ + 1
-         ;
-         lda #<keyposx40$
-         sta keyposx$
-         lda #>keyposx40$
-         sta keyposx$ + 1
-         lda #<keyposy40$
-         sta keyposy$
-         lda #>keyposy40$
-         sta keyposy$ + 1
-         ;
-         lda #<but40$
-         sta but$
-         lda #>but40$
-         sta but$ + 1
-init_key_ptrs_done
-
-         lda #12; hard-coded. enable graphics mode (character set to use).
+         lda #12 ; hard-coded. enable graphics mode (character set to use).
          sta via_pcr$
-
-         lda #80
-         cmp line_len$
-         bne init_graph_done
-         ;
-         ; hard-coded: enable second char. rom, if available (e.g. switch from
-         ;             german rom to english rom on 8032-SK with german DIN
-         ;             keyboard (do this before enabling graphics mode!):
-         ;
-         lda #chr_alt_rom$
-         jsr chrout$
-         ;
-         ; this machine has 80 cols., remove blank(s) between adjacent lines
-         ; (because these must have the 6845 crt controller chip):
-         ;
-         jsr v4_graph_on$ ; (also sets graphics mode, as done manually above..)
-init_graph_done
 
          ; *** draw initial screen ***
 
-         clrscr$
+         ; (screen must already have been cleared)
 
          lda #<keystat$
          sta zero_word_buf2$
@@ -1226,16 +1682,35 @@ init_graph_done
          sta zero_word_buf2$ + 1
          jsr keydrawstat$
 
-         keydraw$
-         patstaticdraw$
+         bit linelen$ + 1
+         bvc init_extradraw40
+
+         lda #'0'
+         sta screen_ram$ + vram_offset80_exit$ ; academic (no one sees this..).
+         ;
+         ; no other key label drawing, here (because always done by loop..).
 
          ; draw dollar sign (indicating hexadecimal number) before cur. "note":
          ;
-         ldy #3 ; hard-coded
-         lda #16 ; hard-coded
-         sta zero_word_buf1$
          lda #'$'
-         jsr pos_draw$
+         sta screen_ram$ + vram_offset80_note_pre$
+         jmp init_extradraw_done
+
+init_extradraw40
+
+         lda #')'
+         sta screen_ram$ + vram_offset40_exit$ ; academic (no one sees this..).
+         ;
+         ; no other key label drawing, here (because always done by loop..).
+
+         ; draw dollar sign (indicating hexadecimal number) before cur. "note":
+         ;
+         lda #'$'
+         sta screen_ram$ + vram_offset40_note_pre$
+
+init_extradraw_done
+
+         patstaticdraw$
 
          jsr patdraw$
          lda #0
@@ -1349,6 +1824,26 @@ loadtune lda #1 ; hard-coded to tape nr. 1.
          jmp (cas_load)
 
          rts
+
+;; a               = row's data (1 byte).
+;; zero_word_buf1$ = column in keyboard matrix (1 byte).
+;; x               = screen code of button's character (1 byte).
+;; zero_word_buf2$ = absolute address of character in screen ram.
+;; y               = index of note in notes$ (1 byte).
+;;
+;but_note_func
+;         and zero_word_buf1$     ; => z-flag = 0, if pressed(!). 1, if not.
+;         beq @pressed            ; branches, if pressed.
+;         ldy #0
+;         txa
+;         bpl @draw               ; (always branches, here)
+;@pressed tya
+;         jsr trysetfndnote
+;         ldy #0
+;         txa
+;         ora #%10000000          ; invert character.
+;@draw    sta (zero_word_buf2$),y
+;         rts
 
 ; -----------------
 ; --- constants ---

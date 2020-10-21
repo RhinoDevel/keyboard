@@ -1,45 +1,6 @@
 
 ; marcel timm, rhinodevel, 2020mar21
 
-; - needs pointers keyposx$ and keyposy$.
-; - calls pos_draw$() and uses zero_word_buf1$.
-
-; --------------
-; --- macros ---
-; --------------
-
-; *** draw all keys at their designated positions on screen.
-; ***
-; *** input:
-; *** ------
-; *** (none)
-; ***
-; *** output:
-; *** -------
-; *** a = garbage.
-; *** x = garbage.
-; *** y = garbage.
-; *** zero_word_buf1$ =  garbage.
-; ***
-;
-defm keydraw$
-         ldx #0
-@loop    txa ; copy index to y register for indirect addressing.
-         tay ;
-         lda (keyposx$),y
-         cmp #$ff
-         beq @next
-         sta zero_word_buf1$
-         lda (keyposy$),y
-         tay
-         txa
-         jsr pos_draw$ ; (keeps content of a)
-         tax ; restore index to x.
-@next    inx
-         cpx #64 ; hard-coded (for screen codes 0 - 63)!
-         bne @loop
-         endm 
-
 ; -----------------
 ; --- functions ---
 ; -----------------

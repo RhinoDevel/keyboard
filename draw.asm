@@ -15,13 +15,42 @@
 ; ***
 ;
 defm clrscr$
-            lda #chr_clr$
-            jsr chrout$
-            endm
+         lda #chr_clr$
+         jsr chrout$
+         endm
 
 ; -----------------
 ; --- functions ---
 ; -----------------
+
+; *************************
+; *** clear the screen. ***
+; *************************
+; ***
+; *** to be used, if interrupt service routine is already disabled.
+; ***
+;
+clrscr_own$
+         lda #<screen_ram$
+         sta zero_word_buf1$
+         lda #>screen_ram$
+         sta zero_word_buf1$+1
+
+         lda #chr_spc$
+         
+         ; ok, because screen ram starts at $??00 (in fact always at $8000):
+         ;
+         ldx #8 ; ok (because of mirroring in 40 column machines),
+                ; but overdone, if 40 column machine.
+@nextx   ldy #0
+@nexty   sta (zero_word_buf1$),y ; from $??00 to $??ff.
+         iny
+         bne @nexty
+         inc zero_word_buf1$+1 ; increment high byte.
+         dex
+         bne @nextx
+
+         rts
 
 ; *** input:
 ; *** ------
@@ -44,15 +73,17 @@ get_mem_addr$
 
          ; calculate address:
          ;
-@loop    cpy #0
-         beq @add_col
+get_mem_addr_loop   
+         cpy #0
+         beq get_mem_addr_add_col
          dey
          clc
-         adc line_len$
-         bcc @loop
+linelen$ adc #0 ; value to-be-set in-place during initialization!
+         bcc get_mem_addr_loop
          inx
-         bcs @loop ; (always loops)
-@add_col clc
+         bcs get_mem_addr_loop ; (always loops)
+get_mem_addr_add_col
+         clc
          adc zero_word_buf1$
          bcc @copy
          inx
@@ -61,48 +92,6 @@ get_mem_addr$
          ;
 @copy    sta zero_word_buf1$
          stx zero_word_buf1$ + 1
-         rts
-
-; ***
-; *** input:
-; *** ------
-; *** y = char row / line nr. (0 - 24).
-; *** zero_word_buf1$ = char column / pos. in line (0 - 39 or 0 - 79).  
-; ***
-; *** output:
-; *** -------
-; *** x = high byte of screen mem. addr.
-; *** y = 0
-; *** zero_word_buf1$ = screen mem. addr.
-; ***
-;
-rev_on$  pha
-         jsr get_mem_addr$
-         lda (zero_word_buf1$),y
-         ora #%10000000 ; sets reverse bit of screen code.
-         sta (zero_word_buf1$),y
-         pla
-         rts
-
-; ***
-; *** input:
-; *** ------
-; *** y = char row / line nr. (0 - 24).
-; *** zero_word_buf1$ = char column / pos. in line (0 - 39 or 0 - 79).  
-; ***
-; *** output:
-; *** -------
-; *** x = high byte of screen mem. addr.
-; *** y = 0
-; *** zero_word_buf1$ = screen mem. addr.
-; ***
-;
-rev_off$ pha
-         jsr get_mem_addr$
-         lda (zero_word_buf1$),y
-         and #%01111111 ; disables reverse bit of screen code.
-         sta (zero_word_buf1$),y
-         pla
          rts
 
 ; ****************
