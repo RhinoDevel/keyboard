@@ -38,7 +38,9 @@ musical keyboard is useful for:
                       
 - **17 different sounds**: Choose between all seventeen sounds distinguishable by
                        the human ear and producible with the shift register.
-                       
+                
+- **Effects**: Enable effects like vibrato (in addition to the 17 sounds).
+                
 - **Record music**: Just play a melody and it will be recorded to memory.
 
 - **Playback your recording**: Let the application play your recorded melody.
@@ -118,7 +120,7 @@ musical keyboard is useful for:
 
 - [ ] Show numbers in **decimal**.
 
-- [ ] Add effect: **Vibrato** (got it already working, some fine tuning necessary).
+- [x] Add effect: **Vibrato**.
 
 - [ ] Add effect: **"Arpeggio"** (press two note buttons to let the associated musical
               notes alternate quickly).
