@@ -1,6 +1,8 @@
 
 ; marcel timm, rhinodevel, 2020mar17
 
+; TODO: immediately disable vibrato on user-toggle, not just with next note!
+
 ; ---------------
 ; --- defines ---
 ; ---------------
@@ -26,6 +28,8 @@ flag_pre_speed = 16
 flag_pre_speed_neg = 255 - flag_pre_speed
 flag_pre_loop = 32
 flag_pre_loop_neg = 255 - flag_pre_loop
+flag_pre_vibr = 64
+flag_pre_vibr_neg = 255 - flag_pre_vibr
 
 ; to be used with flag_upd variable:
 ;
@@ -43,6 +47,9 @@ flag_upd_speed_neg = 255 - flag_upd_speed
 ;
 flag_upd_loop = 32
 flag_upd_loop_neg = 255 - flag_upd_loop
+;
+flag_upd_vibr = 64
+flag_upd_vibr_neg = 255 - flag_upd_vibr
 
 ; to be used with variable named mode:
 ;
@@ -339,6 +346,34 @@ pres5_08 lda flag_pre
          sta screen_ram$ + vram_offset40_spee$
 done5_08
 
+         ; vibrato
+         ;
+         ; :
+         ;
+         txa
+         and #$10
+         beq pres5_10
+         lda flag_pre ; disable is-pressed flag.
+         and #flag_pre_vibr_neg
+         sta flag_pre
+         lda vibr_val + 1 ; keep rev. on screen, if vibrato is already enabled.
+         bne done5_10 ; 0 = vibrato is disabled, 1 = vibrato is enabled.
+         lda #':'
+         sta screen_ram$ + vram_offset40_vibr$
+         jmp done5_10
+pres5_10 lda flag_pre
+         and #flag_pre_vibr
+         bne done5_10 ; skips, if press already is processed.
+         lda flag_pre
+         ora #flag_pre_vibr
+         sta flag_pre ; rem. cur. key press to be alr. processed.
+         lda flag_upd
+         ora #flag_upd_vibr
+         sta flag_upd ; request update.
+         lda #58 + 128 ; 58 = ':'.
+         sta screen_ram$ + vram_offset40_vibr$
+done5_10
+
          ; *** row 6: ***
 
          lda #6
@@ -513,6 +548,35 @@ pres2_20_80
          lda #$0b + 128 ; $0b = 'k'.
          sta screen_ram$ + vram_offset80_spee$
 don2_20_80
+
+         ; vibrato
+         ;
+         ; ;
+         ;
+         txa
+         and #$40
+         beq pres2_40_80
+         lda flag_pre ; disable is-pressed flag.
+         and #flag_pre_vibr_neg
+         sta flag_pre
+         lda vibr_val + 1 ; keep rev. on screen, if vibrato is already enabled.
+         bne done2_40_80 ; 0 = vibrato is disabled, 1 = vibrato is enabled.
+         lda #59 ; 59 = ';'.
+         sta screen_ram$ + vram_offset80_vibr$
+         jmp done2_40_80
+pres2_40_80
+         lda flag_pre
+         and #flag_pre_vibr
+         bne done2_40_80 ; skips, if press already is processed.
+         lda flag_pre
+         ora #flag_pre_vibr
+         sta flag_pre ; rem. cur. key press to be alr. processed.
+         lda flag_upd
+         ora #flag_upd_vibr
+         sta flag_upd ; request update.
+         lda #59 + 128 ; 59 = ';'.
+         sta screen_ram$ + vram_offset80_vibr$
+done2_40_80
 
          ; *** row 3: ***
 
@@ -890,6 +954,23 @@ speed_no_upd
          sta loop_val + 1
 loop_no_upd
 
+         ; enable/disable vibrato, if necessary:
+         ;
+         lda flag_upd
+         and #flag_upd_vibr
+         beq vibr_no_upd ; no update because of vibrato button necessary.
+         ;
+         ; update because of vibrato button:
+         ;
+         lda flag_upd
+         and #flag_upd_vibr_neg ; vibrato button is handled.
+         sta flag_upd
+         ;
+         lda vibr_val + 1
+         eor #1 ; toggles vibrato enabled/disabled.
+         sta vibr_val + 1
+vibr_no_upd
+
          ; do play mode stuff (before playing note), if play mode is active:
          ;
          lda mode
@@ -1059,32 +1140,34 @@ set_timer2_low
          jsr drawnotea ; draws currently playing note.
 no_upd_note
          
-;         ; vibrato (neither note-dependent, nor speed-dependent):
-;         ;
-;         lda vibr_beg
-;         sec
-;         sbc timer1_high$
-;         cmp vibr_int     ; compare with timespan to be between vibrato
-;                          ; modifications.
-;         bcc vibr_end     ; skip and wait a while longer before modifying
-;                          ; vibrato again, if not enough time went by.
-;         lda timer1_high$
-;         sta vibr_beg
-;         ;
-;         ldy playingn
-;         cpy #note_none
-;         beq vibr_end
-;         ;
-;         lda notes$,y ; loads notes' timer 2 low byte value.
-;         clc
-;vibrato  adc #2 ; will get altered in-place, below.
-;         sta timer2_low$ ; modify frequency in one "direction".
-;         lda vibrato+1
-;         eor #$ff ; flip between (e.g.) 10 and 245 (negative value).
-;         clc      ;
-;         adc #1   ;
-;         sta vibrato+1 ; update for next freq.-change in other "direction".
-;vibr_end         
+         ; vibrato (neither note-dependent, nor speed-dependent):
+         ;
+vibr_val lda #0 ; 0 = vibrato off, 1 = vibr. on. value will be changed in-place.
+         beq vibr_end
+         lda vibr_beg
+         sec
+         sbc timer1_high$
+         cmp vibr_int     ; compare with timespan to be between vibrato
+                          ; modifications.
+         bcc vibr_end     ; skip and wait a while longer before modifying
+                          ; vibrato again, if not enough time went by.
+         lda timer1_high$
+         sta vibr_beg
+         ;
+         ldy playingn
+         cpy #note_none
+         beq vibr_end
+         ;
+         lda notes$,y ; loads notes' timer 2 low byte value.
+         clc
+vibrato  adc #2 ; will get altered in-place, below.
+         sta timer2_low$ ; modify frequency in one "direction".
+         lda vibrato+1
+         eor #$ff ; flip between (e.g.) 10 and 245 (negative value).
+         clc      ;
+         adc #1   ;
+         sta vibrato+1 ; update for next freq.-change in other "direction".
+vibr_end         
 
 ; * TODO: implement handling of reached recording byte limit!
 ;
@@ -1182,6 +1265,7 @@ rec_mode_stuff_end
          ;
 exit     lda #0
          sta loop_val + 1 ; TODO: implementing keeping loop enabled, if wanted!
+         sta vibr_val + 1 ; TODO: implementing keeping vibr. enabled, if wanted!
          sta timer2_low$ ; disables sound by timer reset.
 
          sta keybufnum$

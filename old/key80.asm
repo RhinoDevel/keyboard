@@ -69,7 +69,7 @@ key80_row$
          byte $ff ; 8
          byte $ff ; 9
          byte $ff ; :
-         byte $ff ; ;
+          byte $02 ; ;
          byte $ff ; <
          byte $ff ; =
          byte $ff ; >
@@ -146,8 +146,8 @@ key80_neg$
           byte $04 ; 7
          byte $ff ; 8
          byte $ff ; 9
-         byte $ff ; :
-         byte $ff ; ;
+          byte $10 ; :
+          byte $40 ; ;
          byte $ff ; <
          byte $ff ; =
          byte $ff ; >

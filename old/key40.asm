@@ -68,7 +68,7 @@ key40_row$
          byte $ff ; 7
          byte $ff ; 8
          byte $ff ; 9
-         byte $ff ; :
+          byte $05 ; :
           byte $06 ; ;
          byte $ff ; <
          byte $ff ; =
@@ -142,7 +142,7 @@ key40_neg$
          byte $ff ; 7
          byte $ff ; 8
          byte $ff ; 9
-         byte $ff ; :
+          byte $10 ; :
           byte $10 ; ;
          byte $ff ; <
          byte $ff ; =

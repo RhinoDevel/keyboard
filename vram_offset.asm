@@ -44,6 +44,7 @@ vram_offset40_reco$ = 40 *  3 + 31
 vram_offset40_play$ = 40 *  5 + 31
 vram_offset40_spee$ = 40 *  7 + 31
 vram_offset40_loop$ = 40 *  9 + 31
+vram_offset40_vibr$ = 40 * 11 + 31
 ;
 vram_offset40_patl$ = 40 * 10 + 21
 vram_offset40_patn$ = 40 * 10 + 23
@@ -96,6 +97,7 @@ vram_offset80_reco$ = 80 *  3 + 31
 vram_offset80_play$ = 80 *  5 + 31
 vram_offset80_spee$ = 80 *  7 + 31
 vram_offset80_loop$ = 80 *  9 + 31
+vram_offset80_vibr$ = 80 * 11 + 31
 ;
 vram_offset80_patl$ = 80 * 10 + 21
 vram_offset80_patn$ = 80 * 10 + 23
