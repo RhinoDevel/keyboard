@@ -1,8 +1,6 @@
 
 ; marcel timm, rhinodevel, 2020mar17
 
-; TODO: immediately disable vibrato on user-toggle, not just with next note!
-
 ; ---------------
 ; --- defines ---
 ; ---------------
@@ -969,6 +967,15 @@ loop_no_upd
          lda vibr_val + 1
          eor #1 ; toggles vibrato enabled/disabled.
          sta vibr_val + 1
+         ;
+         bne vibr_no_upd ; if vibrato got disabled
+         lda playingn    ; and there is a note
+         cmp #note_none  ; currently
+         beq vibr_no_upd ; playing,
+         tay             ; immediately (kind of hard-coded to do this here..)
+         lda notes$,y    ; load notes' timer 2 low byte value  
+         sta timer2_low$ ; and update register to disable vibrato offset that
+                         ; might be active.
 vibr_no_upd
 
          ; do play mode stuff (before playing note), if play mode is active:
