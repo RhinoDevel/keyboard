@@ -9,8 +9,8 @@ A musical keyboard for Commodore PET/CBM 8-bit machines with record function and
 
 ## Why?
 
-This is no tracker, it is a musical keyboard using the one single sound channel
-the PET/CBM user port offers via CB2.
+This is no tracker (yet), it is a musical keyboard using the one single sound
+channel the PET/CBM user port offers via CB2.
 
 Apart from the 6502/Commodore programming experience for me personally, this
 musical keyboard is useful for:
@@ -127,6 +127,8 @@ musical keyboard is useful for:
 
 - [ ] Optionally save records together with an **IRQ-based background music player** to
   be able to run and play records on their own. I already got an IRQ-based player ready (needs some polishing before release).
+
+- [ ] Add tracker functionality to edit your recorded tune, etc.
 
 - [ ] Create **library with tunes** (*maybe with YOUR help?*). Playing and recording
   melodies from C64 games would be cool..
