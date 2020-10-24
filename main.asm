@@ -1794,8 +1794,6 @@ savetune_inc3_done
          ldx #0 ; really necessary?
          jmp (cas_save)
 
-         rts
-
 ; TODO: integrate into application (also saving):
 ;
 ; you need to enable irq's and disable free running mode before this (via acr):
@@ -1813,8 +1811,6 @@ loadtune lda #1 ; hard-coded to tape nr. 1.
 
          ldx #0 ; really necessary?
          jmp (cas_load)
-
-         rts
 
 ; -----------------
 ; --- constants ---
