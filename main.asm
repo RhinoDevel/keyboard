@@ -165,6 +165,19 @@ keyhandling40
          but_note 4, '%', vram_offset40_fis2$, 18, 165
          but_note 8, '&', vram_offset40_ais2$, 22, 166
 
+         ; load
+         ;
+         ; <left arrow>
+         ;
+         txa
+         and #$20
+         bne loadcheckdone40
+         ;lda #31 + 128                         ; 31 = <left arrow>. this is
+         ;sta screen_ram$ + vram_offset40_load$ ; more or less academic (no one
+                                                ; sees this..).
+         jmp loadtune
+loadcheckdone40
+
          ; *** row 1: ***
 
          lda #1     
@@ -471,6 +484,25 @@ set_pattern_n
          sta screen_ram$ + vram_offset40_patn$
 done7_10
          
+         ; *** row 9: ***
+
+         lda #9
+         sta pia1porta$
+         lda pia1portb$
+         ;tax
+
+         ; save
+         ;
+         ; '['
+         ;
+         ;txa
+         and #$02
+         bne savecheckdone40
+         ;lda #27 + 128                         ; 27 = '['. this is more or less
+         ;sta screen_ram$ + vram_offset40_save$ ; academic (no one sees this..).
+         jmp savetune
+savecheckdone40
+
          jmp keyhandling_done
 
          ; *******************************
@@ -488,6 +520,18 @@ keyhandling80
 
          but_note   1, '2', vram_offset80_cis2$, 13, 178
          but_note   2, '5', vram_offset80_fis2$, 18, 181
+
+         ; save
+         ;
+         ; '-'
+         ;
+         txa
+         and #$08
+         bne savecheckdone80
+         ;lda #45 + 128                         ; 45 = '-'. this is more or less
+         ;sta screen_ram$ + vram_offset80_save$ ; academic (no one sees this..).
+         jmp savetune
+savecheckdone80
 
          ; *** row 1: ***
 
@@ -815,6 +859,18 @@ done8_40_80
 
          but_note   2, '3', vram_offset80_dis2$, 15, 179
          but_note   4, '6', vram_offset80_gis2$, 20, 182
+
+         ; load
+         ;
+         ; ':'
+         ;
+         txa
+         and #$20
+         bne loadcheckdone80
+         ;lda #58 + 128                         ; 58 = ':'. this is more or less
+         ;sta screen_ram$ + vram_offset80_load$ ; academic (no one sees this..).
+         jmp loadtune
+loadcheckdone80
 
 keyhandling_done
 
@@ -1692,7 +1748,11 @@ note_count_end
          bvc init_extradraw40
 
          lda #'0'
-         sta screen_ram$ + vram_offset80_exit$ ; academic (no one sees this..).
+         sta screen_ram$ + vram_offset80_exit$
+         lda #':'
+         sta screen_ram$ + vram_offset80_load$
+         lda #'-'
+         sta screen_ram$ + vram_offset80_save$
          ;
          ; no other key label drawing, here (because always done by loop..).
 
@@ -1705,7 +1765,11 @@ note_count_end
 init_extradraw40
 
          lda #')'
-         sta screen_ram$ + vram_offset40_exit$ ; academic (no one sees this..).
+         sta screen_ram$ + vram_offset40_exit$
+         lda #31 ; 31 = <left arrow>
+         sta screen_ram$ + vram_offset40_load$
+         lda #'['
+         sta screen_ram$ + vram_offset40_save$
          ;
          ; no other key label drawing, here (because always done by loop..).
 

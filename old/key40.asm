@@ -37,11 +37,11 @@ key40_row$
           byte $07 ; x
           byte $03 ; y
           byte $06 ; z
-         byte $ff ; [
+          byte $09 ; [
          byte $ff ; \
          byte $ff ; ]
          byte $ff ; <up arrow>
-         byte $ff ; <left arrow>
+          byte $00 ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
           byte $01 ; <quotation mark>
@@ -111,11 +111,11 @@ key40_neg$
           byte $01 ; x
           byte $04 ; y
           byte $01 ; z
-         byte $ff ; [
+          byte $02 ; [
          byte $ff ; \
          byte $ff ; ]
          byte $ff ; <up arrow>
-         byte $ff ; <left arrow>
+          byte $20 ; <left arrow>
          byte $ff ; <space>
          byte $ff ; !
           byte $01 ; <quotation mark>

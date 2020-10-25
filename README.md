@@ -66,11 +66,9 @@ musical keyboard is useful for:
   displayed as hex value and also the **maximum possible count of
   notes/pauses** storable in memory of your CBM.
 
-- **Save tunes to tape**: Save your recorded melody to tape.
-                      Currently a little bit complicated and limited to tape #1,
-                      but it works.
+- **Save tunes to tape**: Save your recorded melody to tape (#1).
 
-- **Load tunes from tape**: This feature is not perfectly implemented, but works.
+- **Load tunes from tape**: Load tunes from tape (#1).
 
 - **No special hardware**: If your CBM has an internal beeper or you connected
                        (e.g.) an audio amplifier and speaker to CB2 at the user
@@ -78,6 +76,8 @@ musical keyboard is useful for:
 
 - **Single binary application**: The same PRG can be used for all supported
                              CBMs/PETs, 40 or 80 columns, BASIC 2 or 4.
+
+- **Additional BASIC 1 support**: A special BASIC 1 PRG file is available.
                              
 - **Re-entry / no reset**:
 
@@ -85,36 +85,10 @@ musical keyboard is useful for:
                        
   In addition, resetting the machine before doing something else with it is not
   necessary.
-                       
-## How-tos
-
-1) **How to save your record to tape #1**:
-
-   Not completely implemented in application, yet, but it works this way:
-
-   Exit the application.
-
-   Enter: `SYS 2741`
-
-   Follow the instructions (storing to tape #1, as usual).
-
-   Return to application (enter: `RUN`).
-
-2) **How to load your record from tape #1**:
-
-   Also not completely implemented in program, yet. It works like this:
-
-   Load and run the application.
-
-   Exit the application.
-
-   Load your tune from tape #1 (just like loading some program, enter: `LOAD`).
-
-   Return to application (enter: `RUN`).
 
 ## Ideas for future improvements
 
-- [ ] Make **saving and loading** records possible from inside the application.
+- [x] Make **saving and loading** records possible from inside the application.
 
 - [ ] Add check, if there is enough memory to record further.
 

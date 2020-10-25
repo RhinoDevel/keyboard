@@ -55,7 +55,7 @@ key80_row$
          byte $ff ; *
          byte $ff ; +
           byte $07 ; ,
-         byte $ff ; -
+          byte $00 ; -
           byte $06 ; .
           byte $08 ; /
           byte $01 ; 0
@@ -68,7 +68,7 @@ key80_row$
           byte $01 ; 7
          byte $ff ; 8
          byte $ff ; 9
-         byte $ff ; :
+          byte $09 ; :
           byte $02 ; ;
          byte $ff ; <
          byte $ff ; =
@@ -133,7 +133,7 @@ key80_neg$
          byte $ff ; *
          byte $ff ; +
           byte $08 ; ,
-         byte $ff ; -
+          byte $08 ; -
           byte $08 ; .
           byte $40 ; /
           byte $08 ; 0
@@ -146,7 +146,7 @@ key80_neg$
           byte $04 ; 7
          byte $ff ; 8
          byte $ff ; 9
-          byte $10 ; :
+          byte $20 ; :
           byte $40 ; ;
          byte $ff ; <
          byte $ff ; =
