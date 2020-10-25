@@ -1822,6 +1822,12 @@ filename text "tune" ; 4 bytes.
 ; --- variables ---
 ; -----------------
 
+; --- "public" ---
+
+pattern$ byte 0 ; 1 byte.
+
+; --- "private"/"static" ---
+
 vibr_int byte 128 ; vibr_int * 256 microseconds.
 vibr_beg byte 0 ; 1 byte. used for vibrato.
 
