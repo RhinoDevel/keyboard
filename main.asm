@@ -1,4 +1,6 @@
 
+; TODO: Fix bug causing vibrato sometimes no longer working!
+
 ; marcel timm, rhinodevel, 2020mar17
 
 ; ---------------
