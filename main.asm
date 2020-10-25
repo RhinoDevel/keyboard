@@ -1438,9 +1438,9 @@ ifdef TGT_PETBV2
          lda #>v4_cas_load$
          sta cas_load + 2
          lda #<v4_cas_save$
-         sta cas_save
-         lda #>v4_cas_save$
          sta cas_save + 1
+         lda #>v4_cas_save$
+         sta cas_save + 2
          ; (add more, when necessary)
          lda #'4'
          sta basic_version$
@@ -1456,9 +1456,9 @@ ifdef TGT_PETBV2
          lda #>v2_cas_load$
          sta cas_load + 2
          lda #<v2_cas_save$
-         sta cas_save
-         lda #>v2_cas_save$
          sta cas_save + 1
+         lda #>v2_cas_save$
+         sta cas_save + 2
          ; (add more, when necessary)
          lda #'2'
          sta basic_version$
@@ -1475,9 +1475,9 @@ ifdef TGT_NONE
          lda #>v1_cas_load$
          sta cas_load + 2
          lda #<v1_cas_save$
-         sta cas_save
-         lda #>v1_cas_save$
          sta cas_save + 1
+         lda #>v1_cas_save$
+         sta cas_save + 2
          ; (add more, when necessary)
          lda #'1'
          sta basic_version$         
@@ -1743,11 +1743,10 @@ init_extradraw_done
       
          rts
 
-; TODO: integrate into application (also loading):
-;
-; you need to enable irq's and disable free running mode before this (VIA ACR):
-;
-savetune lda #<tune$
+savetune jsr deinit_before_cli
+         jsr deinit_cli
+
+         lda #<tune$
          sta tapesave$
          sta zero_word_buf1$ ; to find end of tune address, below.
          lda #>tune$
@@ -1807,7 +1806,8 @@ savetune_inc3_done
          sta fnameptr$ + 1
 
          ldx #0 ; really necessary?
-         jmp (cas_save)
+cas_save jsr $ffff ; 2 byte. will hold addr. of tape save routine after init().
+         jmp main
 
 loadtune jsr deinit_before_cli
          jsr deinit_cli
@@ -1825,7 +1825,6 @@ loadtune jsr deinit_before_cli
 
          ldx #0 ; really necessary?
 cas_load jsr $ffff ; 2 byte. will hold addr. of tape load routine after init().
-
          jmp main
 
 ; -----------------
@@ -1864,5 +1863,3 @@ lastnote byte 0 ; 1 byte.
 playingn byte 0 ; 1 byte. the currently playing note.
 
 patindex byte 0 ; 1 byte. pattern index.
-
-cas_save word 0 ; 2 byte. will hold address of tape save routine after init().
