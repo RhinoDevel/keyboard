@@ -1434,9 +1434,9 @@ ifdef TGT_PETBV2
          ; prepare for v4:
          ;
          lda #<v4_cas_load$
-         sta cas_load
-         lda #>v4_cas_load$
          sta cas_load + 1
+         lda #>v4_cas_load$
+         sta cas_load + 2
          lda #<v4_cas_save$
          sta cas_save
          lda #>v4_cas_save$
@@ -1452,9 +1452,9 @@ ifdef TGT_PETBV2
          ; prepare for (change to) v2:
          ;
          lda #<v2_cas_load$
-         sta cas_load
-         lda #>v2_cas_load$
          sta cas_load + 1
+         lda #>v2_cas_load$
+         sta cas_load + 2
          lda #<v2_cas_save$
          sta cas_save
          lda #>v2_cas_save$
@@ -1471,9 +1471,9 @@ ifdef TGT_NONE
          ; prepare for v1:
          ;
          lda #<v1_cas_load$
-         sta cas_load
-         lda #>v1_cas_load$
          sta cas_load + 1
+         lda #>v1_cas_load$
+         sta cas_load + 2
          lda #<v1_cas_save$
          sta cas_save
          lda #>v1_cas_save$
@@ -1809,11 +1809,10 @@ savetune_inc3_done
          ldx #0 ; really necessary?
          jmp (cas_save)
 
-; TODO: integrate into application (also saving):
-;
-; you need to enable irq's and disable free running mode before this (via acr):
-;
-loadtune lda #1 ; hard-coded to tape nr. 1.
+loadtune jsr deinit_before_cli
+         jsr deinit_cli
+
+         lda #1 ; hard-coded to tape nr. 1.
          sta devicenr$
 
          lda #4 ; hard-coded, see constant, below.
@@ -1825,7 +1824,9 @@ loadtune lda #1 ; hard-coded to tape nr. 1.
          sta fnameptr$ + 1
 
          ldx #0 ; really necessary?
-         jmp (cas_load)
+cas_load jsr $ffff ; 2 byte. will hold addr. of tape load routine after init().
+
+         jmp main
 
 ; -----------------
 ; --- constants ---
@@ -1864,5 +1865,4 @@ playingn byte 0 ; 1 byte. the currently playing note.
 
 patindex byte 0 ; 1 byte. pattern index.
 
-cas_load word 0 ; 2 byte. will hold address of tape load routine after init().
 cas_save word 0 ; 2 byte. will hold address of tape save routine after init().
