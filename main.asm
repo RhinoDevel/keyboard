@@ -1272,7 +1272,22 @@ rec_mode_stuff_end
 
          ; exit application (show "goodbye"):
          ;
-exit     lda #0
+exit     jsr deinit_before_cli
+
+         lda #<goodbye$
+         sta zero_word_buf2$
+         lda #>goodbye$
+         sta zero_word_buf2$ + 1
+         jsr keydrawstat$
+
+         jmp deinit_cli 
+
+; *************************
+; *** deinit_before_cli ***
+; *************************
+;
+deinit_before_cli
+         lda #0
          sta loop_val + 1 ; TODO: implementing keeping loop enabled, if wanted!
          sta vibr_val + 1 ; TODO: implementing keeping vibr. enabled, if wanted!
          sta timer2_low$ ; disables sound by timer reset.
@@ -1285,13 +1300,13 @@ exit     lda #0
                       ; (e.g. makes tape usable again).
 
          jsr clrscr_own$
+         rts
 
-         lda #<goodbye$
-         sta zero_word_buf2$
-         lda #>goodbye$
-         sta zero_word_buf2$ + 1
-         jsr keydrawstat$
-
+; ******************
+; *** deinit_cli ***
+; ******************
+;
+deinit_cli
          cli
 
          ; doing this after re-enabling interrupt service routine,
