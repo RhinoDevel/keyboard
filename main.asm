@@ -1,6 +1,14 @@
 
 ; TODO: Fix bug causing vibrato sometimes no longer working!
 
+; TODO: Remember "all" settings on exit and entering file mask.
+
+; TODO: Loading/saving from tape #2.
+
+; TODO: Add help screen.
+
+; TODO: Add about screen.
+
 ; marcel timm, rhinodevel, 2020mar17
 
 ; ---------------
@@ -167,18 +175,18 @@ keyhandling40
          but_note 4, '%', vram_offset40_fis2$, 18, 165
          but_note 8, '&', vram_offset40_ais2$, 22, 166
 
-         ; load
+         ; file
          ;
          ; <left arrow>
          ;
          txa
          and #$20
-         bne loadcheckdone40
+         bne filecheckdone40
          ;lda #31 + 128                         ; 31 = <left arrow>. this is
-         ;sta screen_ram$ + vram_offset40_load$ ; more or less academic (no one
+         ;sta screen_ram$ + vram_offset40_file$ ; more or less academic (no one
                                                 ; sees this..).
-         jmp loadtune
-loadcheckdone40
+         jmp file
+filecheckdone40
 
          ; *** row 1: ***
 
@@ -485,25 +493,6 @@ set_pattern_n
          lda #$3f + 128 ; $3f = '?'.
          sta screen_ram$ + vram_offset40_patn$
 done7_10
-         
-         ; *** row 9: ***
-
-         lda #9
-         sta pia1porta$
-         lda pia1portb$
-         ;tax
-
-         ; save
-         ;
-         ; '['
-         ;
-         ;txa
-         and #$02
-         bne savecheckdone40
-         ;lda #27 + 128                         ; 27 = '['. this is more or less
-         ;sta screen_ram$ + vram_offset40_save$ ; academic (no one sees this..).
-         jmp savetune
-savecheckdone40
 
          jmp keyhandling_done
 
@@ -522,18 +511,6 @@ keyhandling80
 
          but_note   1, '2', vram_offset80_cis2$, 13, 178
          but_note   2, '5', vram_offset80_fis2$, 18, 181
-
-         ; save
-         ;
-         ; '-'
-         ;
-         txa
-         and #$08
-         bne savecheckdone80
-         ;lda #45 + 128                         ; 45 = '-'. this is more or less
-         ;sta screen_ram$ + vram_offset80_save$ ; academic (no one sees this..).
-         jmp savetune
-savecheckdone80
 
          ; *** row 1: ***
 
@@ -862,17 +839,17 @@ done8_40_80
          but_note   2, '3', vram_offset80_dis2$, 15, 179
          but_note   4, '6', vram_offset80_gis2$, 20, 182
 
-         ; load
+         ; file
          ;
          ; ':'
          ;
          txa
          and #$20
-         bne loadcheckdone80
+         bne filecheckdone80
          ;lda #58 + 128                         ; 58 = ':'. this is more or less
-         ;sta screen_ram$ + vram_offset80_load$ ; academic (no one sees this..).
-         jmp loadtune
-loadcheckdone80
+         ;sta screen_ram$ + vram_offset80_file$ ; academic (no one sees this..).
+         jmp file
+filecheckdone80
 
 keyhandling_done
 
@@ -1752,9 +1729,7 @@ note_count_end
          lda #'0'
          sta screen_ram$ + vram_offset80_exit$
          lda #':'
-         sta screen_ram$ + vram_offset80_load$
-         lda #'-'
-         sta screen_ram$ + vram_offset80_save$
+         sta screen_ram$ + vram_offset80_file$
          ;
          ; no other key label drawing, here (because always done by loop..).
 
@@ -1769,9 +1744,7 @@ init_extradraw40
          lda #')'
          sta screen_ram$ + vram_offset40_exit$
          lda #31 ; 31 = <left arrow>
-         sta screen_ram$ + vram_offset40_load$
-         lda #'['
-         sta screen_ram$ + vram_offset40_save$
+         sta screen_ram$ + vram_offset40_file$
          ;
          ; no other key label drawing, here (because always done by loop..).
 
@@ -1891,6 +1864,50 @@ loadtune jsr deinit_before_cli
 
          ldx #0 ; really necessary?
 cas_load jsr $ffff ; 2 byte. will hold addr. of tape load routine after init().
+         jmp main
+
+file     jsr deinit_before_cli
+
+         lda #<filemask$
+         sta zero_word_buf2$
+         lda #>filemask$
+         sta zero_word_buf2$ + 1
+         jsr keydrawstat$
+
+         jsr deinit_cli
+
+filescan jsr chrin$   ; wait, until a button is pressed.
+         beq filescan ;
+
+         cmp #"1"
+         beq loadtune
+
+         cmp #"6"
+         bne filechk_c
+         jmp savetune
+
+filechk_c
+         cmp #"c"
+         beq filedone
+
+         jmp filescan
+
+filedone 
+  
+         ; ~250ms delay:
+         ;
+         lda #$ff
+         sta timer1_low$
+         lda #$fe
+         ldy #4
+filedelay
+         sta timer1_high$
+filedelaya
+         bit via_ifr$
+         bvc filedelaya
+         dey
+         bne filedelay
+
          jmp main
 
 ; -----------------

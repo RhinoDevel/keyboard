@@ -90,7 +90,7 @@ pia1ctrlb$ = $e813
 
 ;via_b$ = $e840 ; via port b.
 
-;timer1_low$ = $e844
+timer1_low$ = $e844
 timer1_high$ = $e845
 
 timer2_low$ = $e848 ; low byte of timer 2.
@@ -103,10 +103,10 @@ via_pcr$ = $e84c ; via's peripheral control register.
 ; poke 59468, 12 for graphics mode (basic v2 / v4).
 ; poke 59468, 14 for lower-case mode (basic v2 / v4).
 
-;via_ifr$ = $e84d ; via's interrupt flag register.
+via_ifr$ = $e84d ; via's interrupt flag register.
 
 chrout$ = $ffd2 ; write a character to the screen.
-;chrin$ = $ffe4 ; get one character.
+chrin$ = $ffe4 ; get one character.
 
 vec_nmi$ = $fffa
 ;vec_res$ = $fffc

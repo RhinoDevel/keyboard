@@ -37,7 +37,7 @@ key40_row$
           byte $07 ; x
           byte $03 ; y
           byte $06 ; z
-          byte $09 ; [
+         byte $ff;$09 ; [
          byte $ff ; \
          byte $ff ; ]
          byte $ff ; <up arrow>
@@ -111,7 +111,7 @@ key40_neg$
           byte $01 ; x
           byte $04 ; y
           byte $01 ; z
-          byte $02 ; [
+         byte $ff;$02 ; [
          byte $ff ; \
          byte $ff ; ]
          byte $ff ; <up arrow>
