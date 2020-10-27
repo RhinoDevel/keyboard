@@ -36,17 +36,17 @@ filemask$
          byte 131
          text ' = cancel'
 
-         byte 12
+         byte 13
          byte 0
          byte 6
          text 'hints:'
 
-         byte 14
+         byte 15
          byte 0
          byte 39
          text '- forward or rewind tape now, if needed'
 
-         byte 16
+         byte 17
          byte 0
          byte 40
          text '- if tape fails, go to basic & enter run'
