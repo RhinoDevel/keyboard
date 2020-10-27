@@ -16,7 +16,8 @@
 ; TODO: Relative loading of tune (by manipulating start address).
 
 ; TODO: Implement function to wait on no-keys-pressed and use it in file dialog
-;       (on entry and before exit).
+;       (on entry and before exit and on exit of application after clearing
+;       keyboard buffer?).
 
 ; marcel timm, rhinodevel, 2020mar17
 
