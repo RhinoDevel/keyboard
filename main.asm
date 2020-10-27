@@ -9,8 +9,6 @@
 
 ; TODO: Add about screen.
 
-; TODO: Add hint about just entering ("STOP"?) RUN, if load/save failed to file mask.
-
 ; TODO: Relative loading of tune (by manipulating start address).
 
 ; marcel timm, rhinodevel, 2020mar17
