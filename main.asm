@@ -9,6 +9,15 @@
 
 ; TODO: Add about screen.
 
+; TODO: Add hint about just entering ("STOP"?) RUN, if load/save failed to file mask.
+
+; TODO: Disable monitor mode change in file mask?!
+
+; TODO: Relative loading of tune (by manipulating start address).
+
+; TODO: Implement function to wait on no-keys-pressed and use it in file dialog
+;       (on entry and before exit).
+
 ; marcel timm, rhinodevel, 2020mar17
 
 ; ---------------
@@ -1315,7 +1324,20 @@ exit     jsr deinit_before_cli
          sta zero_word_buf2$ + 1
          jsr keydrawstat$
 
-         jmp deinit_cli 
+         cli
+
+         ; doing this after re-enabling interrupt service routine,
+         ; because of problems with chrout$ and waiting for retrace (see above):
+         ;
+         bit linelen$ + 1
+         bvc exit_graph_done
+         jsr v4_graph_off$ ; (disables graphics mode, enables blank lines)
+exit_graph_done
+         ;
+         ; (not re-enabling first char. rom, because of "goodbye" screen using
+         ;  at-sign..)
+
+         rts
 
 ; *************************
 ; *** deinit_before_cli ***
@@ -1335,26 +1357,6 @@ deinit_before_cli
                       ; (e.g. makes tape usable again).
 
          jsr clrscr_own$
-         rts
-
-; ******************
-; *** deinit_cli ***
-; ******************
-;
-deinit_cli
-         cli
-
-         ; doing this after re-enabling interrupt service routine,
-         ; because of problems with chrout$ and waiting for retrace (see above):
-         ;
-         bit linelen$ + 1
-         bvc exit_graph_done
-         jsr v4_graph_off$ ; (disables graphics mode, enables blank lines)
-exit_graph_done
-         ;
-         ; (not re-enabling first char. rom, because of "goodbye" screen using
-         ;  at-sign..)
-
          rts
 
 ; *********************
@@ -1782,8 +1784,9 @@ init_extradraw_done
       
          rts
 
-savetune jsr deinit_before_cli
-         jsr deinit_cli
+; you need to enable irq's and disable free running mode before this (via acr):
+;
+savetune clrscr$
 
          lda #<tune$
          sta tapesave$
@@ -1848,8 +1851,9 @@ savetune_inc3_done
 cas_save jsr $ffff ; 2 byte. will hold addr. of tape save routine after init().
          jmp main
 
-loadtune jsr deinit_before_cli
-         jsr deinit_cli
+; you need to enable irq's and disable free running mode before this (via acr):
+;
+loadtune clrscr$
 
          lda #1 ; hard-coded to tape nr. 1.
          sta devicenr$
@@ -1874,7 +1878,7 @@ file     jsr deinit_before_cli
          sta zero_word_buf2$ + 1
          jsr keydrawstat$
 
-         jsr deinit_cli
+         cli
 
 filescan jsr chrin$   ; wait, until a button is pressed.
          beq filescan ;
