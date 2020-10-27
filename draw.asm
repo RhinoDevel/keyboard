@@ -9,10 +9,12 @@
 ; *** clear the screen. ***
 ; *************************
 ; ***
+; *** don't use this, if interrupt service routine is disabled (etc.).
+; ***
 ; *** output:
 ; *** -------
 ; *** a = garbage.
-; ***
+; *** 
 ;
 defm clrscr$
          lda #chr_clr$
