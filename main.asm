@@ -11,8 +11,6 @@
 
 ; TODO: Add hint about just entering ("STOP"?) RUN, if load/save failed to file mask.
 
-; TODO: Disable monitor mode change in file mask?!
-
 ; TODO: Relative loading of tune (by manipulating start address).
 
 ; TODO: Implement function to wait on no-keys-pressed and use it in file dialog
