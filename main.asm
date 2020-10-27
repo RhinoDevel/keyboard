@@ -13,10 +13,6 @@
 
 ; TODO: Relative loading of tune (by manipulating start address).
 
-; TODO: Implement function to wait on no-keys-pressed and use it in file dialog
-;       (on entry and before exit and on exit of application after clearing
-;       keyboard buffer?).
-
 ; marcel timm, rhinodevel, 2020mar17
 
 ; ---------------
@@ -1323,6 +1319,8 @@ exit     jsr deinit_before_cli
          sta zero_word_buf2$ + 1
          jsr keydrawstat$
 
+         jsr wait_for_no_key
+
          cli
 
          ; doing this after re-enabling interrupt service routine,
@@ -1877,6 +1875,7 @@ file     jsr deinit_before_cli
          sta zero_word_buf2$ + 1
          jsr keydrawstat$
 
+         jsr wait_for_no_key ; (to be able to reuse keys from main screen)
          cli
 
 filescan jsr chrin$   ; wait, until a button is pressed.
@@ -1895,23 +1894,40 @@ filechk_c
 
          jmp filescan
 
-filedone 
-  
-         ; ~250ms delay:
-         ;
-         lda #$ff
-         sta timer1_low$
-         lda #$fe
-         ldy #4
-filedelay
-         sta timer1_high$
-filedelaya
-         bit via_ifr$
-         bvc filedelaya
-         dey
-         bne filedelay
-
+filedone jsr wait_for_no_key
          jmp main
+
+; ***********************
+; *** wait_for_no_key ***
+; ***********************
+;
+wait_for_no_key
+         ldy #0
+next_row                ; set keyboard row to check (seems to be the way to do
+         sty pia1porta$ ; this, just "overwrite" whole port a with row nr.
+                        ; 0-9).
+         lda pia1portb$ ; loads row's data.
+         ora #1 ; not sure, if this is necessary (test this!).
+         cmp #$ff
+         bne wait_for_no_key
+         iny
+         cpy #10
+         bne next_row
+         rts
+
+;         ; ~250ms delay:
+;         ;
+;         lda #$ff
+;         sta timer1_low$
+;         lda #$fe
+;         ldy #4
+;delay
+;         sta timer1_high$
+;delaya
+;         bit via_ifr$
+;         bvc delaya
+;         dey
+;         bne delay
 
 ; -----------------
 ; --- constants ---
