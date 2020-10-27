@@ -12,11 +12,11 @@ filemask$
          byte 177
          text ' = load from tape #1'
 
-;         byte 2
-;         byte 0
-;         byte 21
-;         byte 178
-;         text ' = load from tape #2'
+         byte 2
+         byte 0
+         byte 21
+         byte 178
+         text ' = load from tape #2'
 
          byte 5
          byte 0
@@ -24,11 +24,11 @@ filemask$
          byte 182
          text ' = save to tape #1'
 
-;         byte 7
-;         byte 0
-;         byte 19 
-;         byte 183
-;         text ' = save to tape #2'
+         byte 7
+         byte 0
+         byte 19 
+         byte 183
+         text ' = save to tape #2'
 
          byte 10
          byte 0

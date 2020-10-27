@@ -1,9 +1,9 @@
 
 ; TODO: Fix bug causing vibrato sometimes no longer working!
 
-; TODO: Remember "all" settings on exit and entering file mask.
+; TODO: Fix bug causing save sometimes lead to playing last (?) note infinitely!
 
-; TODO: Loading/saving from tape #2.
+; TODO: Remember "all" settings on exit and entering file mask.
 
 ; TODO: Add help screen.
 
@@ -1831,7 +1831,8 @@ savetune_inc3_done
          lda zero_word_buf1$ + 1
          sta tape_end$ + 1
 
-         lda #1 ; hard-coded to tape nr. 1.
+savetune_tape_nr
+         lda #1 ; to-be-change in-place for tape nr. 1 or 2.
          sta devicenr$
 
          lda #4 ; hard-coded, see constant, below.
@@ -1850,7 +1851,8 @@ cas_save jsr $ffff ; 2 byte. will hold addr. of tape save routine after init().
 ;
 loadtune clrscr$
 
-         lda #1 ; hard-coded to tape nr. 1.
+loadtune_tape_nr
+         lda #1 ; to-be-change in-place for tape nr. 1 or 2.
          sta devicenr$
 
          lda #4 ; hard-coded, see constant, below.
@@ -1880,10 +1882,31 @@ filescan jsr chrin$   ; wait, until a button is pressed.
          beq filescan ;
 
          cmp #"1"
-         beq loadtune
+         bne filechk_2
+         lda #1
+         sta loadtune_tape_nr + 1
+         jmp loadtune
 
+filechk_2
+         cmp #"2"
+         bne filechk_6
+         lda #2
+         sta loadtune_tape_nr + 1
+         jmp loadtune
+
+filechk_6
          cmp #"6"
+         bne filechk_7
+         lda #1
+         sta savetune_tape_nr + 1
+         jmp savetune
+
+
+filechk_7
+         cmp #"7"
          bne filechk_c
+         lda #2
+         sta savetune_tape_nr + 1
          jmp savetune
 
 filechk_c
