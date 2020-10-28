@@ -90,7 +90,7 @@ pia1ctrlb$ = $e813
 
 ;via_b$ = $e840 ; via port b.
 
-;timer1_low$ = $e844
+timer1_low$ = $e844
 timer1_high$ = $e845
 
 timer2_low$ = $e848 ; low byte of timer 2.

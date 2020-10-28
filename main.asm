@@ -1,10 +1,8 @@
 
-; TODO: Fix bug causing vibrato sometimes no longer working!
-
 ; TODO: Fix bug causing save sometimes lead to playing last (?) note infinitely!
 ;       Same (?) bug caused saving infinitely for $10 notes.
 
-; TODO: Remember "all" settings on exit and entering file mask.
+; TODO: Remember speed and pattern settings on exit and entering file mask.
 
 ; TODO: Add help screen.
 
@@ -1689,13 +1687,12 @@ note_count_end
          lda #0
          sta timer2_low$ ; disables sound by timer reset.
 
-;         ; this should not be necessary, because timers are always running:
-;         ;
-;         ; make sure that timer 1 is running:
-;         ;
-;         lda #$ff
-;         sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
-;         sta timer1_high$ ; clears interrupt flag and starts timer.
+         ; make sure that timer 1 is running (seems to be necessary after tape
+         ; usage, e.g. vibrato won't work, otherwise):
+         ;
+         lda #$ff
+         sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
+         sta timer1_high$ ; clears interrupt flag and starts timer.
 
          lda #16 ; hard-coded. enable free running mode.
          sta via_acr$
@@ -1753,7 +1750,6 @@ init_extradraw40
          lda vibr_val
          ora #':' ; reverse or not, depending on value.
          sta screen_ram$ + vram_offset40_vibr$
-         ;
          ;
          lda #31 ; 31 = <left arrow>
          sta screen_ram$ + vram_offset40_file$
