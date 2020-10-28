@@ -380,7 +380,7 @@ done5_08
          lda flag_pre ; disable is-pressed flag.
          and #flag_pre_vibr_neg
          sta flag_pre
-         lda vibr_val + 1 ; keep rev. on screen, if vibrato is already enabled.
+         lda vibr_val ; keep rev. on screen, if vibrato is already enabled.
          bne done5_10 ; 0 = vibrato is disabled, 1 = vibrato is enabled.
          lda #':'
          sta screen_ram$ + vram_offset40_vibr$
@@ -583,7 +583,7 @@ don2_20_80
          lda flag_pre ; disable is-pressed flag.
          and #flag_pre_vibr_neg
          sta flag_pre
-         lda vibr_val + 1 ; keep rev. on screen, if vibrato is already enabled.
+         lda vibr_val ; keep rev. on screen, if vibrato is already enabled.
          bne done2_40_80 ; 0 = vibrato is disabled, 1 = vibrato is enabled.
          lda #59 ; 59 = ';'.
          sta screen_ram$ + vram_offset80_vibr$
@@ -1002,9 +1002,9 @@ loop_no_upd
          and #flag_upd_vibr_neg ; vibrato button is handled.
          sta flag_upd
          ;
-         lda vibr_val + 1
-         eor #1 ; toggles vibrato enabled/disabled.
-         sta vibr_val + 1
+         lda vibr_val
+         eor #$80 ; toggles vibrato enabled/disabled.
+         sta vibr_val
          ;
          bne vibr_no_upd ; if vibrato got disabled
          lda playingn    ; and there is a note
@@ -1189,7 +1189,7 @@ no_upd_note
          
          ; vibrato (neither note-dependent, nor speed-dependent):
          ;
-vibr_val lda #0 ; 0 = vibrato off, 1 = vibr. on. value will be changed in-place.
+         lda vibr_val ; 0 = vibrato off, $80 = vibrato on.
          beq vibr_end
          lda vibr_beg
          sec
@@ -1341,12 +1341,8 @@ exit_graph_done
 ;
 deinit_before_cli
          lda #0
-         sta vibr_val + 1 ; TODO: implementing keeping vibr. enabled, if wanted!
          sta timer2_low$ ; disables sound by timer reset.
-
-         sta keybufnum$
-         ;
-         ; (sometimes, the exit button char. will still be printed..)
+         sta keybufnum$ ; maybe no longer necessary..
 
          sta via_acr$ ; hard-coded. disables free-running mode
                       ; (e.g. makes tape usable again).
@@ -1727,8 +1723,12 @@ note_count_end
          sta screen_ram$ + vram_offset80_exit$
          ;
          lda loop_val
-         ora #'l' ; reverse or not, depending on loop value.
+         ora #'l' ; reverse or not, depending on value.
          sta screen_ram$ + vram_offset80_loop$
+         ;
+         lda vibr_val
+         ora #$3b ; $3b = ';'. reverse or not, depending on value.
+         sta screen_ram$ + vram_offset80_vibr$
          ;
          lda #':'
          sta screen_ram$ + vram_offset80_file$
@@ -1749,6 +1749,10 @@ init_extradraw40
          lda loop_val
          ora #'l' ; reverse or not, depending on loop value.
          sta screen_ram$ + vram_offset40_loop$
+         ;
+         lda vibr_val
+         ora #':' ; reverse or not, depending on value.
+         sta screen_ram$ + vram_offset40_vibr$
          ;
          ;
          lda #31 ; 31 = <left arrow>
@@ -2001,3 +2005,4 @@ patindex byte 0 ; 1 byte. pattern index.
 ; settings:
 ;
 loop_val byte 0 ; 1 byte. 0 = loop playback off, $80 = loop playback on.
+vibr_val byte 0 ; 1 byte. 0 = vibrato off, $80 = vibrato on.
