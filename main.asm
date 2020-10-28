@@ -316,8 +316,8 @@ done3_10
          lda flag_pre ; disable is-pressed flag.
          and #flag_pre_loop_neg
          sta flag_pre
-         lda loop_val + 1 ; keep rev. on screen, if loop playback is alr. enabl.
-         bne done4_10 ; 0 = loop is disabled, 1 = loop is enabled.
+         lda loop_val ; keep rev. on screen, if loop playback is alr. enabled.
+         bne done4_10 ; 0 = loop is disabled, $80 = loop is enabled.
          lda #'l'
          sta screen_ram$ + vram_offset40_loop$
          jmp done4_10
@@ -623,8 +623,8 @@ done2_40_80
          lda flag_pre ; disable is-pressed flag.
          and #flag_pre_loop_neg
          sta flag_pre
-         lda loop_val + 1 ; keep rev. on screen, if loop playback is alr. enabl.
-         bne done3_20_80 ; 0 = loop is disabled, 1 = loop is enabled.
+         lda loop_val ; keep rev. on screen, if loop playback is alr. enabled.
+         bne done3_20_80 ; 0 = loop is disabled, $80 = loop is enabled.
          lda #'l'
          sta screen_ram$ + vram_offset80_loop$
          jmp done3_20_80
@@ -985,9 +985,9 @@ speed_no_upd
          and #flag_upd_loop_neg ; loop button is handled.
          sta flag_upd
          ;
-         lda loop_val + 1
-         eor #1 ; toggles loop enabled/disabled.
-         sta loop_val + 1
+         lda loop_val
+         eor #$80 ; toggles loop enabled/disabled.
+         sta loop_val
 loop_no_upd
 
          ; enable/disable vibrato, if necessary:
@@ -1071,7 +1071,7 @@ play_tune_ptr_inc_done1
          ; (high and low byte are zero, which is the end of tune marker).
          ;
 
-loop_val lda #0 ; 0 = don't loop, 1 = loop. value will be changed in-place.
+         lda loop_val
          bne play_loop
          ; 
          ; stop playback and enter normal mode:
@@ -1341,7 +1341,6 @@ exit_graph_done
 ;
 deinit_before_cli
          lda #0
-         sta loop_val + 1 ; TODO: implementing keeping loop enabled, if wanted!
          sta vibr_val + 1 ; TODO: implementing keeping vibr. enabled, if wanted!
          sta timer2_low$ ; disables sound by timer reset.
 
@@ -1726,6 +1725,11 @@ note_count_end
 
          lda #'0'
          sta screen_ram$ + vram_offset80_exit$
+         ;
+         lda loop_val
+         ora #'l' ; reverse or not, depending on loop value.
+         sta screen_ram$ + vram_offset80_loop$
+         ;
          lda #':'
          sta screen_ram$ + vram_offset80_file$
          ;
@@ -1741,6 +1745,12 @@ init_extradraw40
 
          lda #')'
          sta screen_ram$ + vram_offset40_exit$
+         ;
+         lda loop_val
+         ora #'l' ; reverse or not, depending on loop value.
+         sta screen_ram$ + vram_offset40_loop$
+         ;
+         ;
          lda #31 ; 31 = <left arrow>
          sta screen_ram$ + vram_offset40_file$
          ;
@@ -1987,3 +1997,7 @@ lastnote byte 0 ; 1 byte.
 playingn byte 0 ; 1 byte. the currently playing note.
 
 patindex byte 0 ; 1 byte. pattern index.
+
+; settings:
+;
+loop_val byte 0 ; 1 byte. 0 = loop playback off, $80 = loop playback on.
