@@ -2,6 +2,7 @@
 ; TODO: Fix bug causing vibrato sometimes no longer working!
 
 ; TODO: Fix bug causing save sometimes lead to playing last (?) note infinitely!
+;       Same (?) bug caused saving infinitely for $10 notes.
 
 ; TODO: Remember "all" settings on exit and entering file mask.
 
