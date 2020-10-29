@@ -1340,7 +1340,7 @@ exit_graph_done
 deinit_before_cli
          lda #0
          sta timer2_low$ ; disables sound by timer reset.
-         sta keybufnum$ ; maybe no longer necessary..
+         ;sta keybufnum$ ; no longer necessary to "clear" keyboard buffer. 
 
          sta via_acr$ ; hard-coded. disables free-running mode
                       ; (e.g. makes tape usable again).
