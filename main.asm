@@ -2,8 +2,6 @@
 ; TODO: Fix bug causing save sometimes lead to playing last (?) note infinitely!
 ;       Same (?) bug caused saving infinitely for $10 notes.
 
-; TODO: Remember pattern settings on exit and entering file mask.
-
 ; TODO: Add help screen.
 
 ; TODO: Add about screen.
@@ -20,8 +18,6 @@ dec_addr1 = 1;main/1000
 dec_addr2 = 0;(main/100) MOD $a
 dec_addr3 = 6;(main/10) MOD $a
 dec_addr4 = 0;main MOD $a
-
-def_pat_index = 0 ; default pattern index (for timbre and sometimes octave).
 
 ; to be used with flag_pre variable:
 ;
@@ -430,14 +426,14 @@ pres6_10 lda flag_pre
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
-         dec patindex
+         dec patt_val
          lda #$ff
-         cmp patindex
+         cmp patt_val
          bne set_pattern_l
          lda #pattern_count$ - 1
-         sta patindex
+         sta patt_val
 set_pattern_l
-         ldy patindex
+         ldy patt_val
          lda patterns$,y
          sta pattern$
          lda #$3b + 128 ; $3b = ';'.
@@ -481,14 +477,14 @@ pres7_10 lda flag_pre
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
-         inc patindex
+         inc patt_val
          lda #pattern_count$
-         cmp patindex
+         cmp patt_val
          bne set_pattern_n
          lda #0
-         sta patindex
+         sta patt_val
 set_pattern_n
-         ldy patindex
+         ldy patt_val
          lda patterns$,y
          sta pattern$
          lda #$3f + 128 ; $3f = '?'.
@@ -757,14 +753,14 @@ pres6_8_80
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
-         dec patindex
+         dec patt_val
          lda #$ff
-         cmp patindex
+         cmp patt_val
          bne set_pattern_l_80
          lda #pattern_count$ - 1
-         sta patindex
+         sta patt_val
 set_pattern_l_80
-         ldy patindex
+         ldy patt_val
          lda patterns$,y
          sta pattern$
          lda #46 + 128 ; 46 = '.'.
@@ -816,14 +812,14 @@ pres8_40_80
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
-         inc patindex
+         inc patt_val
          lda #pattern_count$
-         cmp patindex
+         cmp patt_val
          bne set_pattern_n_80
          lda #0
-         sta patindex
+         sta patt_val
 set_pattern_n_80
-         ldy patindex
+         ldy patt_val
          lda patterns$,y
          sta pattern$
          lda #47 + 128 ; 47 = '/'.
@@ -1592,8 +1588,7 @@ init     ; *** initialize internal variables ***
          sta fndnote2
          sta lastnote
 
-         ldy #def_pat_index ; TODO: keep pattern on exit / re-entry!
-         sty patindex
+         ldy patt_val
          lda patterns$,y
          sta pattern$
 
@@ -1995,10 +1990,9 @@ fndnote2 byte 0 ; 1 byte.
 lastnote byte 0 ; 1 byte.
 playingn byte 0 ; 1 byte. the currently playing note.
 
-patindex byte 0 ; 1 byte. pattern index.
-
 ; settings:
 ;
+patt_val byte 0 ; 1 byte. pattern index (for timbre and sometimes octave).
 loop_val byte 0 ; 1 byte. 0 = loop playback off, $80 = loop playback on.
 vibr_val byte 0 ; 1 byte. 0 = vibrato off, $80 = vibrato on.
 spee_val byte 1 ; 1 byte. speed factor from 1 to 4 for 1x to 4x playback speed.
