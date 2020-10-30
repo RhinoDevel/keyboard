@@ -1790,23 +1790,23 @@ savetune clrscr$
 
          lda #<tune$
          sta tapesave$
-         sta zero_word_buf1$ ; to find end of tune address, below.
+         sta tape_end$ ; we will modify this end of tune address, below.
          lda #>tune$
          sta tapesave$ + 1
-         sta zero_word_buf1$ + 1 ; to find end of tune address, below.
+         sta tape_end$ + 1 ; we will modify this end of tune address, below.
 
-         ; word buffer in zero-page was filled with tune start address, above.
+         ; tune end ptr. in zero-page was filled with tune start address, above.
          ;
-         ; find end of tune marker and store resulting end address for saving to
-         ; tape in the correct place inside zero page:
+         ; find end of tune marker and modify tune end ptr. to hold resulting
+         ; end address + 1 for saving to tape:
          ;
          lda #0 ; (two zero bytes represent the end of tune marker)
 savetune_loop
          ldy #0
-         cmp (zero_word_buf1$),y
+         cmp (tape_end$),y
          bne savetune_not_zero ; not the end of tune marker, low byte is not 0.
          iny
-         cmp (zero_word_buf1$),y
+         cmp (tape_end$),y
          beq savetune_end_found ; branches, if end of tune marker found.
 savetune_not_zero ; end of tune marker not found.
          ldx #3 ; increment pointer to next note/pause or end of tune marker.
@@ -1814,33 +1814,32 @@ savetune_not_zero ; end of tune marker not found.
          ; hard-coded (above): length of one note/pause entry is three bytes.
          ;
 savetune_next_inc
-         inc zero_word_buf1$
+         inc tape_end$
          bne savetune_inc_done
-         inc zero_word_buf1$ + 1
+         inc tape_end$ + 1
 savetune_inc_done
          dex
          bne savetune_next_inc
          jmp savetune_loop ; check next note/pause or end of tune marker.
 savetune_end_found ; end of tune marker (two zeros) was found.
-         inc zero_word_buf1$
-         bne savetune_inc2_done
-         inc zero_word_buf1$ + 1
-savetune_inc2_done
-         inc zero_word_buf1$
-         bne savetune_inc3_done
-         inc zero_word_buf1$ + 1
-savetune_inc3_done
          ;
-         lda zero_word_buf1$
-         sta tape_end$
-         lda zero_word_buf1$ + 1
-         sta tape_end$ + 1
+         ; tape_end$ must point to first address after address of last byte to
+         ; be saved, this is why incrementing twice follows:
+         ;
+         inc tape_end$
+         bne savetune_inc2_done
+         inc tape_end$ + 1
+savetune_inc2_done
+         inc tape_end$
+         bne savetune_inc3_done
+         inc tape_end$ + 1
+savetune_inc3_done
 
 savetune_tape_nr
          lda #1 ; to-be-changed in-place for tape nr. 1 or 2.
          sta devicenr$
 
-         lda #4 ; hard-coded, see constant, below.
+         lda #4 ; hard-coded, see constant file name used below.
          sta fnamelen$
 
          lda #<filename
@@ -1848,7 +1847,7 @@ savetune_tape_nr
          lda #>filename
          sta fnameptr$ + 1
 
-         ldx #0 ; really necessary?
+         ldx #0 ; seems to be necessary.
 cas_save jsr $ffff ; 2 byte. will hold addr. of tape save routine after init().
          jmp main
 
@@ -1860,7 +1859,7 @@ loadtune_tape_nr
          lda #1 ; to-be-change in-place for tape nr. 1 or 2.
          sta devicenr$
 
-         lda #4 ; hard-coded, see constant, below.
+         lda #4 ; hard-coded, see constant file name used below.
          sta fnamelen$
 
          lda #<filename
