@@ -2,7 +2,7 @@
 ; TODO: Fix bug causing save sometimes lead to playing last (?) note infinitely!
 ;       Same (?) bug caused saving infinitely for $10 notes.
 
-; TODO: Remember speed and pattern settings on exit and entering file mask.
+; TODO: Remember pattern settings on exit and entering file mask.
 
 ; TODO: Add help screen.
 
@@ -960,13 +960,13 @@ mode_no_upd
          and #flag_upd_speed_neg ; speed button is handled.
          sta flag_upd
          ;
-         inc speed + 1
+         inc spee_val
          lda #5 ; hard-coded speed maximum is this minus 1.
-         cmp speed + 1
+         cmp spee_val
          bne speed_draw
 speed_to_one
          lda #1
-         sta speed + 1
+         sta spee_val
 speed_draw
          jsr drawspeed
 speed_no_upd
@@ -1029,7 +1029,7 @@ play_mode
          lda #note_none
          sta fndnote2
          ;
-speed    ldy #1 ; (byte value will be changed in-place to modify playback speed)
+         ldy spee_val
 countdown_dec
          lda countdwn
          bne countdown_dec_lsb ; skip dec. msb, because lsb is not zero.
@@ -1378,7 +1378,7 @@ fndnote2_not_set
 ; *****************
 ;
 drawspeed
-         lda speed + 1
+         lda spee_val
          clc
          adc #'0'
          bit linelen$ + 1
@@ -2001,3 +2001,4 @@ patindex byte 0 ; 1 byte. pattern index.
 ;
 loop_val byte 0 ; 1 byte. 0 = loop playback off, $80 = loop playback on.
 vibr_val byte 0 ; 1 byte. 0 = vibrato off, $80 = vibrato on.
+spee_val byte 1 ; 1 byte. speed factor from 1 to 4 for 1x to 4x playback speed.
