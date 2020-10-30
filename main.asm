@@ -1029,8 +1029,7 @@ play_mode
          lda #note_none
          sta fndnote2
          ;
-speed
-         ldy #1 ; (byte value will be changed in-place to modify playback speed)
+speed    ldy #1 ; (byte value will be changed in-place to modify playback speed)
 countdown_dec
          lda countdwn
          bne countdown_dec_lsb ; skip dec. msb, because lsb is not zero.
@@ -1116,7 +1115,7 @@ play_note_nr_inc_done
 play_mode_stuff_end
 
 upd_pat_chk
-         lda flag_upd ; upd. shift pattern on change (for timbre & maybe octave).
+         lda flag_upd ; upd. shift pattern on change (timbre & maybe octave).
          and #flag_upd_pat
          beq no_upd_pat
          lda flag_upd
@@ -1207,11 +1206,11 @@ no_upd_note
          clc
 vibrato  adc #2 ; will get altered in-place, below.
          sta timer2_low$ ; modify frequency in one "direction".
-         lda vibrato+1
+         lda vibrato + 1
          eor #$ff ; flip between (e.g.) 10 and 245 (negative value).
          clc      ;
          adc #1   ;
-         sta vibrato+1 ; update for next freq.-change in other "direction".
+         sta vibrato + 1 ; update for next freq.-change in other "direction".
 vibr_end         
 
 ; * TODO: implement handling of reached recording byte limit!
@@ -1843,7 +1842,7 @@ savetune_inc3_done
          sta tape_end$ + 1
 
 savetune_tape_nr
-         lda #1 ; to-be-change in-place for tape nr. 1 or 2.
+         lda #1 ; to-be-changed in-place for tape nr. 1 or 2.
          sta devicenr$
 
          lda #4 ; hard-coded, see constant, below.

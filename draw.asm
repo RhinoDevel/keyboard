@@ -36,7 +36,7 @@ clrscr_own$
          lda #<screen_ram$
          sta zero_word_buf1$
          lda #>screen_ram$
-         sta zero_word_buf1$+1
+         sta zero_word_buf1$ + 1
 
          lda #chr_spc$
          
@@ -48,7 +48,7 @@ clrscr_own$
 @nexty   sta (zero_word_buf1$),y ; from $??00 to $??ff.
          iny
          bne @nexty
-         inc zero_word_buf1$+1 ; increment high byte.
+         inc zero_word_buf1$ + 1 ; increment high byte.
          dex
          bne @nextx
 
