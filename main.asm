@@ -1945,7 +1945,7 @@ next_row                ; set keyboard row to check (seems to be the way to do
 ;         lda #$ff
 ;         sta timer1_low$
 ;         lda #$fe
-;         ldy #4
+;         ldy #4 ; e.g. replace with #8 for ~500ms delay.
 ;delay
 ;         sta timer1_high$
 ;delaya
