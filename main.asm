@@ -931,7 +931,7 @@ rec_enable
          ; (don't show 0 as note nr., keep showing current note/pause count)
          ;
          lda #rec_is_waiting ; indicates waiting for first note to be played by
-         sta tunenote      ; user to start recording via timer.
+         sta tunenote        ; user to start recording via timer.
          lda #mode_rec
 mode_upd
          sta mode
@@ -1056,7 +1056,6 @@ play_tune_ptr_inc_done1
          ; reached end of tune
          ; (high and low byte are zero, which is the end of tune marker).
          ;
-
          lda loop_val
          bne play_loop
          ; 
