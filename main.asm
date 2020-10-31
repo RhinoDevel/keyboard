@@ -1,12 +1,5 @@
 
-; TODO: Fix bug causing save sometimes lead to playing last (?) note infinitely!
-;       Same (?) bug caused saving infinitely for $10 notes.
-
-; TODO: Add help screen.
-
-; TODO: Add about screen.
-
-; TODO: Relative loading of tune (by manipulating start address).
+; TODO: Fix bug leading to not saving end of tune marker during recording!
 
 ; marcel timm, rhinodevel, 2020mar17
 
