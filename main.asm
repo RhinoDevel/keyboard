@@ -1117,11 +1117,11 @@ no_upd_pat
 
          ; update note to play, if necessary (pattern may alter octave, too):
          
-         ldy fndnote1
-         cpy #note_none
+         lda fndnote1
+         cmp #note_none
          beq upd_note ; no note (key) found. disable currently playing note.
          
-         ; at least one note key is pressed.
+         ; at least one note key is pressed (index held in a register).
          
          ldy fndnote2
          cpy #note_none
@@ -1130,40 +1130,38 @@ no_upd_pat
          ; just one note key is pressed.
          
          sty lastnote ; unsets lastnote (expects #note_none in y register).
-         ldy fndnote1
-         cpy playingn
+         cmp playingn ; (expects fndnote1 in a register)
          beq upd_note_done ; the note is already playing (nothing to do).
          jmp upd_note ; it is not the same as the note playing. update!
 
-         ; two note keys are pressed.
+         ; two note keys are pressed (a holds first, y second note).
          
 did_find_two_notes
-         cpy playingn ; (expects fnd_note2 to be in y register).
+         cpy playingn ; (expects fndnote2 to be in y register)
          beq other_and_playing_found
-         ldy fndnote1
-         cpy playingn
+
+         cmp playingn ; (expects fndnote1 to be in a register)
          bne upd_note ; two note (keys) found, where both are not the
                       ; playing note. this will always use fndnote1.
 
          ; playing note (key) and other note (key) found (in this order).
 
-         ldy fndnote2 ; reorder.
-         sty fndnote1
+         tya ; overwrite playing (first) with other (second) note.
 
-;         ldy playingn ; this is not necessary,
-;         sty fndnote2 ; if fndnote2 will not be used from here on.
+         ; * don't use fndnote1 and fndnote2 from here on (in this iteration). *
 
 other_and_playing_found
-         ;ldy fndnote1 ; this "incidental" arpeggio breaks recording. 
-         ;
-         ldy fndnote1
-         cpy lastnote
+         ; commenting the following two lines out would lead to an "incidental"
+         ; arpeggio, but it would break recording.
+         ; 
+         cmp lastnote ; (expects other note to be in register a)
          beq upd_note_done
 
-upd_note lda playingn
-         sta lastnote
-         sty playingn
-         lda #0
+upd_note ldy playingn
+         sty lastnote
+         sta playingn ; (expects new to-be-played note or pause to be in reg. a)
+         tay ; moves maybe-index of new to-be-played note into y for addressing.
+         lda #0 ; prepared, in case this is no index, but a pause (#note_none).
          cpy #note_none
          beq set_timer2_low
          lda notes$,y ; loads notes' timer 2 low byte value.
