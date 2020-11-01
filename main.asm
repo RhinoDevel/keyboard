@@ -1662,15 +1662,15 @@ note_count_end
 
          ; *** setup system registers ***
 
-         lda #0
-         sta timer2_low$ ; disables sound by timer reset.
-
          ; make sure that timer 1 is running (seems to be necessary after tape
          ; usage, e.g. vibrato won't work, otherwise):
          ;
          lda #$ff
          sta timer1_low$ ; (n.b.: reading would also clear interrupt flag)
          sta timer1_high$ ; clears interrupt flag and starts timer.
+
+         lda #0
+         sta timer2_low$ ; disables sound by timer reset.
 
          lda #16 ; hard-coded. enable free running mode.
          sta via_acr$
