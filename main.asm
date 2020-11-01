@@ -1138,9 +1138,9 @@ no_upd_pat
          
 did_find_two_notes
          cpy playingn ; (expects fndnote2 to be in y register)
-         beq other_and_playing_found
+         beq to_be_played_in_a
 
-         cmp playingn ; (expects fndnote1 to be in a register)
+         cmp playingn ; (expects fndnote1 to be in register a)
          bne upd_note ; two note (keys) found, where both are not the
                       ; playing note. this will always use fndnote1.
 
@@ -1150,11 +1150,11 @@ did_find_two_notes
 
          ; * don't use fndnote1 and fndnote2 from here on (in this iteration). *
 
-other_and_playing_found
+to_be_played_in_a
          ; commenting the following two lines out would lead to an "incidental"
          ; arpeggio, but it would break recording.
          ; 
-         cmp lastnote ; (expects other note to be in register a)
+         cmp lastnote ; (expects to-be-played note in register a)
          beq upd_note_done
 
 upd_note ldy playingn
