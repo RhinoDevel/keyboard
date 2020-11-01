@@ -1568,8 +1568,6 @@ init     ; *** initialize internal variables ***
 
          lda #note_none
          sta playingn
-         sta fndnote1
-         sta fndnote2
          sta lastnote
 
          ldy patt_val
@@ -1968,8 +1966,8 @@ note_nr  word $cafe ; 2 bytes. current note's number (not index).
 note_cnt word $dead ; 2 bytes. current count of notes/pauses stored in ram.
 countdwn word $beef ; 2 bytes. tune countdown.
 rec_note byte $ab   ; 1 byte. it's the note's index in notes$ array.
-fndnote1 byte 0     ; 1 byte.
-fndnote2 byte 0     ; 1 byte.
+fndnote1 byte $cd   ; 1 byte.
+fndnote2 byte $ef   ; 1 byte.
 lastnote byte 0     ; 1 byte.
 playingn byte 0     ; 1 byte. the currently playing note's index in notes$ arr.
 
