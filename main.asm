@@ -233,7 +233,7 @@ pres2_10 lda flag_pre
          bne done2_10 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_rec
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_rec
          sta flag_upd ; request update.
@@ -274,7 +274,7 @@ pres3_10 lda flag_pre
          bne done3_10 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_play
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_play
          sta flag_upd ; request update.
@@ -313,7 +313,7 @@ pres4_10 lda flag_pre
          bne done4_10 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_loop
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_loop
          sta flag_upd ; request update.
@@ -349,7 +349,7 @@ pres5_08 lda flag_pre
          bne done5_08 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_speed
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_speed
          sta flag_upd ; request update.
@@ -377,7 +377,7 @@ pres5_10 lda flag_pre
          bne done5_10 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_vibr
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_vibr
          sta flag_upd ; request update.
@@ -415,7 +415,7 @@ pres6_10 lda flag_pre
          bne done6_10
          lda flag_pre
          ora #flag_pre_pat_l
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
@@ -466,7 +466,7 @@ pres7_10 lda flag_pre
          bne done7_10 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_pat_n
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
@@ -552,7 +552,7 @@ pres2_20_80
          bne don2_20_80 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_speed
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_speed
          sta flag_upd ; request update.
@@ -581,7 +581,7 @@ pres2_40_80
          bne done2_40_80 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_vibr
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_vibr
          sta flag_upd ; request update.
@@ -621,7 +621,7 @@ pres3_20_80
          bne done3_20_80 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_loop
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_loop
          sta flag_upd ; request update.
@@ -663,7 +663,7 @@ pres4_40_80
          bne done4_40_80 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_play
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_play
          sta flag_upd ; request update.
@@ -705,7 +705,7 @@ pres5_20_80
          bne done5_20_80 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_rec
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_rec
          sta flag_upd ; request update.
@@ -742,7 +742,7 @@ pres6_8_80
          bne done6_8_80
          lda flag_pre
          ora #flag_pre_pat_l
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
@@ -801,7 +801,7 @@ pres8_40_80
          bne done8_40_80 ; skips, if press already is processed.
          lda flag_pre
          ora #flag_pre_pat_n
-         sta flag_pre ; rem. cur. key press to be alr. processed.
+         sta flag_pre ; remember current key press to be already processed.
          lda flag_upd
          ora #flag_upd_pat
          sta flag_upd ; request update.
@@ -1964,12 +1964,12 @@ maxnotes word 0 ; 2 bytes. max. count of notes/pauses storable in ram.
 
 note_nr  word $cafe ; 2 bytes. current note's number (not index).
 note_cnt word $dead ; 2 bytes. current count of notes/pauses stored in ram.
-rec_note byte $ab   ; 1 byte. it's the note's index in notes$ array.
 countdwn word $beef ; 2 bytes. tune countdown.
+rec_note byte $ab   ; 1 byte. it's the note's index in notes$ array.
 fndnote1 byte 0     ; 1 byte.
 fndnote2 byte 0     ; 1 byte.
 lastnote byte 0     ; 1 byte.
-playingn byte 0     ; 1 byte. the currently playing note.
+playingn byte 0     ; 1 byte. the currently playing note's index in notes$ arr.
 
 ; settings:
 ;
