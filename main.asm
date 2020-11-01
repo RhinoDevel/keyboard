@@ -1119,31 +1119,31 @@ no_upd_pat
          
          ldy fndnote1
          cpy #note_none
-         beq do_upd_note ; no note (key) found. disable currently playing note.
+         beq upd_note ; no note (key) found. disable currently playing note.
          
-         ; one note (key) was found.
+         ; at least one note key is pressed.
          
          ldy fndnote2
          cpy #note_none
          bne did_find_two_notes
 
-         ; a second note (key) was not found.
+         ; just one note key is pressed.
          
          sty lastnote ; unsets lastnote (expects #note_none in y register).
          ldy fndnote1
          cpy playingn
-         beq no_upd_note ; the note is already playing (nothing to do).
-         jmp do_upd_note ; it is not the same as the note playing. update!
+         beq upd_note_done ; the note is already playing (nothing to do).
+         jmp upd_note ; it is not the same as the note playing. update!
 
-         ; two notes (keys) were found.
+         ; two note keys are pressed.
          
 did_find_two_notes
          cpy playingn ; (expects fnd_note2 to be in y register).
          beq other_and_playing_found
          ldy fndnote1
          cpy playingn
-         bne do_upd_note ; two note (keys) found, where both are not the
-                          ; playing note. this will always use fndnote1.
+         bne upd_note ; two note (keys) found, where both are not the
+                      ; playing note. this will always use fndnote1.
 
          ; playing note (key) and other note (key) found (in this order).
 
@@ -1158,10 +1158,9 @@ other_and_playing_found
          ;
          ldy fndnote1
          cpy lastnote
-         beq no_upd_note
+         beq upd_note_done
 
-do_upd_note
-         lda playingn
+upd_note lda playingn
          sta lastnote
          sty playingn
          lda #0
@@ -1171,7 +1170,7 @@ do_upd_note
 set_timer2_low         
          sta timer2_low$ ; updates register.
          jsr drawnotea ; draws currently playing note.
-no_upd_note
+upd_note_done
          
          ; vibrato (neither note-dependent, nor speed-dependent):
          ;
