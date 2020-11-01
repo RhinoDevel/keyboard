@@ -1564,9 +1564,6 @@ init     ; *** initialize internal variables ***
 
          ; maybe some of these are not really necessary, here:
          ;
-         sta note_nr
-         sta note_nr + 1
-         ;
          sta tunenote   
          ;
          sta countdwn
@@ -1972,14 +1969,14 @@ mode     byte 0 ; 1 byte. 0 = normal, 1 = record, 2 = play.
 
 maxnotes word 0 ; 2 bytes. max. count of notes/pauses storable in ram.
 
-note_nr  word 0 ; 2 bytes. current note's number (not index).
-note_cnt word 0 ; 2 bytes. current count of notes/pauses stored in ram.
-tunenote byte 0 ; 1 byte. it's the note's index in notes$ array.
-countdwn word 0 ; 2 bytes. tune countdown.
-fndnote1 byte 0 ; 1 byte.
-fndnote2 byte 0 ; 1 byte.
-lastnote byte 0 ; 1 byte.
-playingn byte 0 ; 1 byte. the currently playing note.
+note_nr  word $cafe ; 2 bytes. current note's number (not index).
+note_cnt word 0     ; 2 bytes. current count of notes/pauses stored in ram.
+tunenote byte 0     ; 1 byte. it's the note's index in notes$ array.
+countdwn word 0     ; 2 bytes. tune countdown.
+fndnote1 byte 0     ; 1 byte.
+fndnote2 byte 0     ; 1 byte.
+lastnote byte 0     ; 1 byte.
+playingn byte 0     ; 1 byte. the currently playing note.
 
 ; settings:
 ;
