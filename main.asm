@@ -931,7 +931,7 @@ rec_enable
          ; (don't show 0 as note nr., keep showing current note/pause count)
          ;
          lda #rec_is_waiting ; indicates waiting for first note to be played by
-         sta tunenote        ; user to start recording via timer.
+         sta rec_note        ; user to start recording via timer.
          lda #mode_rec
 mode_upd
          sta mode
@@ -1212,7 +1212,7 @@ vibr_end
          ;
          ; record mode:
          ;
-rec_mode lda tunenote
+rec_mode lda rec_note
          cmp #rec_is_waiting
          beq rec_is_waiting_for_first_note
          ;
@@ -1220,7 +1220,7 @@ rec_mode lda tunenote
          ;
          ; next recording step reached, take a measure:
          ;
-         lda tunenote
+         lda rec_note
          cmp playingn
          bne rec_note_changed ; the last memorized note is no longer playing.
          ;
@@ -1260,7 +1260,7 @@ rec_save_countdown_msb
          bne rec_save_note
          inc tune_ptr$ + 1
 rec_save_note
-         lda tunenote
+         lda rec_note
          sta (tune_ptr$),y
          inc note_nr
          bne rec_note_nr_inc_done
@@ -1288,7 +1288,7 @@ rec_next_note
          sta countdwn
          sta countdwn + 1
          lda playingn
-         sta tunenote
+         sta rec_note
 rec_mode_stuff_end
 
          jmp infloop ; restart infinite key processing loop.
@@ -1563,8 +1563,6 @@ init     ; *** initialize internal variables ***
          sta flag_upd ;
 
          ; maybe some of these are not really necessary, here:
-         ;
-         sta tunenote   
          ;
          sta countdwn
          sta countdwn + 1
@@ -1971,7 +1969,7 @@ maxnotes word 0 ; 2 bytes. max. count of notes/pauses storable in ram.
 
 note_nr  word $cafe ; 2 bytes. current note's number (not index).
 note_cnt word 0     ; 2 bytes. current count of notes/pauses stored in ram.
-tunenote byte 0     ; 1 byte. it's the note's index in notes$ array.
+rec_note byte $ab   ; 1 byte. it's the note's index in notes$ array.
 countdwn word 0     ; 2 bytes. tune countdown.
 fndnote1 byte 0     ; 1 byte.
 fndnote2 byte 0     ; 1 byte.
