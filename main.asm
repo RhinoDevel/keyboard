@@ -1150,8 +1150,8 @@ did_find_two_notes
          ldy fndnote2 ; reorder.
          sty fndnote1
 
-         ldy playingn ; this is not necessary,
-         sty fndnote2 ; if fndnote2 will not be used from here on.
+;         ldy playingn ; this is not necessary,
+;         sty fndnote2 ; if fndnote2 will not be used from here on.
 
 other_and_playing_found
          ;ldy fndnote1 ; this "incidental" arpeggio breaks recording. 
