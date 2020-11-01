@@ -926,7 +926,7 @@ normal_enable
          ; enable record mode (must be in normal mode):
          ;
 rec_enable
-         lda #0
+         ;lda #0 ; (a is always 0, here)
          sta note_nr
          sta note_nr + 1
          ; (don't show 0 as note nr., keep showing current note/pause count)
