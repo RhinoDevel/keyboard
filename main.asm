@@ -1193,13 +1193,13 @@ no_upd_note
          ;
          lda notes$,y ; loads notes' timer 2 low byte value.
          clc
-vibrato  adc #2 ; will get altered in-place, below.
+vibr_mod  adc #2 ; will get altered in-place, below.
          sta timer2_low$ ; modify frequency in one "direction".
-         lda vibrato + 1
+         lda vibr_mod + 1
          eor #$ff ; flip between (e.g.) 10 and 245 (negative value).
          clc      ;
          adc #1   ;
-         sta vibrato + 1 ; update for next freq.-change in other "direction".
+         sta vibr_mod + 1 ; update for next freq.-change in other "direction".
 vibr_end         
 
 ; * TODO: implement handling of reached recording byte limit!
@@ -1953,8 +1953,9 @@ pattern$ byte 0 ; 1 byte.
 
 ; --- "private"/"static" ---
 
-vibr_int byte 128 ; vibr_int * 256 microseconds.
-vibr_beg byte 0 ; 1 byte. used for vibrato.
+vibr_int byte 128 ; vibr_int * 256 microseconds = time between vibrato changes.
+vibr_beg byte 0   ; 1 byte. to hold timer 1 's high value memorized when last
+                  ; vibrato change was done.
 
 flag_pre byte 0 ; 1 byte.
 flag_upd byte 0 ; 1 byte.
