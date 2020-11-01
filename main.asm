@@ -1963,7 +1963,7 @@ mode     byte 0 ; 1 byte. 0 = normal, 1 = record, 2 = play.
 maxnotes word 0 ; 2 bytes. max. count of notes/pauses storable in ram.
 
 note_nr  word $cafe ; 2 bytes. current note's number (not index).
-note_cnt word 0     ; 2 bytes. current count of notes/pauses stored in ram.
+note_cnt word $dead ; 2 bytes. current count of notes/pauses stored in ram.
 rec_note byte $ab   ; 1 byte. it's the note's index in notes$ array.
 countdwn word $beef ; 2 bytes. tune countdown.
 fndnote1 byte 0     ; 1 byte.
