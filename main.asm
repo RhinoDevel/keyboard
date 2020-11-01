@@ -1117,12 +1117,6 @@ no_upd_pat
 
          ; update note to play, if necessary (pattern may alter octave, too):
          
-         ldy playingn
-         cpy #note_none
-         bne a_note_is_playing
-         ldy fndnote1
-
-a_note_is_playing
          ldy fndnote1
          cpy #note_none
          beq do_upd_note ; no note (key) found. disable currently playing note.
@@ -1132,13 +1126,19 @@ a_note_is_playing
          ldy fndnote2
          cpy #note_none
          bne did_find_two_notes
-         sty lastnote
-         ldy fndnote1 ; just the one note found.
+
+         ; a second note (key) was not found.
+         
+         sty lastnote ; unsets lastnote (expects #note_none in y register).
+         ldy fndnote1
          cpy playingn
          beq no_upd_note ; the note is already playing (nothing to do).
          jmp do_upd_note ; it is not the same as the note playing. update!
+
+         ; two notes (keys) were found.
+         
 did_find_two_notes
-         cpy playingn ; (expects found_note2 to be in y register).
+         cpy playingn ; (expects fnd_note2 to be in y register).
          beq other_and_playing_found
          ldy fndnote1
          cpy playingn
