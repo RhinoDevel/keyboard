@@ -114,7 +114,8 @@ bas_next word 0
 ; *** main ***
 ; ************
 
-main
+main     cld ; (not necessary because of operating system)
+
          ; initialization stuff to be done before disabling interrupt service
          ; routine (because "jsr chrout$" does somehow cause waiting for retrace
          ; flag to not work correctly):
