@@ -1180,10 +1180,11 @@ no_upd_note
          lda vibr_beg
          sec
          sbc timer1_high$
-         cmp vibr_int     ; compare with timespan to be between vibrato
-                          ; modifications.
-         bcc vibr_end     ; skip and wait a while longer before modifying
-                          ; vibrato again, if not enough time went by.
+         cmp #128     ; compare with timespan to be between vibrato
+                      ; modifications (value * 256 microseconds = timespan
+                      ; between vibrato changes).
+         bcc vibr_end ; skip and wait a while longer before modifying
+                      ; vibrato again, if not enough time went by.
          lda timer1_high$
          sta vibr_beg
          ;
@@ -1193,7 +1194,7 @@ no_upd_note
          ;
          lda notes$,y ; loads notes' timer 2 low byte value.
          clc
-vibr_mod  adc #2 ; will get altered in-place, below.
+vibr_mod adc #2 ; will get altered in-place, below.
          sta timer2_low$ ; modify frequency in one "direction".
          lda vibr_mod + 1
          eor #$ff ; flip between (e.g.) 10 and 245 (negative value).
@@ -1953,7 +1954,6 @@ pattern$ byte 0 ; 1 byte.
 
 ; --- "private"/"static" ---
 
-vibr_int byte 128 ; vibr_int * 256 microseconds = time between vibrato changes.
 vibr_beg byte 0   ; 1 byte. to hold timer 1 's high value memorized when last
                   ; vibrato change was done.
 
