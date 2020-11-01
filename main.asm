@@ -1562,11 +1562,6 @@ init     ; *** initialize internal variables ***
          sta flag_pre ; disables all flags.
          sta flag_upd ;
 
-         ; maybe some of these are not really necessary, here:
-         ;
-         sta countdwn
-         sta countdwn + 1
-
          sta mode ; set to normal mode (equals 0).
 
          lda #note_none
@@ -1970,7 +1965,7 @@ maxnotes word 0 ; 2 bytes. max. count of notes/pauses storable in ram.
 note_nr  word $cafe ; 2 bytes. current note's number (not index).
 note_cnt word 0     ; 2 bytes. current count of notes/pauses stored in ram.
 rec_note byte $ab   ; 1 byte. it's the note's index in notes$ array.
-countdwn word 0     ; 2 bytes. tune countdown.
+countdwn word $beef ; 2 bytes. tune countdown.
 fndnote1 byte 0     ; 1 byte.
 fndnote2 byte 0     ; 1 byte.
 lastnote byte 0     ; 1 byte.
