@@ -1,5 +1,5 @@
 
-; TODO: Fix bug leading to not saving end of tune marker during recording!
+; TODO: fix bug leading to not saving end of tune marker during recording!
 
 ; marcel timm, rhinodevel, 2020mar17
 
@@ -63,28 +63,12 @@ note_none = $ff ; represents a pause "note" / no note.
 ; --- macros ---
 ; --------------
 
-; *********************************************************
-; *** macro to handle note button pressed / not pressed ***
-; *********************************************************
-;
-; "input":    x = row's data.
-;
-; parameters: 1 = column in keyboard matrix (1 byte).
-;             2 = screen code of button's character (1 byte).
-;             3 = offset of character in video ram.
-;             4 = index of note in notes$ (1 byte).
-;             5 = inverted screen code of button's character (1 byte).         
-;
-defm     but_note
-         txa              ; reset a to row's data.
-         and #/1          ; => z-flag = 0, if pressed(!). 1, if not pressed.
-         beq @pressed     ; branches, if pressed.
-         lda #/2
-         bpl @draw        ; (always branches, here)
-@pressed lda #/4
-         jsr trysetfndnote
-         lda #/5
-@draw    sta screen_ram$ + /3    
+defm macro_handle_note_but
+         lda #</1
+         sta zero_word_buf1$
+         lda #>/1
+         sta zero_word_buf1$ + 1
+         jsr handle_note_but
          endm
 
 ; ----------------------
@@ -114,7 +98,7 @@ bas_next word 0
 ; *** main ***
 ; ************
 
-main     cld ; (not necessary because of operating system)
+main     cld ; (at least not necessary because of operating system)
 
          ; initialization stuff to be done before disabling interrupt service
          ; routine (because "jsr chrout$" does somehow cause waiting for retrace
@@ -162,9 +146,9 @@ keyhandling40
          lda pia1portb$ ; loads row's data.
          tax            ; store row's data in x register for reuse.
 
-         but_note 2, '#', vram_offset40_dis2$, 15, 163
-         but_note 4, '%', vram_offset40_fis2$, 18, 165
-         but_note 8, '&', vram_offset40_ais2$, 22, 166
+         macro_handle_note_but notebut40_dis2$
+         macro_handle_note_but notebut40_fis2$
+         macro_handle_note_but notebut40_ais2$
 
          ; file
          ;
@@ -186,8 +170,8 @@ filecheckdone40
          lda pia1portb$
          tax
 
-         but_note 1, '"', vram_offset40_cis2$, 13, 162
-         but_note 4, ''', vram_offset40_gis2$, 20, 167
+         macro_handle_note_but notebut40_cis2$
+         macro_handle_note_but notebut40_gis2$
 
          ; exit
          ;
@@ -208,10 +192,10 @@ exitcheckdone40
          lda pia1portb$
          tax
 
-         but_note 1, 'q', vram_offset40_c02b$, 12, 145 ; (2 buttons used)
-         but_note 2, 'e', vram_offset40_e002$, 16, 133
-         but_note 4, 't', vram_offset40_g002$, 19, 148 
-         but_note 8, 'u', vram_offset40_b002$, 23, 149
+         macro_handle_note_but notebut40_c02b$ ; (2 buttons used)
+         macro_handle_note_but notebut40_e002$
+         macro_handle_note_but notebut40_g002$
+         macro_handle_note_but notebut40_b002$
 
          ; record
          ;
@@ -249,10 +233,10 @@ done2_10
          lda pia1portb$
          tax
 
-         but_note 1, 'w', vram_offset40_d002$, 14, 151
-         but_note 2, 'r', vram_offset40_f002$, 17, 146
-         but_note 4, 'y', vram_offset40_a002$, 21, 153
-         but_note 8, 'i', vram_offset40_c003$, 24, 137 ; (highest note)
+         macro_handle_note_but notebut40_d002$
+         macro_handle_note_but notebut40_f002$
+         macro_handle_note_but notebut40_a002$
+         macro_handle_note_but notebut40_c003$ ; (highest note)
 
          ; play
          ;
@@ -290,9 +274,9 @@ done3_10
          lda pia1portb$
          tax
 
-         but_note 2, 'd', vram_offset40_dis1$,  3, 132
-         but_note 4, 'g', vram_offset40_fis1$,  6, 135
-         but_note 8, 'j', vram_offset40_ais1$, 10, 138
+         macro_handle_note_but notebut40_dis1$
+         macro_handle_note_but notebut40_fis1$
+         macro_handle_note_but notebut40_ais1$
 
          ; loop
          ;
@@ -329,8 +313,8 @@ done4_10
          lda pia1portb$
          tax
 
-         but_note 1, 's', vram_offset40_cis1$,  1, 147
-         but_note 4, 'h', vram_offset40_gis1$,  8, 136
+         macro_handle_note_but notebut40_cis1$
+         macro_handle_note_but notebut40_gis1$
 
          ; speed
          ;
@@ -393,10 +377,10 @@ done5_10
          lda pia1portb$
          tax
 
-         but_note 1, 'z', vram_offset40_c001$,  0, 154 ; (lowest note)
-         but_note 2, 'c', vram_offset40_e001$,  4, 131
-         but_note 4, 'b', vram_offset40_g001$,  7, 130
-         but_note 8, 'm', vram_offset40_b001$, 11, 141
+         macro_handle_note_but notebut40_c001$ ; (lowest note)
+         macro_handle_note_but notebut40_e001$
+         macro_handle_note_but notebut40_g001$
+         macro_handle_note_but notebut40_b001$
 
          ; last-pattern
          ;
@@ -441,13 +425,10 @@ done6_10
          lda pia1portb$
          tax
 
-         but_note 1, 'x', vram_offset40_d001$,  2, 152
-         but_note 2, 'v', vram_offset40_f001$,  5, 150
-         but_note 4, 'n', vram_offset40_a001$,  9, 142
-         
-         but_note 8,  44, vram_offset40_c02a$, 12, 172
-         ;
-         ; 44 = ',' (2 buttons used).
+         macro_handle_note_but notebut40_d001$
+         macro_handle_note_but notebut40_f001$
+         macro_handle_note_but notebut40_a001$
+         macro_handle_note_but notebut40_c02a$ ; (2 buttons used)
 
          ; next-pattern
          ;
@@ -500,8 +481,8 @@ keyhandling80
          lda pia1portb$
          tax
 
-         but_note   1, '2', vram_offset80_cis2$, 13, 178
-         but_note   2, '5', vram_offset80_fis2$, 18, 181
+         macro_handle_note_but notebut80_cis2$
+         macro_handle_note_but notebut80_fis2$
 
          ; *** row 1: ***
 
@@ -510,7 +491,7 @@ keyhandling80
          lda pia1portb$
          tax
 
-         but_note   4, '7', vram_offset80_ais2$, 22, 183   
+         macro_handle_note_but notebut80_ais2$
 
          ; exit
          ;
@@ -531,8 +512,8 @@ exitcheckdone80
          lda pia1portb$
          tax
 
-         but_note   2, 's', vram_offset80_cis1$,  1, 147
-         but_note   8, 'h', vram_offset80_gis1$,  8, 136
+         macro_handle_note_but notebut80_cis1$
+         macro_handle_note_but notebut80_gis1$
 
          ; speed
          ;
@@ -597,9 +578,9 @@ done2_40_80
          lda pia1portb$
          tax
 
-         but_note   2, 'd', vram_offset80_dis1$,  3, 132
-         but_note   4, 'g', vram_offset80_fis1$,  6, 135
-         but_note   8, 'j', vram_offset80_ais1$, 10, 138
+         macro_handle_note_but notebut80_dis1$
+         macro_handle_note_but notebut80_fis1$
+         macro_handle_note_but notebut80_ais1$
  
          ; loop
          ;
@@ -617,7 +598,7 @@ done2_40_80
          sta screen_ram$ + vram_offset80_loop$
          jmp done3_20_80
 pres3_20_80
-        lda flag_pre
+         lda flag_pre
          and #flag_pre_loop
          bne done3_20_80 ; skips, if press already is processed.
          lda flag_pre
@@ -637,10 +618,10 @@ done3_20_80
          lda pia1portb$
          tax
 
-         but_note   2, 'w', vram_offset80_d002$, 14, 151
-         but_note   4, 'r', vram_offset80_f002$, 17, 146
-         but_note   8, 'y', vram_offset80_a002$, 21, 153
-         but_note $20, 'i', vram_offset80_c003$, 24, 137
+         macro_handle_note_but notebut80_d002$
+         macro_handle_note_but notebut80_f002$
+         macro_handle_note_but notebut80_a002$
+         macro_handle_note_but notebut80_c003$
       
          ; play
          ;
@@ -679,10 +660,10 @@ done4_40_80
          lda pia1portb$
          tax
 
-         but_note   1, 'q', vram_offset80_c02b$, 12, 145
-         but_note   2, 'e', vram_offset80_e002$, 16, 133
-         but_note   4, 't', vram_offset80_g002$, 19, 148
-         but_note   8, 'u', vram_offset80_b002$, 23, 149
+         macro_handle_note_but notebut80_c02b$
+         macro_handle_note_but notebut80_e002$
+         macro_handle_note_but notebut80_g002$
+         macro_handle_note_but notebut80_b002$
      
          ; record
          ;
@@ -721,8 +702,8 @@ done5_20_80
          lda pia1portb$
          tax
 
-         but_note   2, 'c', vram_offset80_e001$,  4, 131
-         but_note   4, 'b', vram_offset80_g001$,  7, 130
+         macro_handle_note_but notebut80_e001$
+         macro_handle_note_but notebut80_g001$
 
          ; last-pattern
          ;
@@ -768,10 +749,10 @@ done6_8_80
          lda pia1portb$
          tax
 
-         but_note   1, 'z', vram_offset80_c001$,  0, 154
-         but_note   2, 'v', vram_offset80_f001$,  5, 150
-         but_note   4, 'n', vram_offset80_a001$,  9, 142
-         but_note   8,  44, vram_offset80_c02a$, 12, 172 ; 44 = ','
+         macro_handle_note_but notebut80_c001$
+         macro_handle_note_but notebut80_f001$
+         macro_handle_note_but notebut80_a001$
+         macro_handle_note_but notebut80_c02a$
 
          ; *** row 8: ***
 
@@ -780,8 +761,8 @@ done6_8_80
          lda pia1portb$
          tax
 
-         but_note   2, 'x', vram_offset80_d001$,  2, 152
-         but_note   8, 'm', vram_offset80_b001$, 11, 141
+         macro_handle_note_but notebut80_d001$
+         macro_handle_note_but notebut80_b001$
 
          ; next-pattern
          ;
@@ -827,8 +808,8 @@ done8_40_80
          lda pia1portb$
          tax
 
-         but_note   2, '3', vram_offset80_dis2$, 15, 179
-         but_note   4, '6', vram_offset80_gis2$, 20, 182
+         macro_handle_note_but notebut80_dis2$
+         macro_handle_note_but notebut80_gis2$
 
          ; file
          ;
@@ -1332,32 +1313,6 @@ deinit_before_cli
                       ; (e.g. makes tape usable again).
 
          jsr clrscr_own$
-         rts
-
-; *********************
-; *** trysetfndnote ***
-; ***               ***
-; *** a = input     ***
-; *** y = used      ***
-; *** sets fndnote1 ***
-; *** or fndnote2,  ***
-; *** if not both   ***
-; *** already set.  ***
-; *********************
-;
-trysetfndnote
-         ldy fndnote1
-         cpy #note_none
-         bne fndnote1_already_set
-         sta fndnote1 ; save note's index from a (must not be #note_none, here).
-         rts
-fndnote1_already_set
-         ldy fndnote2
-         cpy #note_none
-         beq fndnote2_not_set
-         rts ; two notes were already found.  
-fndnote2_not_set
-         sta fndnote2 ; save note's index from a (must not be #note_none, here).
          rts
 
 ; *****************
@@ -1919,8 +1874,75 @@ next_row                ; set keyboard row to check (seems to be the way to do
          bne next_row
          rts
 
-;         ; ~250ms delay:
-;         ;
+; ************************************************************
+; *** function to handle note button pressed / not pressed ***
+; ************************************************************
+;
+; "input":          zero_word_buf1$ = address of note data.
+;                   register x      = row's data (will be in x on return, too).
+;
+; note data format: 0 byte $23   ; screen code of button's character.
+;                   1 byte 3     ; column in keyboard matrix.
+;                   2 byte $10   ; index of note in notes$
+;                   3 word $8102 ; absolute position of character in screen ram.
+;
+handle_note_but
+         txa                     ; save row's data.
+         pha                     ;
+
+         ; load button character's screen code into register x:
+         ;
+         ldy #0
+         lda (zero_word_buf1$),y
+         tax
+
+         ; check, if button is pressed or not:
+         ;
+         pla                     ; gets row's data from stack.
+         pha                     ; put it on stack, again (stupid this way?).
+         iny                     ; checks column in keyboard matrix.
+         and (zero_word_buf1$),y ; 0, if pressed(!). 1, if not.
+         bne @draw_char          ; branches, if not pressed.
+
+         ; as button is pressed, reverse its character's screen code which is
+         ; already stored in register x:
+         ;
+         txa
+         ora #%10000000
+         tax
+
+         ; memorize note's index, if not already two indices are memorized:
+         ;
+         iny                     ; loads note's index into register a.
+         lda (zero_word_buf1$),y ;
+         ldy fndnote1
+         bpl @one_note_alr_set   ; hard-coded for #note_none "being negative". 
+         sta fndnote1            ; saves note index (is never #note_none, here).
+         bmi @draw_char          ; (always branches, here)
+@one_note_alr_set
+         ldy fndnote2
+         bpl @draw_char          ; hard-coded for #note_none "being negative".
+         sta fndnote2            ; saves note index (is never #note_none, here).
+
+         ; draw button's character (or reversed character) at its position:
+         ;
+@draw_char
+         ldy #3
+         lda (zero_word_buf1$),y
+         sta zero_word_buf2$
+         iny
+         lda (zero_word_buf1$),y
+         sta zero_word_buf2$ + 1
+         ldy #0
+         txa
+         sta (zero_word_buf2$),y
+
+         pla                     ; restores row's data to register x.
+         tax                     ;
+         rts
+
+;; ~250ms delay:
+;;
 ;         lda #$ff
 ;         sta timer1_low$
 ;         lda #$fe
