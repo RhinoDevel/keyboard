@@ -64,10 +64,10 @@ note_none = $ff ; represents a pause "note" / no note.
 ; --------------
 
 defm macro_handle_note_but
-         lda #</1
-         sta zero_word_buf1$
-         lda #>/1
-         sta zero_word_buf1$ + 1
+         ldx #</1
+         stx zero_word_buf1$
+         ldx #>/1
+         stx zero_word_buf1$ + 1
          jsr handle_note_but
          endm
 
@@ -144,7 +144,6 @@ keyhandling40
          sta pia1porta$ ; this, just "overwrite" whole port a with row nr.
                         ; 0-9).
          lda pia1portb$ ; loads row's data.
-         tax            ; store row's data in x register for reuse.
 
          macro_handle_note_but notebut40_dis2$
          macro_handle_note_but notebut40_fis2$
@@ -154,7 +153,6 @@ keyhandling40
          ;
          ; <left arrow>
          ;
-         txa
          and #$20
          bne filecheckdone40
          ;lda #31 + 128                         ; 31 = <left arrow>. this is
@@ -168,7 +166,6 @@ filecheckdone40
          lda #1     
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut40_cis2$
          macro_handle_note_but notebut40_gis2$
@@ -177,7 +174,6 @@ filecheckdone40
          ;
          ; )
          ;
-         txa
          and #$10
          bne exitcheckdone40
          ;lda #41 + 128                         ; 41 = ')'. this is more or less
@@ -190,7 +186,6 @@ exitcheckdone40
          lda #2     
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut40_c02b$ ; (2 buttons used)
          macro_handle_note_but notebut40_e002$
@@ -201,7 +196,6 @@ exitcheckdone40
          ;
          ; o
          ;
-         txa
          and #$10
          beq pres2_10
          lda flag_pre ; disable is-pressed flag.
@@ -231,7 +225,6 @@ done2_10
          lda #3
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut40_d002$
          macro_handle_note_but notebut40_f002$
@@ -242,7 +235,6 @@ done2_10
          ;
          ; p
          ;
-         txa
          and #$10
          beq pres3_10
          lda flag_pre ; disable is-pressed flag.
@@ -272,7 +264,6 @@ done3_10
          lda #4
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut40_dis1$
          macro_handle_note_but notebut40_fis1$
@@ -282,7 +273,6 @@ done3_10
          ;
          ; l
          ;
-         txa
          and #$10
          beq pres4_10
          lda flag_pre ; disable is-pressed flag.
@@ -311,7 +301,6 @@ done4_10
          lda #5
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut40_cis1$
          macro_handle_note_but notebut40_gis1$
@@ -320,7 +309,7 @@ done4_10
          ;
          ; k
          ;
-         txa
+         tax
          and #8
          beq pres5_08
          lda flag_pre ; disable is-pressed flag.
@@ -340,13 +329,12 @@ pres5_08 lda flag_pre
          sta flag_upd ; request update.
          lda #$0b + 128 ; $0b = 'k'.
          sta screen_ram$ + vram_offset40_spee$
-done5_08
+done5_08 txa
 
          ; vibrato
          ;
          ; :
          ;
-         txa
          and #$10
          beq pres5_10
          lda flag_pre ; disable is-pressed flag.
@@ -375,7 +363,6 @@ done5_10
          lda #6
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut40_c001$ ; (lowest note)
          macro_handle_note_but notebut40_e001$
@@ -386,7 +373,6 @@ done5_10
          ;
          ; ;
          ;
-         txa
          and #$10
          beq pres6_10
          lda flag_pre
@@ -423,7 +409,6 @@ done6_10
          lda #7
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut40_d001$
          macro_handle_note_but notebut40_f001$
@@ -434,7 +419,6 @@ done6_10
          ;
          ; ?
          ;
-         txa
          and #$10
          beq pres7_10
          lda flag_pre ; disable is-pressed flag.
@@ -479,7 +463,6 @@ keyhandling80
          lda #0
          sta pia1porta$          
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut80_cis2$
          macro_handle_note_but notebut80_fis2$
@@ -489,7 +472,6 @@ keyhandling80
          lda #1     
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut80_ais2$
 
@@ -497,7 +479,6 @@ keyhandling80
          ;
          ; '0'
          ;
-         txa
          and #8
          bne exitcheckdone80
          ;lda #48 + 128                         ; 48 = '0'. this is more or less
@@ -510,7 +491,6 @@ exitcheckdone80
          lda #2     
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut80_cis1$
          macro_handle_note_but notebut80_gis1$
@@ -519,7 +499,7 @@ exitcheckdone80
          ;
          ; k
          ;
-         txa
+         tax
          and #$20
          beq pres2_20_80
          lda flag_pre ; disable is-pressed flag.
@@ -541,12 +521,12 @@ pres2_20_80
          lda #$0b + 128 ; $0b = 'k'.
          sta screen_ram$ + vram_offset80_spee$
 don2_20_80
+         txa
 
          ; vibrato
          ;
          ; ;
          ;
-         txa
          and #$40
          beq pres2_40_80
          lda flag_pre ; disable is-pressed flag.
@@ -576,7 +556,6 @@ done2_40_80
          lda #3
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut80_dis1$
          macro_handle_note_but notebut80_fis1$
@@ -586,7 +565,6 @@ done2_40_80
          ;
          ; l
          ;
-         txa
          and #$20
          beq pres3_20_80
          lda flag_pre ; disable is-pressed flag.
@@ -616,7 +594,6 @@ done3_20_80
          lda #4
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut80_d002$
          macro_handle_note_but notebut80_f002$
@@ -627,7 +604,6 @@ done3_20_80
          ;
          ; p
          ;
-         txa
          and #$40
          beq pres4_40_80
          lda flag_pre ; disable is-pressed flag.
@@ -658,7 +634,6 @@ done4_40_80
          lda #5
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut80_c02b$
          macro_handle_note_but notebut80_e002$
@@ -669,7 +644,6 @@ done4_40_80
          ;
          ; o
          ;
-         txa
          and #$20
          beq pres5_20_80
          lda flag_pre ; disable is-pressed flag.
@@ -700,7 +674,6 @@ done5_20_80
          lda #6
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut80_e001$
          macro_handle_note_but notebut80_g001$
@@ -709,7 +682,6 @@ done5_20_80
          ;
          ; .
          ;
-         txa
          and #8
          beq pres6_8_80
          lda flag_pre
@@ -747,7 +719,6 @@ done6_8_80
          lda #7
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut80_c001$
          macro_handle_note_but notebut80_f001$
@@ -759,7 +730,6 @@ done6_8_80
          lda #8
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut80_d001$
          macro_handle_note_but notebut80_b001$
@@ -768,7 +738,6 @@ done6_8_80
          ;
          ; /
          ;
-         txa
          and #$40
          beq pres8_40_80
          lda flag_pre ; disable is-pressed flag.
@@ -806,7 +775,6 @@ done8_40_80
          lda #9
          sta pia1porta$
          lda pia1portb$
-         tax
 
          macro_handle_note_but notebut80_dis2$
          macro_handle_note_but notebut80_gis2$
@@ -815,7 +783,6 @@ done8_40_80
          ;
          ; ':'
          ;
-         txa
          and #$20
          bne filecheckdone80
          ;lda #58 + 128                         ; 58 = ':'. this is more or less
@@ -1879,7 +1846,7 @@ next_row                ; set keyboard row to check (seems to be the way to do
 ; ************************************************************
 ;
 ; "input":          zero_word_buf1$ = address of note data.
-;                   register x      = row's data (will be in x on return, too).
+;                   register a      = row's data (will be in a on return, too).
 ;
 ; note data format: 0 byte $23   ; screen code of button's character.
 ;                   1 byte 3     ; column in keyboard matrix.
@@ -1887,8 +1854,7 @@ next_row                ; set keyboard row to check (seems to be the way to do
 ;                   3 word $8102 ; absolute position of character in screen ram.
 ;
 handle_note_but
-         txa                     ; save row's data.
-         pha                     ;
+         pha                     ; save row's data.
 
          ; load button character's screen code into register x:
          ;
@@ -1937,8 +1903,7 @@ handle_note_but
          txa
          sta (zero_word_buf2$),y
 
-         pla                     ; restores row's data to register x.
-         tax                     ;
+         pla                     ; restores row's data to register a.
          rts
 
 ;; ~250ms delay:
