@@ -1,6 +1,4 @@
 
-; TODO: fix bug leading to not saving end of tune marker during recording!
-
 ; marcel timm, rhinodevel, 2020mar17
 
 ; ---------------
@@ -1376,8 +1374,8 @@ ifdef TGT_PETBV2
          lda #>v4_cas_save$
          sta cas_save + 2
          ; (add more, when necessary)
-         lda #'4'
-         sta basic_version$
+;         lda #'4'
+;         sta basic_version$
          ;
          lda vec_nmi$
          cmp #<$fcfe ; hard-coded: lower byte of basic v2 nmi handling address.
@@ -1394,8 +1392,8 @@ ifdef TGT_PETBV2
          lda #>v2_cas_save$
          sta cas_save + 2
          ; (add more, when necessary)
-         lda #'2'
-         sta basic_version$
+;         lda #'2'
+;         sta basic_version$
 basic_setup_done
 
 endif ;TGT_PETBV2
@@ -1413,8 +1411,8 @@ ifdef TGT_NONE
          lda #>v1_cas_save$
          sta cas_save + 2
          ; (add more, when necessary)
-         lda #'1'
-         sta basic_version$         
+;         lda #'1'
+;         sta basic_version$         
 
 endif ;TGT_NONE
 
