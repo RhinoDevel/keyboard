@@ -5,7 +5,7 @@
 ; --- musical notes' values (to fill via timer 2 's low byte with) ---
 ; --------------------------------------------------------------------
 
-notes$   byte 236 ; 1. c (c-4)
+notes$   byte 236 ; 1. c (c-4 for non-repeating bit pattern)
          byte 223 ; 1. c#
          byte 210 ; 1. d
          byte 198 ; 1. d#
@@ -18,7 +18,7 @@ notes$   byte 236 ; 1. c (c-4)
          byte 132 ; 1. a#
          byte 125 ; 1. b
 
-         byte 117 ; 2. c (c-5); index 12
+         byte 117 ; 2. c (c-5 for non-repeating bit pattern); index 12
          byte 111 ; 2. c#
          byte 104 ; 2. d
          byte  98 ; 2. d#
@@ -31,4 +31,4 @@ notes$   byte 236 ; 1. c (c-4)
          byte  65 ; 2. a#
          byte  61 ; 2. b
 
-         byte  58 ; 3. c (c-6)
+         byte  58 ; 3. c (c-6 for non-repeating bit pattern)
