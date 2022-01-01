@@ -20,7 +20,7 @@ goodbye$ byte 4, 9, 21
          text '**********************************'
 
          byte 10, 0, 39
-         text '++ (c) 2020, rhinodevel, marcel timm ++'
+         text '++ (c) 2022, rhinodevel, marcel timm ++'
 
          byte 12, 0, 40
          text '-- source code: github.com/rhinodevel --'

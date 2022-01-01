@@ -84,7 +84,7 @@ defm macro_handle_note_but
          byte chr_0$ + dec_addr4
          byte ":"
          byte $8f; rem token
-         text " (c) 2020, rhinodevel"
+         text " (c) 2022, rhinodevel"
          byte 0
 bas_next word 0
 
