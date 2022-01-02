@@ -1,9 +1,9 @@
-# RhinoDevel's Musical Keyboard v1.2
+# RhinoDevel's Musical Keyboard v1.4
 The only musical keyboard for Commodore PET/CBM 8-bit machines with live recording functionality, vibrato and more.
 
-[DOWNLOAD current release v1.2 for BASIC v2 and v4, here!](https://github.com/RhinoDevel/keyboard/releases/download/v1.2/keyboard-v1_2-basic_v2_and_v4.prg)
+[DOWNLOAD current release v1.4 for BASIC v2 and v4, here!](https://github.com/RhinoDevel/keyboard/releases/download/v1.4/keyboard-v1_4-basic_v2_and_v4.prg)
 
-[DOWNLOAD current release v1.2 for BASIC v1, here!](https://github.com/RhinoDevel/keyboard/releases/download/v1.2/keyboard-v1_2-basic_v1.prg)
+[DOWNLOAD current release v1.4 for BASIC v1, here!](https://github.com/RhinoDevel/keyboard/releases/download/v1.4/keyboard-v1_4-basic_v1.prg)
 
 ![Screenshot of RhinoDevel's Keyboard](/40col-v1_2.jpg?raw=true)
 
